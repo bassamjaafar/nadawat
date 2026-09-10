@@ -1,12 +1,28 @@
 -- ندوات — full database setup (schema + RLS + demo seed)
--- Paste into the Supabase SQL Editor and run, OR: supabase db push && psql $DB_URL -f supabase/seed.sql
+--
+-- Safe to run repeatedly: the reset block below drops everything this script
+-- owns before recreating it. Intended for the Supabase SQL Editor while there
+-- is no production data. For tracked migrations use `supabase db push` with the
+-- files in supabase/migrations/ instead.
 
 begin;
 
--- ندوات — core schema
--- Reproducible database structure. Apply with the Supabase CLI:
---   supabase db reset            (local)
---   supabase db push             (linked project)
+-- ---------------------------------------------------------------------------
+-- Reset (idempotent)
+-- ---------------------------------------------------------------------------
+drop table if exists consent_events      cascade;
+drop table if exists registrations       cascade;
+drop table if exists debate_participants cascade;
+drop table if exists subscribers         cascade;
+drop table if exists debates             cascade;
+drop table if exists people              cascade;
+drop table if exists site_content        cascade;
+drop table if exists admin_users         cascade;
+drop function if exists is_admin()        cascade;
+drop function if exists set_updated_at()  cascade;
+drop type if exists debate_status     cascade;
+drop type if exists subscriber_status cascade;
+drop type if exists participant_role  cascade;
 
 -- ---------------------------------------------------------------------------
 -- Enums
@@ -18,7 +34,7 @@ create type participant_role as enum ('speaker', 'moderator');
 -- ---------------------------------------------------------------------------
 -- updated_at helper
 -- ---------------------------------------------------------------------------
-create or replace function set_updated_at()
+create function set_updated_at()
 returns trigger
 language plpgsql
 as $$
@@ -51,21 +67,19 @@ create table debates (
   id                 uuid primary key default gen_random_uuid(),
   slug               text not null unique,
   title_ar           text not null,
-  summary_ar         text,                       -- short line for cards / hero
-  description_ar      text,                       -- longer contextual text (detail page)
+  summary_ar         text,
+  description_ar      text,
   status             debate_status not null default 'draft',
   is_published       boolean not null default false,
-  starts_at          timestamptz,                -- date + time of the debate
+  starts_at          timestamptz,
   timezone           text not null default 'Asia/Damascus',
   location_ar        text,
   registration_open  boolean not null default false,
-  broadcast_url      text,                       -- live stream link
-  youtube_url        text,                       -- full recording URL
-  youtube_video_id   text,                       -- 11-char id (thumbnail + embed)
-  cover_image_url    text,                       -- event photograph (upcoming)
+  broadcast_url      text,
+  youtube_url        text,
+  youtube_video_id   text,
+  cover_image_url    text,
   moderator_id       uuid references people (id) on delete set null,
-  -- Room for future archival fields (transcript, reference docs, clips…)
-  -- without a schema change.
   meta               jsonb not null default '{}'::jsonb,
   created_at         timestamptz not null default now(),
   updated_at         timestamptz not null default now()
@@ -83,7 +97,7 @@ create table debate_participants (
   debate_id           uuid not null references debates (id) on delete cascade,
   person_id           uuid not null references people (id) on delete restrict,
   role                participant_role not null default 'speaker',
-  position_label_ar   text,           -- e.g. «مع توسيع الصلاحيات المحلية» (not a vote)
+  position_label_ar   text,
   sort_order          integer not null default 0,
   created_at          timestamptz not null default now(),
   unique (debate_id, person_id)
@@ -91,7 +105,7 @@ create table debate_participants (
 create index debate_participants_debate_idx on debate_participants (debate_id);
 
 -- ---------------------------------------------------------------------------
--- registrations  (per-debate attendance)
+-- registrations
 -- ---------------------------------------------------------------------------
 create table registrations (
   id                    uuid primary key default gen_random_uuid(),
@@ -100,9 +114,9 @@ create table registrations (
   last_name             text not null,
   email                 text not null,
   country               text not null,
-  notify_future_events  boolean not null default false,  -- marketing consent, kept separate
-  consent_at            timestamptz,                     -- set only when marketing consent granted
-  access_token          uuid not null default gen_random_uuid(),  -- for future private event links
+  notify_future_events  boolean not null default false,
+  consent_at            timestamptz,
+  access_token          uuid not null default gen_random_uuid(),
   confirmation_sent_at  timestamptz,
   ip_hash               text,
   user_agent            text,
@@ -112,7 +126,7 @@ create table registrations (
 create index registrations_debate_idx on registrations (debate_id);
 
 -- ---------------------------------------------------------------------------
--- subscribers  (long-term notification list, double opt-in)
+-- subscribers  (double opt-in)
 -- ---------------------------------------------------------------------------
 create table subscribers (
   id                    uuid primary key default gen_random_uuid(),
@@ -121,7 +135,7 @@ create table subscribers (
   email                 text not null unique,
   country               text not null,
   status                subscriber_status not null default 'pending',
-  consent_text          text not null,               -- exact wording shown to the user
+  consent_text          text not null,
   consent_at            timestamptz not null default now(),
   confirmation_token    uuid not null default gen_random_uuid(),
   confirmation_sent_at  timestamptz,
@@ -145,10 +159,10 @@ create trigger subscribers_updated_at before update on subscribers
 -- ---------------------------------------------------------------------------
 create table consent_events (
   id            bigint generated always as identity primary key,
-  subject_type  text not null,   -- 'subscriber' | 'registration'
+  subject_type  text not null,
   subject_id    uuid not null,
   email         text not null,
-  action        text not null,   -- 'opt_in_requested' | 'opt_in_confirmed' | 'unsubscribed' | 'registration'
+  action        text not null,
   consent_text  text,
   ip_hash       text,
   user_agent    text,
@@ -158,32 +172,30 @@ create index consent_events_subject_idx on consent_events (subject_type, subject
 create index consent_events_email_idx on consent_events (email);
 
 -- ---------------------------------------------------------------------------
--- admin_users  (roles — does not preclude adding more admins later)
+-- admin_users  +  is_admin()
 -- ---------------------------------------------------------------------------
 create table admin_users (
   user_id      uuid primary key references auth.users (id) on delete cascade,
-  role         text not null default 'admin',   -- 'admin' | 'editor'
+  role         text not null default 'admin',
   display_name text,
   created_at   timestamptz not null default now()
 );
 
-create or replace function is_admin()
+create function is_admin()
 returns boolean
 language sql
 stable
 security definer
 set search_path = public
 as $$
-  select exists (
-    select 1 from admin_users where user_id = auth.uid()
-  );
+  select exists (select 1 from admin_users where user_id = auth.uid());
 $$;
 
 -- ---------------------------------------------------------------------------
--- site_content  (small custom CMS for About/contact blocks)
+-- site_content  (small custom CMS)
 -- ---------------------------------------------------------------------------
 create table site_content (
-  key         text primary key,          -- e.g. 'about.mission', 'contact.email'
+  key         text primary key,
   value       jsonb not null,
   updated_at  timestamptz not null default now(),
   updated_by  uuid references auth.users (id)
@@ -191,16 +203,9 @@ create table site_content (
 create trigger site_content_updated_at before update on site_content
   for each row execute function set_updated_at();
 
--- ندوات — Row Level Security
---
--- Model:
---  * Public (anon) may read only PUBLISHED debates, their participants, the
---    people involved, and site_content. Nothing else is readable by anon.
---  * registrations / subscribers / consent_events have NO anon or
---    authenticated-user policies — they are written and read exclusively by
---    the server using the service role key (which bypasses RLS).
---  * Admin/editor users (admin_users) get full read/write on content tables.
-
+-- ===========================================================================
+-- Row Level Security
+-- ===========================================================================
 alter table people              enable row level security;
 alter table debates             enable row level security;
 alter table debate_participants enable row level security;
@@ -210,114 +215,61 @@ alter table consent_events      enable row level security;
 alter table admin_users         enable row level security;
 alter table site_content        enable row level security;
 
--- --- people -----------------------------------------------------------------
 create policy "people are publicly readable"
-  on people for select
-  to anon, authenticated
-  using (true);
-
+  on people for select to anon, authenticated using (true);
 create policy "admins manage people"
-  on people for all
-  to authenticated
-  using (is_admin())
-  with check (is_admin());
+  on people for all to authenticated using (is_admin()) with check (is_admin());
 
--- --- debates ---------------------------------------------------------------
 create policy "published debates are publicly readable"
-  on debates for select
-  to anon, authenticated
+  on debates for select to anon, authenticated
   using (is_published = true and status <> 'draft');
-
 create policy "admins read all debates"
-  on debates for select
-  to authenticated
-  using (is_admin());
-
+  on debates for select to authenticated using (is_admin());
 create policy "admins manage debates"
-  on debates for all
-  to authenticated
-  using (is_admin())
-  with check (is_admin());
+  on debates for all to authenticated using (is_admin()) with check (is_admin());
 
--- --- debate_participants -------------------------------------------------
 create policy "participants of published debates are readable"
-  on debate_participants for select
-  to anon, authenticated
-  using (
-    exists (
-      select 1 from debates d
-      where d.id = debate_participants.debate_id
-        and d.is_published = true
-        and d.status <> 'draft'
-    )
-  );
-
+  on debate_participants for select to anon, authenticated
+  using (exists (
+    select 1 from debates d
+    where d.id = debate_participants.debate_id
+      and d.is_published = true and d.status <> 'draft'
+  ));
 create policy "admins manage participants"
-  on debate_participants for all
-  to authenticated
-  using (is_admin())
-  with check (is_admin());
+  on debate_participants for all to authenticated
+  using (is_admin()) with check (is_admin());
 
--- --- registrations (admin read only; writes via service role) ----------
 create policy "admins read registrations"
-  on registrations for select
-  to authenticated
-  using (is_admin());
-
+  on registrations for select to authenticated using (is_admin());
 create policy "admins update registrations"
-  on registrations for update
-  to authenticated
-  using (is_admin())
-  with check (is_admin());
+  on registrations for update to authenticated
+  using (is_admin()) with check (is_admin());
 
--- --- subscribers (admin read only; writes via service role) ------------
 create policy "admins read subscribers"
-  on subscribers for select
-  to authenticated
-  using (is_admin());
-
+  on subscribers for select to authenticated using (is_admin());
 create policy "admins update subscribers"
-  on subscribers for update
-  to authenticated
-  using (is_admin())
-  with check (is_admin());
+  on subscribers for update to authenticated
+  using (is_admin()) with check (is_admin());
 
--- --- consent_events (admin read only) ---------------------------------
 create policy "admins read consent events"
-  on consent_events for select
-  to authenticated
-  using (is_admin());
+  on consent_events for select to authenticated using (is_admin());
 
--- --- admin_users -----------------------------------------------------
 create policy "user sees own admin row"
-  on admin_users for select
-  to authenticated
+  on admin_users for select to authenticated
   using (user_id = auth.uid() or is_admin());
-
 create policy "admins manage admin users"
-  on admin_users for all
-  to authenticated
-  using (is_admin())
-  with check (is_admin());
+  on admin_users for all to authenticated
+  using (is_admin()) with check (is_admin());
 
--- --- site_content --------------------------------------------------
 create policy "site content is publicly readable"
-  on site_content for select
-  to anon, authenticated
-  using (true);
-
+  on site_content for select to anon, authenticated using (true);
 create policy "admins manage site content"
-  on site_content for all
-  to authenticated
-  using (is_admin())
-  with check (is_admin());
+  on site_content for all to authenticated
+  using (is_admin()) with check (is_admin());
 
--- ============ demo seed ============
--- ندوات — demo/seed content
--- Fictional names and topics for design evaluation. Not real people.
--- YouTube IDs are Blender Foundation open movies used as visual placeholders.
-
--- --- people ---------------------------------------------------------------
+-- ===========================================================================
+-- Demo seed  (fictional names & topics; Blender open-movie video IDs)
+-- ===========================================================================
 insert into people (id, name_ar, title_ar, bio_ar, slug) values
   ('11111111-1111-1111-1111-111111111101', 'د. ليلى المصري', 'أستاذة اقتصاد سياسي',
    'تُدرّس الاقتصاد السياسي وتكتب عن سياسات المال العام وإعادة الإعمار. لها أبحاث في تمويل التنمية وحوكمة الموارد.', 'leila-almasri'),
@@ -336,7 +288,6 @@ insert into people (id, name_ar, title_ar, bio_ar, slug) values
   ('11111111-1111-1111-1111-111111111108', 'ريم قاسيون', 'صحفية ومحاوِرة',
    'قدّمت برامج حوارية عن الشأن العام، وتهتمّ بأدب الاختلاف في النقاش.', 'reem-qasioun');
 
--- --- debates ------------------------------------------------------------
 insert into debates (id, slug, title_ar, summary_ar, description_ar, status, is_published,
                      starts_at, timezone, location_ar, registration_open, youtube_url,
                      youtube_video_id, moderator_id) values
@@ -348,7 +299,6 @@ insert into debates (id, slug, title_ar, summary_ar, description_ar, status, is_
    'upcoming', true,
    '2026-10-02T18:00:00+03:00', 'Asia/Damascus', 'بثّ مباشر عبر الإنترنت', true,
    null, null, '11111111-1111-1111-1111-111111111107'),
-
   ('22222222-2222-2222-2222-222222222202',
    'iadat-al-iemar-man-yumawwil',
    'إعادة الإعمار: من يموّل، ومن يقرّر الأولويات؟',
@@ -358,7 +308,6 @@ insert into debates (id, slug, title_ar, summary_ar, description_ar, status, is_
    '2026-06-12T18:00:00+03:00', 'Asia/Damascus', null, false,
    'https://www.youtube.com/watch?v=aqz-KE-bpKQ', 'aqz-KE-bpKQ',
    '11111111-1111-1111-1111-111111111108'),
-
   ('22222222-2222-2222-2222-222222222203',
    'al-taleem-fi-marhala-intiqaliyya',
    'التعليم في مرحلة انتقالية: منهج موحّد أم مناهج متعدّدة؟',
@@ -368,7 +317,6 @@ insert into debates (id, slug, title_ar, summary_ar, description_ar, status, is_
    '2026-03-20T18:00:00+03:00', 'Asia/Damascus', null, false,
    'https://www.youtube.com/watch?v=eRsGyueVLvQ', 'eRsGyueVLvQ',
    '11111111-1111-1111-1111-111111111108'),
-
   ('22222222-2222-2222-2222-222222222204',
    'al-iilaam-al-aam-khidma-am-tawjih',
    'الإعلام العام: خدمة عمومية مستقلّة أم أداة توجيه؟',
@@ -379,7 +327,6 @@ insert into debates (id, slug, title_ar, summary_ar, description_ar, status, is_
    'https://www.youtube.com/watch?v=R6MlUcmOul8', 'R6MlUcmOul8',
    '11111111-1111-1111-1111-111111111107');
 
--- --- debate_participants ---------------------------------------------
 insert into debate_participants (debate_id, person_id, role, position_label_ar, sort_order) values
   ('22222222-2222-2222-2222-222222222201', '11111111-1111-1111-1111-111111111103', 'speaker', 'مع توسيع الصلاحيات المحلية', 0),
   ('22222222-2222-2222-2222-222222222201', '11111111-1111-1111-1111-111111111106', 'speaker', 'مع مركزية انتقالية منضبطة', 1),
@@ -390,7 +337,6 @@ insert into debate_participants (debate_id, person_id, role, position_label_ar, 
   ('22222222-2222-2222-2222-222222222204', '11111111-1111-1111-1111-111111111104', 'speaker', 'مع نموذج خدمة عامة مستقلّ', 0),
   ('22222222-2222-2222-2222-222222222204', '11111111-1111-1111-1111-111111111102', 'speaker', 'مع إشراف عام في المرحلة الانتقالية', 1);
 
--- --- site_content (editable copy blocks) ----------------------------
 insert into site_content (key, value) values
   ('contact.email', '"events@nadawat.org"'::jsonb),
   ('home.institutional_intro',
