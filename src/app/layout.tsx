@@ -54,6 +54,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
+      data-scroll-behavior="smooth"
       className={`${reemKufi.variable} ${plexArabic.variable}`}
     >
       <body className="flex min-h-dvh flex-col bg-cream text-ink">
