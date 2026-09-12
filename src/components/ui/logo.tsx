@@ -3,14 +3,22 @@ import { cn } from "@/lib/cn";
 import { SITE_NAME } from "@/lib/site";
 
 /**
- * Header/footer logo slot.
+ * Header/footer logo slot — the official calligraphic «ندوات» mark.
  *
- * The official logo is an Arabic calligraphic treatment of «ندوات» and will
- * be supplied as an asset. Drop it in `public/brand/` and set
- * `NEXT_PUBLIC_LOGO_URL=/brand/<file>.svg` (SVG or high-quality transparent
- * PNG). Until then a plain wordmark stands in — it is deliberately not a
- * recreation of the calligraphy.
+ * Shipped as two flat-colour PNGs sharing one alpha mask (public/brand/):
+ * olive ink for light backgrounds (header) and cream ink for dark
+ * backgrounds (footer, brand band). Override either via
+ * NEXT_PUBLIC_LOGO_URL / NEXT_PUBLIC_LOGO_URL_CREAM if the asset changes —
+ * e.g. once a true vector (path-based) export exists.
  */
+const DEFAULT_LOGO_OLIVE = "/brand/nadawat-logo.png";
+const DEFAULT_LOGO_CREAM = "/brand/nadawat-logo-cream.png";
+
+// Intrinsic aspect ratio of the source artwork (2200×1008) — keeps layout
+// stable regardless of the rendered size set via className.
+const INTRINSIC_WIDTH = 275;
+const INTRINSIC_HEIGHT = 126;
+
 export function Logo({
   className,
   tone = "olive",
@@ -18,30 +26,19 @@ export function Logo({
   className?: string;
   tone?: "olive" | "cream";
 }) {
-  const src = process.env.NEXT_PUBLIC_LOGO_URL;
-
-  if (src) {
-    return (
-      <Image
-        src={src}
-        alt={SITE_NAME}
-        width={132}
-        height={44}
-        priority
-        className={cn("h-10 w-auto", className)}
-      />
-    );
-  }
+  const src =
+    tone === "cream"
+      ? (process.env.NEXT_PUBLIC_LOGO_URL_CREAM ?? DEFAULT_LOGO_CREAM)
+      : (process.env.NEXT_PUBLIC_LOGO_URL ?? DEFAULT_LOGO_OLIVE);
 
   return (
-    <span
-      className={cn(
-        "font-display text-[1.6rem] font-semibold leading-none tracking-normal",
-        tone === "cream" ? "text-cream" : "text-olive",
-        className,
-      )}
-    >
-      {SITE_NAME}
-    </span>
+    <Image
+      src={src}
+      alt={SITE_NAME}
+      width={INTRINSIC_WIDTH}
+      height={INTRINSIC_HEIGHT}
+      priority
+      className={cn("h-9 w-auto", className)}
+    />
   );
 }
