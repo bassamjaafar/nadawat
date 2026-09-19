@@ -154,10 +154,36 @@ against the same `subscribers` table later.
 
 ## Logo
 
-Header/footer read `NEXT_PUBLIC_LOGO_URL`. Drop the official calligraphic
-`ندوات` asset into `public/brand/` (SVG or high-quality transparent PNG) and set
-`NEXT_PUBLIC_LOGO_URL=/brand/<file>`. Until then a plain wordmark stands in — it
-is not a font recreation of the calligraphy.
+The official calligraphic `ندوات` mark is real vector art, inlined as
+`src/components/ui/logo-mark.tsx` (paths sourced from
+`src/components/ui/logo-mark-data.ts`) with `fill="currentColor"`, so the same
+asset recolours for the cream header and the olive footer via CSS — no
+separate light/dark files. `NEXT_PUBLIC_LOGO_URL` / `_CREAM` remain as an
+escape hatch to swap in an external image instead; see `logo.tsx`.
+
+The formal institutional name, **المنتدى السوري للحوار**, is set as real text
+(`ORG_NAME` in `src/lib/site.ts`) beside the mark in the header and footer —
+not an image, so it stays sharp and themeable. `public/brand/nadawat-mark-512.png`
+and the favicon/apple-icon are a square crop of the same mark, for icons/avatars.
+
+## Homepage control
+
+The homepage is fully automatic by default: it shows the soonest debate with
+status `upcoming`, or — if none is scheduled — falls back to an institutional
+layout featuring the latest `completed`/`archived` debate.
+
+To **override** that (e.g. more than one debate is marked `upcoming`, or you
+want a specific past debate spotlighted), set one row in `site_content`:
+
+```sql
+insert into site_content (key, value) values
+  ('home.featured_debate_slug', '"the-debate-slug"'::jsonb)
+on conflict (key) do update set value = excluded.value;
+```
+
+Delete that row (or set its value to `null`) to return to the automatic
+behaviour. This is a deliberately low-tech lever — a proper one-click toggle
+belongs in the admin panel (see Roadmap) once that exists.
 
 ---
 

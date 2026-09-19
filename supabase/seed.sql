@@ -80,3 +80,8 @@ insert into site_content (key, value) values
   ('contact.email', '"events@nadawat.org"'::jsonb),
   ('home.institutional_intro',
    '"تنظّم ندوات مناظرات دوريّة بين أصحاب مواقف مختلفة حول قضايا سوريا، وتحفظها أرشيفًا عامًّا مفتوحًا."'::jsonb);
+
+-- Homepage override — see docs/design-system.md / README for how
+-- 'home.featured_debate_slug' pins a specific debate to the homepage,
+-- overriding the automatic "soonest upcoming, else latest" selection.
+-- Left unset here so the demo behaves automatically.

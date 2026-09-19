@@ -3,6 +3,7 @@ import { Logo } from "@/components/ui/logo";
 import {
   CONTACT_EMAIL,
   FOOTER_NAV,
+  ORG_NAME,
   SITE_NAME,
   SITE_TAGLINE,
 } from "@/lib/site";
@@ -16,7 +17,16 @@ export function SiteFooter() {
       <div className="container-page section-y-sm">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="max-w-sm">
-            <Logo tone="cream" />
+            <div className="flex items-center gap-3">
+              <Logo tone="cream" />
+              <span
+                aria-hidden="true"
+                className="h-7 w-px bg-cream/25"
+              />
+              <span className="text-[0.9rem] font-medium leading-tight text-cream/85">
+                {ORG_NAME}
+              </span>
+            </div>
             <p className="mt-4 text-[0.95rem] leading-7 text-cream/70">
               {SITE_NAME} منصّة للمناظرات المنظّمة والحوار العام حول الشأن
               السوري. {SITE_TAGLINE}.

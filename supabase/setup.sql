@@ -342,4 +342,14 @@ insert into site_content (key, value) values
   ('home.institutional_intro',
    '"تنظّم ندوات مناظرات دوريّة بين أصحاب مواقف مختلفة حول قضايا سوريا، وتحفظها أرشيفًا عامًّا مفتوحًا."'::jsonb);
 
+-- Homepage override (left unset = fully automatic: soonest "upcoming" debate,
+-- else the latest completed/archived one). To pin a specific debate to the
+-- homepage instead, set/replace this row with its slug:
+--
+--   insert into site_content (key, value) values
+--     ('home.featured_debate_slug', '"al-lamarkaziyya-al-idariyya"'::jsonb)
+--   on conflict (key) do update set value = excluded.value;
+--
+-- Delete the row (or set the value to null) to go back to automatic.
+
 commit;

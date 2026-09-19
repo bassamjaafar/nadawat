@@ -5,6 +5,8 @@
 export const SITE_NAME = "ندوات";
 export const SITE_NAME_LATIN = "Nadawat";
 export const SITE_TAGLINE = "نختلف باحترام";
+/** Formal institutional name, set beside the logo mark in the header/footer. */
+export const ORG_NAME = "المنتدى السوري للحوار";
 export const SITE_DESCRIPTION =
   "منصّة عربية للمناظرات المنظّمة والحوار العام الرصين حول القضايا السياسية والاقتصادية والاجتماعية والمدنية في سوريا.";
 

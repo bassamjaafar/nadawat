@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/cn";
-import { PRIMARY_NAV, SITE_NAME } from "@/lib/site";
+import { ORG_NAME, PRIMARY_NAV } from "@/lib/site";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -44,12 +44,15 @@ export function SiteHeader() {
       )}
     >
       <div className="container-page flex h-[4.75rem] items-center justify-between gap-6">
-        <Link
-          href="/"
-          aria-label={SITE_NAME}
-          className="flex items-center py-2 pe-2"
-        >
+        <Link href="/" className="flex items-center gap-3 py-2 pe-2">
           <Logo />
+          <span
+            aria-hidden="true"
+            className="hidden h-8 w-px bg-line-strong sm:block"
+          />
+          <span className="hidden text-[0.95rem] font-medium leading-tight text-olive sm:block">
+            {ORG_NAME}
+          </span>
         </Link>
 
         <nav aria-label="التنقّل الرئيسي" className="hidden md:block">

@@ -8,6 +8,10 @@ import type {
   Person,
 } from "@/lib/types";
 import { FIXTURE_DEBATES } from "@/lib/data/fixtures";
+import { getSiteContentValue } from "@/lib/data/site-content";
+
+/** site_content key that manually pins a debate to the homepage. See getFeaturedDebate(). */
+export const FEATURED_DEBATE_KEY = "home.featured_debate_slug";
 
 const PERSON_COLUMNS = "id, name_ar, title_ar, bio_ar, image_url, slug";
 
@@ -62,7 +66,7 @@ function mapDetail(row: Row): DebateDetail {
   };
 }
 
-function toSummary(d: DebateDetail): DebateSummary {
+export function toSummary(d: DebateDetail): DebateSummary {
   return {
     id: d.id,
     slug: d.slug,
@@ -170,6 +174,23 @@ export async function getDebateBySlug(
     return null;
   }
   return data ? mapDetail(data as Row) : null;
+}
+
+/**
+ * Manual homepage override. By default the homepage picks the soonest
+ * upcoming debate, or falls back to the latest past one — fully automatic.
+ * To pin a specific debate instead (e.g. several are "upcoming" at once, or
+ * you want a particular past debate spotlighted), set a row in site_content:
+ *
+ *   key   = 'home.featured_debate_slug'
+ *   value = "the-debate-slug"   (a JSON string; quotes included)
+ *
+ * Clear the row (or set it to null) to return to the automatic behaviour.
+ */
+export async function getFeaturedDebate(): Promise<DebateDetail | null> {
+  const value = await getSiteContentValue(FEATURED_DEBATE_KEY);
+  if (typeof value !== "string" || !value.trim()) return null;
+  return getDebateBySlug(value.trim());
 }
 
 export async function getRelatedDebates(

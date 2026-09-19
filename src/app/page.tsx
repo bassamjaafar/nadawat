@@ -4,7 +4,12 @@ import { BrandStatement } from "@/components/home/brand-statement";
 import { RecentDebates } from "@/components/home/recent-debates";
 import { SubscribeSection } from "@/components/home/subscribe-section";
 import { AboutPreview } from "@/components/home/about-preview";
-import { getRecentDebates, getUpcomingDebate } from "@/lib/data/debates";
+import {
+  getFeaturedDebate,
+  getRecentDebates,
+  getUpcomingDebate,
+  toSummary,
+} from "@/lib/data/debates";
 
 // Homepage reflects live scheduling — revalidate frequently.
 export const revalidate = 120;
@@ -18,10 +23,17 @@ export default async function HomePage({
   const forceInstitutional =
     process.env.NODE_ENV !== "production" && params.preview === "institutional";
 
-  const [upcoming, recent] = await Promise.all([
-    forceInstitutional ? Promise.resolve(null) : getUpcomingDebate(),
+  // A debate manually pinned via site_content (see getFeaturedDebate) always
+  // wins over the automatic "soonest upcoming, else latest" selection below —
+  // that's the "convenient way to control the homepage" without an admin UI yet.
+  const featured = forceInstitutional ? null : await getFeaturedDebate();
+
+  const [autoUpcoming, recent] = await Promise.all([
+    featured || forceInstitutional ? Promise.resolve(null) : getUpcomingDebate(),
     getRecentDebates(3),
   ]);
+
+  const upcoming = featured?.status === "upcoming" ? featured : autoUpcoming;
 
   if (upcoming) {
     return (
@@ -35,12 +47,19 @@ export default async function HomePage({
     );
   }
 
+  // A pinned, non-upcoming debate takes the "latest debate" spot instead of
+  // whatever is chronologically newest.
+  const recentForDisplay =
+    featured && featured.status !== "upcoming"
+      ? [toSummary(featured), ...recent.filter((d) => d.id !== featured.id)]
+      : recent;
+
   return (
     <>
       <InstitutionalHero />
       <BrandStatement />
-      {recent.length ? (
-        <RecentDebates debates={recent} variant="feature" />
+      {recentForDisplay.length ? (
+        <RecentDebates debates={recentForDisplay} variant="feature" />
       ) : null}
       <AboutPreview />
       <SubscribeSection />
