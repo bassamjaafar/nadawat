@@ -62,7 +62,7 @@ export function DebateCard({
   debate: DebateSummary;
   priority?: boolean;
 }) {
-  const href = `/debates/${debate.slug}`;
+  const href = `/events/${debate.slug}`;
   return (
     <article className="group flex flex-col gap-4">
       <Link href={href} tabIndex={-1} aria-hidden="true" className="block">

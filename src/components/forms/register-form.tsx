@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useId } from "react";
-import { registerAction } from "@/app/debates/[slug]/actions";
+import { registerAction } from "@/app/events/[slug]/actions";
 import { Button } from "@/components/ui/button";
 import {
   CheckboxField,

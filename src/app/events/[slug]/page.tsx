@@ -39,12 +39,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: debate.title_ar,
     description,
-    alternates: { canonical: `/debates/${debate.slug}` },
+    alternates: { canonical: `/events/${debate.slug}` },
     openGraph: {
       type: "article",
       title: `${debate.title_ar} — ${SITE_NAME}`,
       description,
-      url: absoluteUrl(`/debates/${debate.slug}`),
+      url: absoluteUrl(`/events/${debate.slug}`),
       images: image ? [{ url: image }] : undefined,
     },
     twitter: {
@@ -71,7 +71,7 @@ export default async function DebatePage({ params }: Params) {
     <article className="pb-24">
       <div className="container-page pt-12 sm:pt-16">
         <Link
-          href="/debates"
+          href="/events"
           className="text-meta text-muted transition-colors hover:text-olive"
         >
           → جميع الفعاليات

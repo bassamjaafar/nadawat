@@ -31,7 +31,7 @@ export async function registerForDebate(
   const debateWhen = debate.starts_at
     ? `${formatDate(debate.starts_at, debate.timezone)} — ${formatTime(debate.starts_at, debate.timezone)}`
     : "يُعلَن لاحقًا";
-  const debateUrl = absoluteUrl(`/debates/${debate.slug}`);
+  const debateUrl = absoluteUrl(`/events/${debate.slug}`);
 
   const sendConfirmation = () =>
     sendEmail({

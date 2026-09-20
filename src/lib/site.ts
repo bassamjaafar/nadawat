@@ -25,14 +25,14 @@ export type NavItem = { href: string; label: string };
 
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/", label: "الرئيسية" },
-  { href: "/debates", label: "الفعاليات" },
+  { href: "/events", label: "الفعاليات" },
   { href: "/about", label: "عن ندوات" },
   { href: "/subscribe", label: "اشترك بالتحديثات" },
   { href: "/contact", label: "تواصل معنا" },
 ];
 
 export const FOOTER_NAV: NavItem[] = [
-  { href: "/debates", label: "الفعاليات" },
+  { href: "/events", label: "الفعاليات" },
   { href: "/about", label: "عن ندوات" },
   { href: "/subscribe", label: "اشترك بالتحديثات" },
   { href: "/contact", label: "تواصل معنا" },

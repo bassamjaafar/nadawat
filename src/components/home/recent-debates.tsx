@@ -26,7 +26,7 @@ export function RecentDebates({
           </h2>
         </div>
         <div className="hidden shrink-0 sm:block">
-          <ArrowLink href="/debates">عرض جميع الفعاليات</ArrowLink>
+          <ArrowLink href="/events">عرض جميع الفعاليات</ArrowLink>
         </div>
       </div>
 
@@ -43,14 +43,14 @@ export function RecentDebates({
       )}
 
       <div className="mt-10 sm:hidden">
-        <ArrowLink href="/debates">عرض جميع الفعاليات</ArrowLink>
+        <ArrowLink href="/events">عرض جميع الفعاليات</ArrowLink>
       </div>
     </section>
   );
 }
 
 function FeatureDebate({ debate }: { debate: DebateSummary }) {
-  const href = `/debates/${debate.slug}`;
+  const href = `/events/${debate.slug}`;
   return (
     <article className="group mt-10 grid gap-8 md:grid-cols-2 md:items-center">
       <Link href={href} aria-hidden="true" tabIndex={-1}>

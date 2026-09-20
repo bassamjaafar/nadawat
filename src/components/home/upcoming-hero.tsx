@@ -14,7 +14,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 }
 
 export function UpcomingHero({ debate }: { debate: DebateDetail }) {
-  const href = `/debates/${debate.slug}`;
+  const href = `/events/${debate.slug}`;
 
   return (
     <section aria-labelledby="upcoming-title" className="container-page pt-10 pb-4 sm:pt-16">

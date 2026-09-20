@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "الفعاليات",
   description:
     "أرشيف فعاليات ندوات: نقاشات منظّمة حول قضايا سياسية واقتصادية واجتماعية ومدنية تخصّ سوريا.",
-  alternates: { canonical: "/debates" },
+  alternates: { canonical: "/events" },
 };
 
 function groupByYear(debates: DebateSummary[]) {
@@ -52,7 +52,7 @@ export default async function DebatesPage() {
           </p>
           <div className="mt-4 grid gap-6 sm:grid-cols-[0.9fr_1.1fr] sm:items-center">
             <Link
-              href={`/debates/${upcoming.slug}`}
+              href={`/events/${upcoming.slug}`}
               aria-hidden="true"
               tabIndex={-1}
               className="group block sm:max-w-sm"
@@ -62,7 +62,7 @@ export default async function DebatesPage() {
             <div>
               <h2 className="text-h2 text-ink">
                 <Link
-                  href={`/debates/${upcoming.slug}`}
+                  href={`/events/${upcoming.slug}`}
                   className="transition-colors hover:text-olive"
                 >
                   {upcoming.title_ar}
@@ -74,7 +74,7 @@ export default async function DebatesPage() {
                 </p>
               ) : null}
               <div className="mt-4">
-                <ArrowLink href={`/debates/${upcoming.slug}`}>
+                <ArrowLink href={`/events/${upcoming.slug}`}>
                   التفاصيل والتسجيل
                 </ArrowLink>
               </div>
@@ -110,7 +110,7 @@ export default async function DebatesPage() {
 }
 
 function ArchiveRow({ debate }: { debate: DebateSummary }) {
-  const href = `/debates/${debate.slug}`;
+  const href = `/events/${debate.slug}`;
   return (
     <article className="group grid gap-5 py-8 sm:grid-cols-[13rem_1fr] sm:gap-7">
       <Link href={href} aria-hidden="true" tabIndex={-1} className="block">
