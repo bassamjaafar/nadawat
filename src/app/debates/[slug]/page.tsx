@@ -130,7 +130,7 @@ export default async function DebatePage({ params }: Params) {
           {isUpcoming && debate.registration_open ? (
             <section
               id="register"
-              className="mt-14 scroll-mt-24 border-t border-line pt-10"
+              className="mt-14 scroll-mt-[7rem] border-t border-line pt-10"
             >
               <h2 className="text-h2 text-ink">سجّل حضورك</h2>
               <p className="mt-3 max-w-[40rem] text-[1rem] leading-8 text-muted">

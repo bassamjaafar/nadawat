@@ -35,7 +35,7 @@ export function Logo({
         width={INTRINSIC_WIDTH}
         height={INTRINSIC_HEIGHT}
         priority
-        className={cn("h-9 w-auto", className)}
+        className={cn("h-[4.5rem] w-auto", className)}
       />
     );
   }
@@ -43,7 +43,7 @@ export function Logo({
   return (
     <LogoMark
       className={cn(
-        "h-9 w-auto",
+        "h-[4.5rem] w-auto",
         tone === "cream" ? "text-cream" : "text-olive",
         className,
       )}

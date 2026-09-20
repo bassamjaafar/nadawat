@@ -43,7 +43,7 @@ export function SiteHeader() {
           : "border-transparent bg-cream",
       )}
     >
-      <div className="container-page flex h-[4.75rem] items-center justify-between gap-6">
+      <div className="container-page flex h-[7rem] items-center justify-between gap-6">
         <Link href="/" className="flex items-center gap-3 py-2 pe-2">
           <Logo />
           <span
@@ -114,7 +114,7 @@ export function SiteHeader() {
       <div
         id="mobile-nav"
         hidden={!open}
-        className="fixed inset-0 top-[4.75rem] z-40 bg-cream md:hidden"
+        className="fixed inset-0 top-[7rem] z-40 bg-cream md:hidden"
       >
         <nav aria-label="التنقّل الرئيسي" className="container-page py-6">
           <ul className="flex flex-col divide-y divide-line">
