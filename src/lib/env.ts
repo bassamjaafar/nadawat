@@ -23,6 +23,12 @@ const schema = z.object({
 
   /** Salt for hashing IP addresses stored alongside consent records. */
   CONSENT_IP_SALT: z.string().min(1).default("nadawat-dev-salt"),
+
+  // Cloudflare Turnstile (bot protection on the subscribe form). NEXT_PUBLIC_
+  // site key must NOT be marked "Sensitive" in Vercel — see the
+  // NEXT_PUBLIC_SUPABASE_* incident for exactly why that silently breaks.
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1).optional(),
+  TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
 });
 
 // A dashboard-added env var left blank arrives as "" (not unset) — treat that
@@ -43,6 +49,10 @@ const parsed = schema.safeParse({
   EMAIL_FROM: orUnset(process.env.EMAIL_FROM),
   EMAIL_REPLY_TO: orUnset(process.env.EMAIL_REPLY_TO),
   CONSENT_IP_SALT: orUnset(process.env.CONSENT_IP_SALT),
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: orUnset(
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  ),
+  TURNSTILE_SECRET_KEY: orUnset(process.env.TURNSTILE_SECRET_KEY),
 });
 
 if (!parsed.success) {
@@ -63,3 +73,7 @@ export const hasSupabase = Boolean(
 export const hasSupabaseAdmin = Boolean(hasSupabase && SUPABASE_ADMIN_KEY);
 
 export const hasResend = Boolean(env.RESEND_API_KEY);
+
+export const hasTurnstile = Boolean(
+  env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY,
+);

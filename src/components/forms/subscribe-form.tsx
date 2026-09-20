@@ -9,9 +9,11 @@ import {
   SelectField,
   TextField,
 } from "@/components/ui/field";
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 import { COUNTRIES } from "@/lib/countries";
 import { IDLE_FORM_STATE } from "@/lib/forms";
 import { SUBSCRIBE_CONSENT_TEXT } from "@/lib/validation";
+import { env, hasTurnstile } from "@/lib/env";
 
 export function SubscribeForm({ compact = false }: { compact?: boolean }) {
   const [state, formAction, pending] = useActionState(
@@ -107,6 +109,10 @@ export function SubscribeForm({ compact = false }: { compact?: boolean }) {
       </CheckboxField>
 
       <Honeypot />
+
+      {hasTurnstile ? (
+        <TurnstileWidget siteKey={env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} />
+      ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <Button type="submit" disabled={pending}>

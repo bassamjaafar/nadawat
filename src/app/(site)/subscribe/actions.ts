@@ -3,6 +3,7 @@
 import { requestFingerprint } from "@/lib/security";
 import { requestSubscription } from "@/lib/data/subscribers";
 import { subscribeSchema, fieldErrors } from "@/lib/validation";
+import { verifyTurnstile } from "@/lib/turnstile";
 import type { FormState } from "@/lib/forms";
 
 export async function subscribeAction(
@@ -22,6 +23,16 @@ export async function subscribeAction(
   // Honeypot: a bot filled the hidden field — respond as if successful.
   if (parsed.data.company) {
     return { status: "success" };
+  }
+
+  const turnstileOk = await verifyTurnstile(
+    formData.get("cf-turnstile-response") as string | null,
+  );
+  if (!turnstileOk) {
+    return {
+      status: "error",
+      message: "تعذّر التحقّق من أنّك لست روبوتًا. أعد المحاولة.",
+    };
   }
 
   const fp = await requestFingerprint();
