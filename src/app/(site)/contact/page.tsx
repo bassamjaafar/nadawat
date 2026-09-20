@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/ui/page-header";
-import { CONTACT_EMAIL } from "@/lib/site";
+import { ContactForm } from "@/components/forms/contact-form";
 
 export const metadata: Metadata = {
   title: "تواصل معنا",
@@ -14,26 +14,12 @@ export default function ContactPage() {
       <PageHeader
         kicker="تواصل معنا"
         title="نحبّ أن نسمع منك"
-        lede="نقرأ كلّ رسالة تصلنا: اقتراح موضوع لندوة، ترشيح ضيف أو محاور، ملاحظة على عملنا، أو استفسار من وسائل الإعلام."
+        lede="نقرأ كلّ رسالة تصلنا: اقتراح موضوع لندوة، ترشيح ضيف أو محاور، ملاحظة على عملنا، طلب تطوّع أو دعم، أو استفسار من وسائل الإعلام."
       />
 
       <div className="container-page section-y">
         <div className="max-w-[40rem]">
-          <p className="text-kicker font-medium uppercase text-muted">
-            البريد الإلكتروني
-          </p>
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            dir="ltr"
-            className="mt-2 inline-block font-display text-h2 text-olive underline decoration-line-strong underline-offset-8 transition-colors hover:decoration-olive"
-          >
-            {CONTACT_EMAIL}
-          </a>
-          <p className="mt-6 text-[1rem] leading-8 text-muted">
-            هذا صندوقٌ مُتابَع، والردود قد تتحوّل إلى أفكارٍ لندوات قادمة. إن
-            كنت ترغب بالمشاركة كضيف، أخبرنا بالموضوع الذي يهمّك وموقفك منه
-            باختصار.
-          </p>
+          <ContactForm />
         </div>
       </div>
     </div>

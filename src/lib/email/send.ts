@@ -7,6 +7,9 @@ type SendArgs = {
   subject: string;
   html: string;
   text: string;
+  /** Overrides EMAIL_REPLY_TO — e.g. the contact form replies straight to
+   * whoever wrote in, so the team can just hit "reply" in their inbox. */
+  replyTo?: string;
 };
 
 let client: Resend | null = null;
@@ -26,6 +29,7 @@ export async function sendEmail({
   subject,
   html,
   text,
+  replyTo,
 }: SendArgs): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
   if (!hasResend) {
     console.info(
@@ -37,7 +41,7 @@ export async function sendEmail({
   try {
     const { error } = await resend().emails.send({
       from: env.EMAIL_FROM,
-      replyTo: env.EMAIL_REPLY_TO,
+      replyTo: replyTo ?? env.EMAIL_REPLY_TO,
       to,
       subject,
       html,

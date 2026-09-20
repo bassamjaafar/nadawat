@@ -2,6 +2,16 @@ import { CONTACT_EMAIL, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 type Email = { subject: string; html: string; text: string };
 
+/** User-submitted free text goes through this before landing in HTML. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const COLORS = {
   page: "#efe8d8",
   card: "#f8f4ea",
@@ -133,5 +143,45 @@ export function registrationConfirmedEmail(input: {
       cta: { label: "صفحة الندوة", href: input.debateUrl },
     }),
     text: `مرحبًا ${input.firstName}،\n\nسجّلنا حضورك في ندوة «${input.debateTitle}».\nالموعد: ${input.debateWhen}\n\nصفحة الندوة: ${input.debateUrl}\n\n${CONTACT_EMAIL}`,
+  };
+}
+
+/**
+ * Internal notification for the team's inbox, not a subscriber-facing
+ * branded email — skips `shell()` on purpose (its fixed footer telling the
+ * reader to email CONTACT_EMAIL makes no sense on a message already sent
+ * there). Reply-To is set to the submitter's own address by the caller, so
+ * replying in the inbox goes straight back to them.
+ */
+export function contactMessageEmail(input: {
+  name: string;
+  email: string;
+  category: string;
+  message: string;
+}): Email {
+  const safeName = escapeHtml(input.name);
+  const safeMessage = escapeHtml(input.message).replace(/\n/g, "<br>");
+
+  return {
+    subject: `رسالة تواصل جديدة (${input.category}): ${input.name}`,
+    html: `<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:24px;background:${COLORS.page};font-family:'Segoe UI',Tahoma,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:${COLORS.card};border:1px solid ${COLORS.line};border-radius:6px;">
+<tr><td style="padding:24px 28px;">
+<p style="margin:0 0 4px;font-size:13px;color:${COLORS.muted};">رسالة تواصل جديدة من الموقع</p>
+<h1 style="margin:0 0 18px;font-size:19px;color:${COLORS.ink};">${input.category}</h1>
+<p style="margin:0 0 6px;font-size:14px;color:${COLORS.muted};">الاسم</p>
+<p style="margin:0 0 16px;font-size:15px;color:${COLORS.ink};">${safeName}</p>
+<p style="margin:0 0 6px;font-size:14px;color:${COLORS.muted};">البريد الإلكتروني</p>
+<p style="margin:0 0 16px;font-size:15px;color:${COLORS.ink};" dir="ltr">${escapeHtml(input.email)}</p>
+<p style="margin:0 0 6px;font-size:14px;color:${COLORS.muted};">الرسالة</p>
+<p style="margin:0;font-size:15px;line-height:1.9;color:${COLORS.ink};white-space:pre-wrap;">${safeMessage}</p>
+</td></tr>
+</table>
+</body>
+</html>`,
+    text: `رسالة تواصل جديدة من الموقع\nالنوع: ${input.category}\nالاسم: ${input.name}\nالبريد: ${input.email}\n\nالرسالة:\n${input.message}`,
   };
 }

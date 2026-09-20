@@ -61,6 +61,32 @@ export const registerSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 
+export const CONTACT_CATEGORIES = [
+  "ملاحظة",
+  "سؤال",
+  "تطوّع أو دعم",
+  "ترشيح ضيف أو موضوع",
+  "استفسار إعلامي",
+  "أخرى",
+] as const;
+
+export const contactSchema = z.object({
+  name,
+  email,
+  category: z.enum(CONTACT_CATEGORIES, {
+    message: "يرجى اختيار نوع الرسالة",
+  }),
+  message: z
+    .string()
+    .trim()
+    .min(10, "يرجى كتابة رسالة أوضح قليلًا")
+    .max(4000, "الرسالة طويلة جدًا"),
+  // Honeypot — must stay empty.
+  company: z.string().max(0).optional(),
+});
+
+export type ContactInput = z.infer<typeof contactSchema>;
+
 /** Turns a ZodError into a { field: message } map for form rendering. */
 export function fieldErrors(error: z.ZodError): Record<string, string> {
   const out: Record<string, string> = {};

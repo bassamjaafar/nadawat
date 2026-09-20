@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
-import {
-  CONTACT_EMAIL,
-  FOOTER_NAV,
-  ORG_NAME,
-  SITE_NAME,
-  SITE_TAGLINE,
-} from "@/lib/site";
+import { FOOTER_NAV, ORG_NAME, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import { formatYear } from "@/lib/format";
 
 export function SiteFooter() {
@@ -50,13 +44,12 @@ export function SiteFooter() {
 
           <div className="text-[0.95rem]">
             <p className="text-cream/60">للتواصل والملاحظات</p>
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
+            <Link
+              href="/contact"
               className="mt-1 inline-block text-cream underline decoration-cream/30 underline-offset-4 hover:decoration-cream"
-              dir="ltr"
             >
-              {CONTACT_EMAIL}
-            </a>
+              راسلنا من هنا
+            </Link>
           </div>
         </div>
 
