@@ -13,7 +13,7 @@ import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 import { COUNTRIES } from "@/lib/countries";
 import { IDLE_FORM_STATE } from "@/lib/forms";
 import { SUBSCRIBE_CONSENT_TEXT } from "@/lib/validation";
-import { env, hasTurnstile } from "@/lib/env";
+import { env } from "@/lib/env";
 
 export function SubscribeForm({ compact = false }: { compact?: boolean }) {
   const [state, formAction, pending] = useActionState(
@@ -110,8 +110,13 @@ export function SubscribeForm({ compact = false }: { compact?: boolean }) {
 
       <Honeypot />
 
-      {hasTurnstile ? (
-        <TurnstileWidget siteKey={env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} />
+      {/* Gate on the site key alone, never `hasTurnstile` — that flag also
+          checks TURNSTILE_SECRET_KEY, a non-public var Next.js never inlines
+          into client code. Server sees it as true, client always sees it as
+          false, and that server/client disagreement is exactly what caused
+          the hydration mismatch that silently dropped this widget before. */}
+      {env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
+        <TurnstileWidget siteKey={env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
       ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
