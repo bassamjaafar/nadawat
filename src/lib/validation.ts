@@ -23,10 +23,10 @@ const country = z
 
 /** Exact wording shown next to the subscription consent checkbox. Stored with each record. */
 export const SUBSCRIBE_CONSENT_TEXT =
-  "أوافق على تلقّي إشعارات من ندوات حول المناظرات والفعاليات القادمة، وأفهم أنّ بإمكاني إلغاء الاشتراك في أي وقت.";
+  "أوافق على تلقّي إشعارات من ندوات حول الندوات القادمة، وأفهم أنّ بإمكاني إلغاء الاشتراك في أي وقت.";
 
 export const REGISTER_CONSENT_TEXT =
-  "أرغب أيضًا بتلقّي إشعارات عن مناظرات ندوات القادمة (اختياري).";
+  "أرغب أيضًا بتلقّي إشعارات عن الندوات القادمة من ندوات (اختياري).";
 
 const checkboxTrue = z.preprocess(
   (v) => v === "on" || v === "true" || v === true,

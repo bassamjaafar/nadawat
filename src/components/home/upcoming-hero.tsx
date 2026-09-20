@@ -19,7 +19,7 @@ export function UpcomingHero({ debate }: { debate: DebateDetail }) {
   return (
     <section aria-labelledby="upcoming-title" className="container-page pt-10 pb-4 sm:pt-16">
       <p className="text-kicker font-medium uppercase tracking-wide text-clay">
-        المناظرة القادمة
+        الندوة القادمة
       </p>
 
       {debate.cover_image_url ? (
@@ -72,7 +72,7 @@ export function UpcomingHero({ debate }: { debate: DebateDetail }) {
             {debate.registration_open ? (
               <ButtonLink href={`${href}#register`}>سجّل حضورك</ButtonLink>
             ) : (
-              <ButtonLink href={href}>تفاصيل المناظرة</ButtonLink>
+              <ButtonLink href={href}>تفاصيل الندوة</ButtonLink>
             )}
             {debate.broadcast_url ? (
               <ButtonLink href={debate.broadcast_url} variant="outline">

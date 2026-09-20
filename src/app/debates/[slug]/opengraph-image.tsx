@@ -40,7 +40,7 @@ export default async function Image({
 
   const kicker = debate
     ? debate.status === "upcoming"
-      ? "مناظرة قادمة"
+      ? "ندوة قادمة"
       : "من أرشيف ندوات"
     : SITE_NAME;
   const title = debate?.title_ar ?? SITE_NAME;

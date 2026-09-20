@@ -51,7 +51,7 @@ export function RegisterForm({
       className="flex flex-col gap-5"
     >
       <span id={headingId} className="sr-only">
-        نموذج التسجيل في مناظرة {debateTitle}
+        نموذج التسجيل في ندوة {debateTitle}
       </span>
       <input type="hidden" name="debateId" value={debateId} />
       <input type="hidden" name="debateSlug" value={debateSlug} />
@@ -112,7 +112,7 @@ export function RegisterForm({
           {pending ? "جارٍ التسجيل…" : "سجّل حضوري"}
         </Button>
         <p className="text-[0.85rem] leading-6 text-muted">
-          التسجيل لهذه المناظرة فقط. لن يُضاف بريدك إلى قائمة الإشعارات إلا إذا
+          التسجيل لهذه الندوة فقط. لن يُضاف بريدك إلى قائمة الإشعارات إلا إذا
           اخترت ذلك أعلاه.
         </p>
       </div>

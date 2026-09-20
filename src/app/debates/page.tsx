@@ -14,9 +14,9 @@ import type { DebateSummary } from "@/lib/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "المناظرات",
+  title: "الفعاليات",
   description:
-    "أرشيف مناظرات ندوات: نقاشات منظّمة حول قضايا سياسية واقتصادية واجتماعية ومدنية تخصّ سوريا.",
+    "أرشيف فعاليات ندوات: نقاشات منظّمة حول قضايا سياسية واقتصادية واجتماعية ومدنية تخصّ سوريا.",
   alternates: { canonical: "/debates" },
 };
 
@@ -41,14 +41,14 @@ export default async function DebatesPage() {
   return (
     <div className="pb-24">
       <PageHeader
-        title="المناظرات"
-        lede="سجلٌّ دائم لمناظرات ندوات. كلّ مناظرة صفحةٌ ثابتة تحفظ موضوعها والمتناظرين والتسجيل الكامل."
+        title="الفعاليات"
+        lede="سجلٌّ دائم لفعاليات ندوات. كلّ ندوة صفحةٌ ثابتة تحفظ موضوعها والضيوف والتسجيل الكامل."
       />
 
       {upcoming ? (
         <section className="container-page section-y-sm border-b border-line">
           <p className="text-kicker font-medium uppercase text-clay">
-            المناظرة القادمة
+            الندوة القادمة
           </p>
           <div className="mt-4 grid gap-6 sm:grid-cols-[0.9fr_1.1fr] sm:items-center">
             <Link
@@ -85,7 +85,7 @@ export default async function DebatesPage() {
 
       {groups.length === 0 ? (
         <p className="container-page section-y text-muted">
-          لا توجد مناظرات منشورة بعد.
+          لا توجد ندوات منشورة بعد.
         </p>
       ) : (
         groups.map((group) => (
@@ -138,7 +138,7 @@ function ArchiveRow({ debate }: { debate: DebateSummary }) {
           </p>
         ) : null}
         <div className="mt-4">
-          <ArrowLink href={href}>شاهد المناظرة</ArrowLink>
+          <ArrowLink href={href}>شاهد الندوة</ArrowLink>
         </div>
       </div>
     </article>

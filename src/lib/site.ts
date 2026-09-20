@@ -8,7 +8,7 @@ export const SITE_TAGLINE = "نختلف باحترام";
 /** Formal institutional name, set beside the logo mark in the header/footer. */
 export const ORG_NAME = "المنتدى السوري للحوار";
 export const SITE_DESCRIPTION =
-  "منصّة عربية للمناظرات المنظّمة والحوار العام الرصين حول القضايا السياسية والاقتصادية والاجتماعية والمدنية في سوريا.";
+  "منصّة عربية للندوات المنظّمة والحوار العام الرصين حول القضايا السياسية والاقتصادية والاجتماعية والمدنية في سوريا.";
 
 export const CONTACT_EMAIL = "events@nadawat.org";
 
@@ -25,16 +25,16 @@ export type NavItem = { href: string; label: string };
 
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/", label: "الرئيسية" },
-  { href: "/debates", label: "المناظرات" },
+  { href: "/debates", label: "الفعاليات" },
   { href: "/about", label: "عن ندوات" },
-  { href: "/subscribe", label: "اشترك" },
+  { href: "/subscribe", label: "اشترك بالتحديثات" },
   { href: "/contact", label: "تواصل معنا" },
 ];
 
 export const FOOTER_NAV: NavItem[] = [
-  { href: "/debates", label: "المناظرات" },
+  { href: "/debates", label: "الفعاليات" },
   { href: "/about", label: "عن ندوات" },
-  { href: "/subscribe", label: "اشترك" },
+  { href: "/subscribe", label: "اشترك بالتحديثات" },
   { href: "/contact", label: "تواصل معنا" },
   { href: "/privacy", label: "الخصوصية" },
 ];

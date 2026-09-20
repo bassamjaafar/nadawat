@@ -28,7 +28,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const debate = await getDebateBySlug(slug);
-  if (!debate) return { title: "مناظرة غير موجودة" };
+  if (!debate) return { title: "ندوة غير موجودة" };
 
   const description =
     debate.summary_ar ?? debate.description_ar?.slice(0, 160) ?? undefined;
@@ -74,11 +74,11 @@ export default async function DebatePage({ params }: Params) {
           href="/debates"
           className="text-meta text-muted transition-colors hover:text-olive"
         >
-          → جميع المناظرات
+          → جميع الفعاليات
         </Link>
 
         <p className="mt-6 text-kicker font-medium uppercase text-clay">
-          {isUpcoming ? "مناظرة قادمة" : "من الأرشيف"}
+          {isUpcoming ? "ندوة قادمة" : "من الأرشيف"}
         </p>
         <h1 className="mt-3 max-w-[46rem] text-h1 text-ink">{debate.title_ar}</h1>
         {when ? <p className="mt-4 text-meta text-muted">{when}</p> : null}
@@ -118,7 +118,7 @@ export default async function DebatePage({ params }: Params) {
           ) : null}
 
           <div className="mt-14 border-t border-line pt-10">
-            <h2 className="text-h2 text-ink">المتناظرون</h2>
+            <h2 className="text-h2 text-ink">الضيوف</h2>
             <div className="mt-8">
               <ParticipantProfiles
                 participants={debate.participants}
@@ -174,7 +174,7 @@ export default async function DebatePage({ params }: Params) {
 
       {related.length ? (
         <section className="container-page mt-20 border-t border-line pt-12">
-          <h2 className="text-h2 text-ink">مناظرات ذات صلة</h2>
+          <h2 className="text-h2 text-ink">فعاليات ذات صلة</h2>
           <div className="mt-8 grid gap-x-8 gap-y-10 sm:grid-cols-2">
             {related.map((d) => (
               <DebateCard key={d.id} debate={d} />

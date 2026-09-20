@@ -25,7 +25,7 @@ export async function registerForDebate(
   const debate = await getDebateBySlug(input.debateSlug);
 
   if (!debate || debate.status !== "upcoming" || !debate.registration_open) {
-    return { status: "error", message: "التسجيل غير متاح لهذه المناظرة حاليًا." };
+    return { status: "error", message: "التسجيل غير متاح لهذه الندوة حاليًا." };
   }
 
   const debateWhen = debate.starts_at

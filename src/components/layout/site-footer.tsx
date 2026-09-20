@@ -28,7 +28,7 @@ export function SiteFooter() {
               </span>
             </div>
             <p className="mt-4 text-[0.95rem] leading-7 text-cream/70">
-              {SITE_NAME} منصّة للمناظرات المنظّمة والحوار العام حول الشأن
+              {SITE_NAME} منصّة للندوات المنظّمة والحوار العام حول الشأن
               السوري. {SITE_TAGLINE}.
             </p>
           </div>

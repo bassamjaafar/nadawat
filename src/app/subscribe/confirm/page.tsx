@@ -35,11 +35,11 @@ export default async function ConfirmSubscriptionPage({
       <NoticePage
         kicker="الاشتراك"
         title="تمّ تأكيد اشتراكك"
-        action={{ href: "/debates", label: "تصفّح المناظرات" }}
+        action={{ href: "/debates", label: "تصفّح الفعاليات" }}
       >
         <p>
           شكرًا {result.firstName}. سنرسل إليك إشعارًا موجزًا عند تحديد موعد كلّ
-          مناظرة جديدة.
+          ندوة جديدة.
         </p>
       </NoticePage>
     );
@@ -50,7 +50,7 @@ export default async function ConfirmSubscriptionPage({
       <NoticePage
         kicker="الاشتراك"
         title="اشتراكك مؤكَّد مسبقًا"
-        action={{ href: "/debates", label: "تصفّح المناظرات" }}
+        action={{ href: "/debates", label: "تصفّح الفعاليات" }}
       >
         <p>لا حاجة لأيّ إجراءٍ إضافي.</p>
       </NoticePage>

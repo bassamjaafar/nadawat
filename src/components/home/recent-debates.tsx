@@ -22,11 +22,11 @@ export function RecentDebates({
             الأرشيف
           </span>
           <h2 id="recent-title" className="text-h2 text-ink">
-            {variant === "feature" ? "أحدث مناظرة" : "مناظرات سابقة"}
+            {variant === "feature" ? "أحدث ندوة" : "الفعاليات السابقة"}
           </h2>
         </div>
         <div className="hidden shrink-0 sm:block">
-          <ArrowLink href="/debates">عرض جميع المناظرات</ArrowLink>
+          <ArrowLink href="/debates">عرض جميع الفعاليات</ArrowLink>
         </div>
       </div>
 
@@ -43,7 +43,7 @@ export function RecentDebates({
       )}
 
       <div className="mt-10 sm:hidden">
-        <ArrowLink href="/debates">عرض جميع المناظرات</ArrowLink>
+        <ArrowLink href="/debates">عرض جميع الفعاليات</ArrowLink>
       </div>
     </section>
   );
@@ -73,7 +73,7 @@ function FeatureDebate({ debate }: { debate: DebateSummary }) {
           </p>
         ) : null}
         <div className="mt-5">
-          <ArrowLink href={href}>شاهد المناظرة</ArrowLink>
+          <ArrowLink href={href}>شاهد الندوة</ArrowLink>
         </div>
       </div>
     </article>

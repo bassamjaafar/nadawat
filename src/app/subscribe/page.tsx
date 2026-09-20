@@ -3,9 +3,9 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SubscribeForm } from "@/components/forms/subscribe-form";
 
 export const metadata: Metadata = {
-  title: "اشترك",
+  title: "اشترك بالتحديثات",
   description:
-    "اشترك لتصلك إشعارات ندوات عند تحديد موعد كلّ مناظرة جديدة. تأكيدٌ بالبريد، ولا رسائل متكرّرة.",
+    "اشترك لتصلك إشعارات ندوات عند تحديد موعد كلّ ندوة جديدة. تأكيدٌ بالبريد، ولا رسائل متكرّرة.",
   alternates: { canonical: "/subscribe" },
 };
 
@@ -14,8 +14,8 @@ export default function SubscribePage() {
     <div className="pb-24">
       <PageHeader
         kicker="الاشتراك"
-        title="اعرف بموعد كلّ مناظرة"
-        lede="نرسل إشعارًا واحدًا موجزًا عند تحديد موعد كلّ مناظرة جديدة. لا نشرات دورية، ولا رسائل تسويقية."
+        title="اعرف بموعد كلّ ندوة"
+        lede="نرسل إشعارًا واحدًا موجزًا عند تحديد موعد كلّ ندوة جديدة. لا نشرات دورية، ولا رسائل تسويقية."
       />
 
       <div className="container-page section-y">
@@ -23,7 +23,7 @@ export default function SubscribePage() {
           <div className="max-w-sm">
             <h2 className="text-h3 text-ink">ماذا يعني الاشتراك</h2>
             <ul className="mt-4 flex flex-col gap-3 text-[0.98rem] leading-8 text-muted">
-              <li>— إشعارٌ بالبريد عند جدولة كلّ مناظرة، مع الموضوع والموعد.</li>
+              <li>— إشعارٌ بالبريد عند جدولة كلّ ندوة، مع الموضوع والموعد.</li>
               <li>— تأكيدٌ مزدوج: لا يبدأ اشتراكك قبل الضغط على رابط التأكيد.</li>
               <li>— إلغاءٌ فوريّ من رابطٍ في كلّ رسالة.</li>
               <li>— لا مشاركة لبريدك مع أيّ جهة.</li>

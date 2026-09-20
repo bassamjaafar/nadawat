@@ -34,7 +34,7 @@ export async function registerAction(
     status: "success",
     message:
       result.status === "already"
-        ? "أنت مسجَّل بالفعل في هذه المناظرة. أرسلنا إليك رسالة تذكيريّة."
+        ? "أنت مسجَّل بالفعل في هذه الندوة. أرسلنا إليك رسالة تذكيريّة."
         : undefined,
   };
 }

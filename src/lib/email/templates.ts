@@ -99,7 +99,7 @@ export function subscribeConfirmedEmail(input: {
   unsubscribeUrl: string;
 }): Email {
   const body = `<p style="margin:0 0 12px;">مرحبًا ${input.firstName},</p>
-<p style="margin:0 0 12px;">تمّ تأكيد اشتراكك. سنرسل إليك إشعارًا موجزًا عند تحديد موعد كل مناظرة جديدة — دون رسائل متكرّرة.</p>
+<p style="margin:0 0 12px;">تمّ تأكيد اشتراكك. سنرسل إليك إشعارًا موجزًا عند تحديد موعد كل ندوة جديدة — دون رسائل متكرّرة.</p>
 <p style="margin:0;">يمكنك إلغاء الاشتراك في أي وقت من الرابط أدناه أو من تذييل أي رسالة.</p>`;
   return {
     subject: "تمّ تأكيد اشتراكك في ندوات",
@@ -120,18 +120,18 @@ export function registrationConfirmedEmail(input: {
   debateUrl: string;
 }): Email {
   const body = `<p style="margin:0 0 12px;">مرحبًا ${input.firstName},</p>
-<p style="margin:0 0 12px;">سجّلنا حضورك في مناظرة:</p>
+<p style="margin:0 0 12px;">سجّلنا حضورك في ندوة:</p>
 <p style="margin:0 0 6px;font-weight:600;color:${COLORS.olive};">«${input.debateTitle}»</p>
 <p style="margin:0 0 12px;">الموعد: ${input.debateWhen}</p>
 <p style="margin:0;">سنرسل إليك تفاصيل الحضور ورابط البثّ قبل الموعد.</p>`;
   return {
     subject: `تأكيد تسجيلك: ${input.debateTitle}`,
     html: shell({
-      preview: `تأكيد تسجيلك في مناظرة ${input.debateTitle}`,
+      preview: `تأكيد تسجيلك في ندوة ${input.debateTitle}`,
       heading: "تمّ تسجيل حضورك",
       body,
-      cta: { label: "صفحة المناظرة", href: input.debateUrl },
+      cta: { label: "صفحة الندوة", href: input.debateUrl },
     }),
-    text: `مرحبًا ${input.firstName}،\n\nسجّلنا حضورك في مناظرة «${input.debateTitle}».\nالموعد: ${input.debateWhen}\n\nصفحة المناظرة: ${input.debateUrl}\n\n${CONTACT_EMAIL}`,
+    text: `مرحبًا ${input.firstName}،\n\nسجّلنا حضورك في ندوة «${input.debateTitle}».\nالموعد: ${input.debateWhen}\n\nصفحة الندوة: ${input.debateUrl}\n\n${CONTACT_EMAIL}`,
   };
 }

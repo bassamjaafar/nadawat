@@ -16,7 +16,7 @@ export function SpeakerLineup({
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-kicker font-medium uppercase text-muted">المتناظران</p>
+      <p className="text-kicker font-medium uppercase text-muted">الضيوف</p>
       <ul className="grid grid-cols-2 gap-5 sm:gap-6">
         {speakers.map(({ person, position_label_ar }) => (
           <li key={person.id} className="flex flex-col gap-3">
@@ -44,7 +44,7 @@ export function SpeakerLineup({
         <div className="flex items-center gap-3 border-t border-line pt-4">
           <PersonAvatarSmall person={moderator} />
           <p className="text-meta text-muted">
-            إدارة الجلسة:{" "}
+            المحاور:{" "}
             <span className="text-ink">{moderator.name_ar}</span>
           </p>
         </div>
@@ -106,7 +106,7 @@ export function ParticipantProfiles({
           />
           <div>
             <p className="text-kicker font-medium uppercase text-muted">
-              إدارة الجلسة
+              المحاور
             </p>
             <h3 className="mt-1 font-display text-[1.1rem] font-medium text-ink">
               {moderator.name_ar}

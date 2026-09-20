@@ -11,10 +11,10 @@ export function SubscribeSection() {
               الاشتراك
             </span>
             <h2 id="subscribe-title" className="mt-2 text-h2 text-ink">
-              اعرف بموعد كل مناظرة جديدة
+              اعرف بموعد كل ندوة جديدة
             </h2>
             <p className="mt-4 max-w-md text-[1rem] leading-8 text-muted">
-              نرسل إشعارًا موجزًا عند تحديد موعد كل مناظرة، دون رسائل متكرّرة.
+              نرسل إشعارًا موجزًا عند تحديد موعد كل ندوة، دون رسائل متكرّرة.
               نطلب تأكيدًا بالبريد بعد التسجيل، ويمكنك إلغاء الاشتراك متى شئت.
             </p>
           </div>

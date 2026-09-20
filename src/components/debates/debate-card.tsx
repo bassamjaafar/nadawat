@@ -86,7 +86,7 @@ export function DebateCard({
           <p className="text-meta text-muted">{speakerNames(debate)}</p>
         ) : null}
         <div className="mt-1">
-          <ArrowLink href={href}>شاهد المناظرة</ArrowLink>
+          <ArrowLink href={href}>شاهد الندوة</ArrowLink>
         </div>
       </div>
     </article>
