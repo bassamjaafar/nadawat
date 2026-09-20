@@ -74,6 +74,46 @@ export function TextField({
   );
 }
 
+export function TextareaField({
+  id,
+  label,
+  error,
+  optional,
+  hint,
+  className,
+  ...props
+}: ComponentPropsWithoutRef<"textarea"> & {
+  id: string;
+  label: string;
+  error?: string;
+  optional?: boolean;
+  hint?: string;
+}) {
+  const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
+  return (
+    <div className={cn("flex flex-col gap-1.5", className)}>
+      <Label htmlFor={id} optional={optional}>
+        {label}
+      </Label>
+      {hint ? (
+        <p id={hintId} className="text-[0.85rem] text-muted">
+          {hint}
+        </p>
+      ) : null}
+      <textarea
+        id={id}
+        name={id}
+        className={cn(controlBase, "min-h-[7rem] resize-y")}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={cn(error && errorId, hint && hintId) || undefined}
+        {...props}
+      />
+      {error ? <ErrorText id={errorId}>{error}</ErrorText> : null}
+    </div>
+  );
+}
+
 export function SelectField({
   id,
   label,
@@ -86,10 +126,13 @@ export function SelectField({
   id: string;
   label: string;
   error?: string;
-  options: string[];
+  options: string[] | { value: string; label: string }[];
   placeholder?: string;
 }) {
   const errorId = `${id}-error`;
+  const normalized = options.map((o) =>
+    typeof o === "string" ? { value: o, label: o } : o,
+  );
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <Label htmlFor={id}>{label}</Label>
@@ -105,9 +148,9 @@ export function SelectField({
         <option value="" disabled>
           {placeholder ?? "اختر…"}
         </option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
+        {normalized.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
           </option>
         ))}
       </select>

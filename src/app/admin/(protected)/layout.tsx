@@ -6,7 +6,10 @@ import { hasSupabase } from "@/lib/env";
 import { SITE_NAME } from "@/lib/site";
 import { SignOutButton } from "@/components/admin/sign-out-button";
 
-const ADMIN_NAV = [{ href: "/admin", label: "لوحة التحكم" }];
+const ADMIN_NAV = [
+  { href: "/admin", label: "لوحة التحكم" },
+  { href: "/admin/events", label: "الفعاليات" },
+];
 
 export default async function ProtectedAdminLayout({
   children,

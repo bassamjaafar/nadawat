@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useId } from "react";
-import { subscribeAction } from "@/app/subscribe/actions";
+import { subscribeAction } from "@/app/(site)/subscribe/actions";
 import { Button } from "@/components/ui/button";
 import {
   CheckboxField,
