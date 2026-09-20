@@ -35,7 +35,7 @@ export default async function Image() {
           height={markHeight}
           viewBox={LOGO_VIEWBOX}
           fill={OLIVE}
-          fillRule="nonzero"
+          fillRule="evenodd"
         >
           {LOGO_PATHS.map((d) => (
             <path key={d.slice(0, 24)} d={d} />

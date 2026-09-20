@@ -12,7 +12,7 @@ export function LogoMark(props: SVGProps<SVGSVGElement>) {
     <svg
       viewBox={LOGO_VIEWBOX}
       fill="currentColor"
-      fillRule="nonzero"
+      fillRule="evenodd"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="ندوات"
