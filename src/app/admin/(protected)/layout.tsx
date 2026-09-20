@@ -9,6 +9,8 @@ import { SignOutButton } from "@/components/admin/sign-out-button";
 const ADMIN_NAV = [
   { href: "/admin", label: "لوحة التحكم" },
   { href: "/admin/events", label: "الفعاليات" },
+  { href: "/admin/registrations", label: "التسجيلات" },
+  { href: "/admin/subscribers", label: "المشتركون" },
 ];
 
 export default async function ProtectedAdminLayout({
