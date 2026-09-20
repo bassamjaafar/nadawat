@@ -21,15 +21,23 @@ const schema = z.object({
   CONSENT_IP_SALT: z.string().min(1).default("nadawat-dev-salt"),
 });
 
+// A dashboard-added env var left blank arrives as "" (not unset) — treat that
+// the same as unset, or every `.optional()`/`.default()` below would still
+// try to validate an empty string and fail the whole parse.
+const orUnset = (v: string | undefined) =>
+  v && v.trim() !== "" ? v : undefined;
+
 const parsed = schema.safeParse({
-  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-  RESEND_API_KEY: process.env.RESEND_API_KEY,
-  EMAIL_FROM: process.env.EMAIL_FROM,
-  EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO,
-  CONSENT_IP_SALT: process.env.CONSENT_IP_SALT,
+  NEXT_PUBLIC_SITE_URL: orUnset(process.env.NEXT_PUBLIC_SITE_URL),
+  NEXT_PUBLIC_SUPABASE_URL: orUnset(process.env.NEXT_PUBLIC_SUPABASE_URL),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: orUnset(
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  ),
+  SUPABASE_SERVICE_ROLE_KEY: orUnset(process.env.SUPABASE_SERVICE_ROLE_KEY),
+  RESEND_API_KEY: orUnset(process.env.RESEND_API_KEY),
+  EMAIL_FROM: orUnset(process.env.EMAIL_FROM),
+  EMAIL_REPLY_TO: orUnset(process.env.EMAIL_REPLY_TO),
+  CONSENT_IP_SALT: orUnset(process.env.CONSENT_IP_SALT),
 });
 
 if (!parsed.success) {

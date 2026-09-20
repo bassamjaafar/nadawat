@@ -12,9 +12,13 @@ export const SITE_DESCRIPTION =
 
 export const CONTACT_EMAIL = "events@nadawat.org";
 
-/** Canonical origin. Overridden in every environment via NEXT_PUBLIC_SITE_URL. */
+/**
+ * Canonical origin. Overridden in every environment via NEXT_PUBLIC_SITE_URL.
+ * `||` (not `??`) deliberately — an env var set to an empty string in a
+ * dashboard is common and must fall back too, not just a fully unset one.
+ */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://nadawat.org"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://nadawat.org"
 ).replace(/\/$/, "");
 
 export type NavItem = { href: string; label: string };
