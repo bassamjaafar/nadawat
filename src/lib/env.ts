@@ -11,7 +11,11 @@ const schema = z.object({
 
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
+  // Supabase renamed "service_role key" to "secret key" in newer dashboards —
+  // accept either env var name so a project set up under the new naming
+  // doesn't need a var renamed in Vercel to match older docs/code.
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+  SUPABASE_SECRET_KEY: z.string().min(1).optional(),
 
   RESEND_API_KEY: z.string().min(1).optional(),
   EMAIL_FROM: z.string().min(1).default("ندوات <events@nadawat.org>"),
@@ -34,6 +38,7 @@ const parsed = schema.safeParse({
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   ),
   SUPABASE_SERVICE_ROLE_KEY: orUnset(process.env.SUPABASE_SERVICE_ROLE_KEY),
+  SUPABASE_SECRET_KEY: orUnset(process.env.SUPABASE_SECRET_KEY),
   RESEND_API_KEY: orUnset(process.env.RESEND_API_KEY),
   EMAIL_FROM: orUnset(process.env.EMAIL_FROM),
   EMAIL_REPLY_TO: orUnset(process.env.EMAIL_REPLY_TO),
@@ -47,12 +52,14 @@ if (!parsed.success) {
 
 export const env = parsed.data;
 
+/** The privileged Supabase key, whichever name it was set under. */
+export const SUPABASE_ADMIN_KEY =
+  env.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_SECRET_KEY;
+
 export const hasSupabase = Boolean(
   env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
-export const hasSupabaseAdmin = Boolean(
-  hasSupabase && env.SUPABASE_SERVICE_ROLE_KEY,
-);
+export const hasSupabaseAdmin = Boolean(hasSupabase && SUPABASE_ADMIN_KEY);
 
 export const hasResend = Boolean(env.RESEND_API_KEY);
