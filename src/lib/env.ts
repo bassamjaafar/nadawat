@@ -20,6 +20,11 @@ const schema = z.object({
   RESEND_API_KEY: z.string().min(1).optional(),
   EMAIL_FROM: z.string().min(1).default("ندوات <events@nadawat.org>"),
   EMAIL_REPLY_TO: z.string().email().default("events@nadawat.org"),
+  // Where the contact form actually delivers, separate from the public-
+  // facing CONTACT_EMAIL — events@nadawat.org has no real mailbox yet
+  // (confirmed via DNS, no MX record), so this overrides it in the
+  // meantime. Unset this once that mailbox exists.
+  CONTACT_FORM_RECIPIENT: z.string().email().optional(),
 
   /** Salt for hashing IP addresses stored alongside consent records. */
   CONSENT_IP_SALT: z.string().min(1).default("nadawat-dev-salt"),
@@ -48,6 +53,7 @@ const parsed = schema.safeParse({
   RESEND_API_KEY: orUnset(process.env.RESEND_API_KEY),
   EMAIL_FROM: orUnset(process.env.EMAIL_FROM),
   EMAIL_REPLY_TO: orUnset(process.env.EMAIL_REPLY_TO),
+  CONTACT_FORM_RECIPIENT: orUnset(process.env.CONTACT_FORM_RECIPIENT),
   CONSENT_IP_SALT: orUnset(process.env.CONSENT_IP_SALT),
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: orUnset(
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,

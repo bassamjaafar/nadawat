@@ -5,6 +5,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 import { sendEmail } from "@/lib/email/send";
 import { contactMessageEmail } from "@/lib/email/templates";
 import { CONTACT_EMAIL } from "@/lib/site";
+import { env } from "@/lib/env";
 import type { FormState } from "@/lib/forms";
 
 export async function contactAction(
@@ -37,7 +38,7 @@ export async function contactAction(
   }
 
   const result = await sendEmail({
-    to: CONTACT_EMAIL,
+    to: env.CONTACT_FORM_RECIPIENT ?? CONTACT_EMAIL,
     replyTo: parsed.data.email,
     ...contactMessageEmail(parsed.data),
   });
