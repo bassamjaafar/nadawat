@@ -18,7 +18,7 @@ const PERSON_COLUMNS = "id, name_ar, title_ar, bio_ar, image_url, slug";
 const DEBATE_SELECT = `
   id, slug, title_ar, summary_ar, description_ar, status, starts_at, timezone,
   location_ar, registration_open, broadcast_url, youtube_url, youtube_video_id,
-  cover_image_url,
+  cover_image_url, updated_at,
   moderator:people!debates_moderator_id_fkey ( ${PERSON_COLUMNS} ),
   participants:debate_participants (
     role, position_label_ar, sort_order,
@@ -58,6 +58,7 @@ function mapDetail(row: Row): DebateDetail {
     youtube_url: (row.youtube_url as string | null) ?? null,
     youtube_video_id: (row.youtube_video_id as string | null) ?? null,
     cover_image_url: (row.cover_image_url as string | null) ?? null,
+    updated_at: (row.updated_at as string | undefined) ?? undefined,
     speakers: participants
       .filter((p) => p.role === "speaker")
       .map((p) => p.person),
@@ -79,6 +80,7 @@ export function toSummary(d: DebateDetail): DebateSummary {
     registration_open: d.registration_open,
     youtube_video_id: d.youtube_video_id,
     cover_image_url: d.cover_image_url,
+    updated_at: d.updated_at,
     speakers: d.speakers,
     moderator: d.moderator,
   };

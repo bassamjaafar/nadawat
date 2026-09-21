@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLink } from "@/components/ui/arrow-link";
 import { formatDateShort } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { youtubeThumbnailUrl } from "@/lib/youtube";
 import type { DebateSummary } from "@/lib/types";
 
 function speakerNames(d: DebateSummary): string {
@@ -27,7 +28,7 @@ export function DebateThumb({
     >
       {debate.youtube_video_id ? (
         <Image
-          src={`https://i.ytimg.com/vi/${debate.youtube_video_id}/hqdefault.jpg`}
+          src={youtubeThumbnailUrl(debate.youtube_video_id, debate.updated_at)}
           alt=""
           fill
           priority={priority}

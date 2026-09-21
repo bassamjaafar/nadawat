@@ -14,6 +14,7 @@ import {
 } from "@/lib/data/debates";
 import { formatDate, formatTime } from "@/lib/format";
 import { absoluteUrl } from "@/lib/url";
+import { youtubeThumbnailUrl } from "@/lib/youtube";
 import { SITE_NAME } from "@/lib/site";
 
 export const revalidate = 300;
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const description =
     debate.summary_ar ?? debate.description_ar?.slice(0, 160) ?? undefined;
   const image = debate.youtube_video_id
-    ? `https://i.ytimg.com/vi/${debate.youtube_video_id}/hqdefault.jpg`
+    ? youtubeThumbnailUrl(debate.youtube_video_id, debate.updated_at)
     : (debate.cover_image_url ?? undefined);
 
   return {
@@ -92,6 +93,7 @@ export default async function DebatePage({ params }: Params) {
           <YouTubeEmbed
             videoId={debate.youtube_video_id}
             title={debate.title_ar}
+            updatedAt={debate.updated_at}
           />
         ) : debate.cover_image_url ? (
           <div className="relative aspect-[16/8] overflow-hidden rounded-[var(--radius-lg)] bg-cream-deep">

@@ -32,6 +32,13 @@ export type DebateSummary = {
   registration_open: boolean;
   speakers: Person[];
   moderator: Person | null;
+  /**
+   * Used to cache-bust the YouTube/cover thumbnail URL so editing a video's
+   * thumbnail on YouTube (same video ID, new image) shows up right away
+   * instead of waiting out the image optimizer's multi-hour edge cache.
+   * Optional because fixture data doesn't carry a real timestamp.
+   */
+  updated_at?: string;
 };
 
 export type DebateDetail = DebateSummary & {

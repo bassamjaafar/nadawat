@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { youtubeThumbnailUrl } from "@/lib/youtube";
 
 /**
  * Privacy-conscious YouTube embed: shows the thumbnail until the visitor
@@ -11,9 +12,11 @@ import { useState } from "react";
 export function YouTubeEmbed({
   videoId,
   title,
+  updatedAt,
 }: {
   videoId: string;
   title: string;
+  updatedAt?: string;
 }) {
   const [active, setActive] = useState(false);
 
@@ -35,7 +38,7 @@ export function YouTubeEmbed({
           aria-label={`تشغيل الفيديو: ${title}`}
         >
           <Image
-            src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+            src={youtubeThumbnailUrl(videoId, updatedAt)}
             alt=""
             fill
             sizes="(max-width: 768px) 100vw, 720px"
