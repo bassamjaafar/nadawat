@@ -79,10 +79,25 @@ export async function updateEventAction(
   return { status: "success", message: "تمّ الحفظ." };
 }
 
-export async function deleteEventAction(formData: FormData): Promise<void> {
+export async function deleteEventAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const id = String(formData.get("id"));
   const slug = formData.get("slug") ? String(formData.get("slug")) : undefined;
-  await adminDeleteEvent(id);
+
+  try {
+    await adminDeleteEvent(id);
+  } catch (err) {
+    return {
+      status: "error",
+      message: err instanceof Error ? err.message : "تعذّر حذف الندوة.",
+    };
+  }
+
+  // redirect() throws internally to interrupt rendering — kept outside the
+  // try/catch above so that signal is never accidentally swallowed as an
+  // "error" by the catch block.
   revalidatePublicPages(slug);
   redirect("/admin/events");
 }

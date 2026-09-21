@@ -4,7 +4,7 @@ import { adminGetEvent } from "@/lib/admin/events";
 import { adminListPeople } from "@/lib/admin/people";
 import { EventForm } from "@/components/admin/event-form";
 import { ParticipantsEditor } from "@/components/admin/participants-editor";
-import { Button } from "@/components/ui/button";
+import { DeleteForm } from "@/components/admin/delete-button";
 import { deleteEventAction, updateEventAction } from "../actions";
 
 export const metadata: Metadata = {
@@ -52,21 +52,17 @@ export default async function EditEventPage({
         </div>
       </div>
 
-      <form
-        action={deleteEventAction}
-        className="mt-14 border-t border-line pt-8"
-      >
-        <input type="hidden" name="id" value={event.id} />
-        <input type="hidden" name="slug" value={event.slug} />
-        <p className="text-[0.85rem] text-muted">
+      <div className="mt-14 border-t border-line pt-8">
+        <p className="mb-3 text-[0.85rem] text-muted">
           حذف الندوة نهائي ولا يمكن التراجع عنه.
         </p>
-        <div className="mt-3">
-          <Button type="submit" variant="outline" size="sm">
-            حذف الندوة
-          </Button>
-        </div>
-      </form>
+        <DeleteForm
+          action={deleteEventAction}
+          hiddenFields={{ id: event.id, slug: event.slug }}
+          confirmMessage={`حذف ندوة "${event.title_ar}" نهائيًا؟`}
+          buttonLabel="حذف الندوة"
+        />
+      </div>
     </div>
   );
 }

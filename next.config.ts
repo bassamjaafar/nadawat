@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
       { source: "/debates/:slug", destination: "/events/:slug", permanent: true },
     ];
   },
+  // Default 1MB is too small for a person's photo upload in the admin.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "6mb",
+    },
+  },
 };
 
 export default nextConfig;
