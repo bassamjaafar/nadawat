@@ -25,5 +25,12 @@ export async function GET() {
     keyLength: key?.length ?? 0,
     keyPrefix: key ? key.slice(0, 3) : null,
     apiReachable,
+    // Which deployment/project is actually serving this request — to rule
+    // out the domain pointing somewhere other than expected.
+    vercelEnv: process.env.VERCEL_ENV,
+    vercelProjectProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    vercelGitCommitSha: process.env.VERCEL_GIT_COMMIT_SHA,
+    vercelGitRepoSlug: process.env.VERCEL_GIT_REPO_SLUG,
+    vercelUrl: process.env.VERCEL_URL,
   });
 }
