@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
     return [
       { source: "/debates", destination: "/events", permanent: true },
       { source: "/debates/:slug", destination: "/events/:slug", permanent: true },
+      // www.nadawat.org -> nadawat.org, path preserved. nadawat.org is the
+      // canonical public domain everywhere else (metadata, sitemap, OG URLs).
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.nadawat.org" }],
+        destination: "https://nadawat.org/:path*",
+        permanent: true,
+      },
     ];
   },
   // Default 1MB is too small for a person's photo upload in the admin.
