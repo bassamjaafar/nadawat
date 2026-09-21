@@ -1,4 +1,12 @@
-import { CONTACT_EMAIL, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
+import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
+import { env } from "@/lib/env";
+
+// The address shown/used as "contact us" in these transactional emails is
+// the actual configured Reply-To, not the public CONTACT_EMAIL constant —
+// events@nadawat.org has no real mailbox as of this writing, and showing an
+// address that bounces in every subscriber-facing email would be worse than
+// showing whatever address Reply-To is actually overridden to.
+const REPLY_ADDRESS = env.EMAIL_REPLY_TO;
 
 type Email = { subject: string; html: string; text: string };
 
@@ -73,7 +81,7 @@ ${
 <tr><td style="padding:18px 32px 26px;border-top:1px solid ${COLORS.line};">
 <p style="margin:0;font-size:12px;color:${COLORS.muted};line-height:1.8;">
 هذه الرسالة من ${SITE_NAME}. للردّ أو الاستفسار راسلنا على
-<a href="mailto:${CONTACT_EMAIL}" style="color:${COLORS.olive};">${CONTACT_EMAIL}</a> — نقرأ الردود.
+<a href="mailto:${REPLY_ADDRESS}" style="color:${COLORS.olive};">${REPLY_ADDRESS}</a> — نقرأ الردود.
 <br>${SITE_URL.replace(/^https?:\/\//, "")}
 </p>
 </td></tr>
@@ -100,7 +108,7 @@ export function subscribeConfirmEmail(input: {
       cta: { label: "تأكيد الاشتراك", href: input.confirmUrl },
       footNote: "الرابط صالح لهذا الطلب فقط.",
     }),
-    text: `مرحبًا ${input.firstName}،\n\nلتأكيد اشتراكك في إشعارات ندوات افتح الرابط التالي:\n${input.confirmUrl}\n\nإن لم تطلب ذلك، تجاهل هذه الرسالة.\n\n${CONTACT_EMAIL}`,
+    text: `مرحبًا ${input.firstName}،\n\nلتأكيد اشتراكك في إشعارات ندوات افتح الرابط التالي:\n${input.confirmUrl}\n\nإن لم تطلب ذلك، تجاهل هذه الرسالة.\n\n${REPLY_ADDRESS}`,
   };
 }
 
@@ -119,7 +127,7 @@ export function subscribeConfirmedEmail(input: {
       body,
       footNote: `لإلغاء الاشتراك: <a href="${input.unsubscribeUrl}" style="color:${COLORS.olive};">اضغط هنا</a>`,
     }),
-    text: `مرحبًا ${input.firstName}،\n\nتمّ تأكيد اشتراكك في إشعارات ندوات.\n\nلإلغاء الاشتراك في أي وقت:\n${input.unsubscribeUrl}\n\n${CONTACT_EMAIL}`,
+    text: `مرحبًا ${input.firstName}،\n\nتمّ تأكيد اشتراكك في إشعارات ندوات.\n\nلإلغاء الاشتراك في أي وقت:\n${input.unsubscribeUrl}\n\n${REPLY_ADDRESS}`,
   };
 }
 
@@ -142,7 +150,7 @@ export function registrationConfirmedEmail(input: {
       body,
       cta: { label: "صفحة الندوة", href: input.debateUrl },
     }),
-    text: `مرحبًا ${input.firstName}،\n\nسجّلنا حضورك في ندوة «${input.debateTitle}».\nالموعد: ${input.debateWhen}\n\nصفحة الندوة: ${input.debateUrl}\n\n${CONTACT_EMAIL}`,
+    text: `مرحبًا ${input.firstName}،\n\nسجّلنا حضورك في ندوة «${input.debateTitle}».\nالموعد: ${input.debateWhen}\n\nصفحة الندوة: ${input.debateUrl}\n\n${REPLY_ADDRESS}`,
   };
 }
 
