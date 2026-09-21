@@ -8,6 +8,7 @@ import { absoluteUrl } from "@/lib/url";
 import { formatDate, formatTime } from "@/lib/format";
 import { REGISTER_CONSENT_TEXT, type RegisterInput } from "@/lib/validation";
 import { getDebateBySlug } from "@/lib/data/debates";
+import { isUpcoming } from "@/lib/types";
 
 type Fingerprint = { ipHash: string | null; userAgent: string | null };
 
@@ -24,7 +25,7 @@ export async function registerForDebate(
   const firstName = input.firstName.trim();
   const debate = await getDebateBySlug(input.debateSlug);
 
-  if (!debate || debate.status !== "upcoming" || !debate.registration_open) {
+  if (!debate || !isUpcoming(debate) || !debate.registration_open) {
     return { status: "error", message: "التسجيل غير متاح لهذه الندوة حاليًا." };
   }
 

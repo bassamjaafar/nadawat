@@ -95,6 +95,7 @@ export function EventForm({
           options={STATUS_OPTIONS}
           defaultValue={event?.status ?? "draft"}
           error={state.errors?.status}
+          hint="لا يحدّد ظهورها في «القادمة» أو «الأرشيف» — ذلك يُحسب تلقائيًّا من الموعد أدناه. اختر «مسودّة» فقط لإخفائها مؤقتًا."
         />
         <TextField
           id="starts_at"

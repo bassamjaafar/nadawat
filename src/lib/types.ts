@@ -48,6 +48,19 @@ export type DebateDetail = DebateSummary & {
   participants: DebateParticipant[];
 };
 
-export function isUpcoming(d: Pick<DebateSummary, "status">): boolean {
-  return d.status === "upcoming";
+/**
+ * Whether an event is still ahead of us — derived purely from its date, not
+ * the (legacy) `status` field. An event is never manually moved from
+ * "upcoming" to "archived": the moment its start time passes, it's archived
+ * automatically, and there's exactly one row for it the whole time.
+ */
+export function isUpcoming(d: Pick<DebateSummary, "starts_at">): boolean {
+  return !!d.starts_at && new Date(d.starts_at).getTime() > Date.now();
+}
+
+/** "شاهد الندوة" only makes sense once a recording actually exists. */
+export function pastEventCtaLabel(
+  d: Pick<DebateSummary, "youtube_video_id">,
+): string {
+  return d.youtube_video_id ? "شاهد الندوة" : "تفاصيل الندوة";
 }

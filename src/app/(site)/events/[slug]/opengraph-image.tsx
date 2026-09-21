@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { LOGO_PATHS, LOGO_VIEWBOX } from "@/components/ui/logo-mark-data";
 import { loadOgFonts } from "@/lib/og-fonts";
 import { getDebateBySlug } from "@/lib/data/debates";
+import { isUpcoming } from "@/lib/types";
 import { SITE_NAME } from "@/lib/site";
 import { wrapByChars } from "@/lib/wrap-text";
 
@@ -39,7 +40,7 @@ export default async function Image({
   const markHeight = (vbH / vbW) * markWidth;
 
   const kicker = debate
-    ? debate.status === "upcoming"
+    ? isUpcoming(debate)
       ? "ندوة قادمة"
       : "من أرشيف ندوات"
     : SITE_NAME;

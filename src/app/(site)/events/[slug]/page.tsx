@@ -15,6 +15,7 @@ import {
 import { formatDate, formatTime } from "@/lib/format";
 import { absoluteUrl } from "@/lib/url";
 import { youtubeThumbnailUrl } from "@/lib/youtube";
+import { isUpcoming } from "@/lib/types";
 import { SITE_NAME } from "@/lib/site";
 
 export const revalidate = 300;
@@ -63,7 +64,7 @@ export default async function DebatePage({ params }: Params) {
   if (!debate) notFound();
 
   const related = await getRelatedDebates(debate.id, 2);
-  const isUpcoming = debate.status === "upcoming";
+  const upcoming = isUpcoming(debate);
   const when = debate.starts_at
     ? `${formatDate(debate.starts_at, debate.timezone)} · ${formatTime(debate.starts_at, debate.timezone)} بتوقيت دمشق`
     : null;
@@ -79,7 +80,7 @@ export default async function DebatePage({ params }: Params) {
         </Link>
 
         <p className="mt-6 text-kicker font-medium uppercase text-clay">
-          {isUpcoming ? "ندوة قادمة" : "من الأرشيف"}
+          {upcoming ? "ندوة قادمة" : "من الأرشيف"}
         </p>
         <h1 className="mt-3 max-w-[46rem] text-h1 text-ink">{debate.title_ar}</h1>
         {when ? <p className="mt-4 text-meta text-muted">{when}</p> : null}
@@ -89,7 +90,7 @@ export default async function DebatePage({ params }: Params) {
       </div>
 
       <div className="container-page mt-10">
-        {!isUpcoming && debate.youtube_video_id ? (
+        {!upcoming && debate.youtube_video_id ? (
           <YouTubeEmbed
             videoId={debate.youtube_video_id}
             title={debate.title_ar}
@@ -129,7 +130,7 @@ export default async function DebatePage({ params }: Params) {
             </div>
           </div>
 
-          {isUpcoming && debate.registration_open ? (
+          {upcoming && debate.registration_open ? (
             <section
               id="register"
               className="mt-14 scroll-mt-[7rem] border-t border-line pt-10"
@@ -153,12 +154,12 @@ export default async function DebatePage({ params }: Params) {
         <aside className="lg:sticky lg:top-24">
           <div className="rounded-[var(--radius-md)] border border-line p-5">
             <p className="text-kicker font-medium uppercase text-muted">
-              {isUpcoming ? "الموعد" : "نُشرت"}
+              {upcoming ? "الموعد" : "نُشرت"}
             </p>
             {when ? (
               <p className="mt-2 text-[0.95rem] leading-7 text-ink">{when}</p>
             ) : null}
-            {isUpcoming && debate.registration_open ? (
+            {upcoming && debate.registration_open ? (
               <div className="mt-4">
                 <ArrowLink href="#register">إلى نموذج التسجيل</ArrowLink>
               </div>

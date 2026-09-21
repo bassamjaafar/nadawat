@@ -120,6 +120,7 @@ export function SelectField({
   error,
   options,
   placeholder,
+  hint,
   className,
   ...props
 }: ComponentPropsWithoutRef<"select"> & {
@@ -128,20 +129,27 @@ export function SelectField({
   error?: string;
   options: string[] | { value: string; label: string }[];
   placeholder?: string;
+  hint?: string;
 }) {
   const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
   const normalized = options.map((o) =>
     typeof o === "string" ? { value: o, label: o } : o,
   );
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <Label htmlFor={id}>{label}</Label>
+      {hint ? (
+        <p id={hintId} className="text-[0.85rem] text-muted">
+          {hint}
+        </p>
+      ) : null}
       <select
         id={id}
         name={id}
         className={cn(controlBase, "appearance-none bg-[length:1rem] pe-3")}
         aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
+        aria-describedby={cn(error && errorId, hint && hintId) || undefined}
         defaultValue=""
         {...props}
       >

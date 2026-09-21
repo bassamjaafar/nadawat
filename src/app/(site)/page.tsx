@@ -10,6 +10,7 @@ import {
   getUpcomingDebate,
   toSummary,
 } from "@/lib/data/debates";
+import { isUpcoming } from "@/lib/types";
 
 // Homepage reflects live scheduling — revalidate frequently.
 export const revalidate = 120;
@@ -33,7 +34,7 @@ export default async function HomePage({
     getRecentDebates(3),
   ]);
 
-  const upcoming = featured?.status === "upcoming" ? featured : autoUpcoming;
+  const upcoming = featured && isUpcoming(featured) ? featured : autoUpcoming;
 
   if (upcoming) {
     return (
@@ -50,7 +51,7 @@ export default async function HomePage({
   // A pinned, non-upcoming debate takes the "latest debate" spot instead of
   // whatever is chronologically newest.
   const recentForDisplay =
-    featured && featured.status !== "upcoming"
+    featured && !isUpcoming(featured)
       ? [toSummary(featured), ...recent.filter((d) => d.id !== featured.id)]
       : recent;
 

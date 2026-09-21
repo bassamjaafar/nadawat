@@ -1,11 +1,12 @@
 import "server-only";
 import { hasSupabase } from "@/lib/env";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
-import type {
-  DebateDetail,
-  DebateParticipant,
-  DebateSummary,
-  Person,
+import {
+  isUpcoming,
+  type DebateDetail,
+  type DebateParticipant,
+  type DebateSummary,
+  type Person,
 } from "@/lib/types";
 import { FIXTURE_DEBATES } from "@/lib/data/fixtures";
 import { getSiteContentValue } from "@/lib/data/site-content";
@@ -25,9 +26,6 @@ const DEBATE_SELECT = `
     person:people ( ${PERSON_COLUMNS} )
   )
 `;
-
-const ARCHIVE_STATUSES = ["completed", "archived"] as const;
-const PUBLIC_STATUSES = ["upcoming", "completed", "archived"] as const;
 
 type Row = Record<string, unknown>;
 
@@ -94,18 +92,26 @@ const fixturesByDate = [...FIXTURE_DEBATES].sort(
 );
 
 // --- Public API ----------------------------------------------------------
+//
+// "Upcoming" vs "archived" is derived purely from starts_at vs now() below —
+// never from the (legacy) status column — so an event lives in exactly one
+// row and never needs to be manually flipped or duplicated once it happens.
+// `status` is only still checked for "draft", which stays an explicit,
+// independent editorial gate (not ready to publish at all).
 
 export async function getUpcomingDebate(): Promise<DebateDetail | null> {
   if (!hasSupabase) {
-    return FIXTURE_DEBATES.find((d) => d.status === "upcoming") ?? null;
+    return FIXTURE_DEBATES.find((d) => isUpcoming(d)) ?? null;
   }
   const supabase = getSupabasePublicClient();
   const { data, error } = await supabase
     .from("debates")
     .select(DEBATE_SELECT)
     .eq("is_published", true)
-    .eq("status", "upcoming")
+    .neq("status", "draft")
+    .gt("starts_at", new Date().toISOString())
     .order("starts_at", { ascending: true })
+    .order("id", { ascending: true })
     .limit(1)
     .maybeSingle();
   if (error) {
@@ -118,17 +124,20 @@ export async function getUpcomingDebate(): Promise<DebateDetail | null> {
 export async function getRecentDebates(limit = 3): Promise<DebateSummary[]> {
   if (!hasSupabase) {
     return fixturesByDate
-      .filter((d) => (ARCHIVE_STATUSES as readonly string[]).includes(d.status))
+      .filter((d) => !isUpcoming(d))
       .slice(0, limit)
       .map(toSummary);
   }
   const supabase = getSupabasePublicClient();
+  const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("debates")
     .select(DEBATE_SELECT)
     .eq("is_published", true)
-    .in("status", ARCHIVE_STATUSES as unknown as string[])
-    .order("starts_at", { ascending: false })
+    .neq("status", "draft")
+    .or(`starts_at.lte.${nowIso},starts_at.is.null`)
+    .order("starts_at", { ascending: false, nullsFirst: false })
+    .order("id", { ascending: true })
     .limit(limit);
   if (error) {
     console.error("getRecentDebates", error.message);
@@ -139,17 +148,18 @@ export async function getRecentDebates(limit = 3): Promise<DebateSummary[]> {
 
 export async function getArchiveDebates(): Promise<DebateSummary[]> {
   if (!hasSupabase) {
-    return fixturesByDate
-      .filter((d) => (ARCHIVE_STATUSES as readonly string[]).includes(d.status))
-      .map(toSummary);
+    return fixturesByDate.filter((d) => !isUpcoming(d)).map(toSummary);
   }
   const supabase = getSupabasePublicClient();
+  const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("debates")
     .select(DEBATE_SELECT)
     .eq("is_published", true)
-    .in("status", ARCHIVE_STATUSES as unknown as string[])
-    .order("starts_at", { ascending: false });
+    .neq("status", "draft")
+    .or(`starts_at.lte.${nowIso},starts_at.is.null`)
+    .order("starts_at", { ascending: false, nullsFirst: false })
+    .order("id", { ascending: true });
   if (error) {
     console.error("getArchiveDebates", error.message);
     return [];
@@ -168,7 +178,7 @@ export async function getDebateBySlug(
     .from("debates")
     .select(DEBATE_SELECT)
     .eq("is_published", true)
-    .in("status", PUBLIC_STATUSES as unknown as string[])
+    .neq("status", "draft")
     .eq("slug", slug)
     .maybeSingle();
   if (error) {
@@ -217,7 +227,7 @@ export async function getPublishedDebateSlugs(): Promise<
     .from("debates")
     .select("slug, updated_at")
     .eq("is_published", true)
-    .in("status", PUBLIC_STATUSES as unknown as string[]);
+    .neq("status", "draft");
   if (error || !data) return [];
   return data.map((d) => ({
     slug: d.slug as string,

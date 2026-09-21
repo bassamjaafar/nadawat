@@ -9,7 +9,7 @@ import {
   getUpcomingDebate,
 } from "@/lib/data/debates";
 import { formatDateShort, formatYear } from "@/lib/format";
-import type { DebateSummary } from "@/lib/types";
+import { pastEventCtaLabel, type DebateSummary } from "@/lib/types";
 
 export const revalidate = 300;
 
@@ -138,7 +138,7 @@ function ArchiveRow({ debate }: { debate: DebateSummary }) {
           </p>
         ) : null}
         <div className="mt-4">
-          <ArrowLink href={href}>شاهد الندوة</ArrowLink>
+          <ArrowLink href={href}>{pastEventCtaLabel(debate)}</ArrowLink>
         </div>
       </div>
     </article>

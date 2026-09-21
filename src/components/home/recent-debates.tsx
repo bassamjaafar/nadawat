@@ -3,7 +3,7 @@ import { ArrowLink } from "@/components/ui/arrow-link";
 import { DebateCard, DebateThumb } from "@/components/debates/debate-card";
 import { Reveal } from "@/components/ui/reveal";
 import { formatDateShort } from "@/lib/format";
-import type { DebateSummary } from "@/lib/types";
+import { pastEventCtaLabel, type DebateSummary } from "@/lib/types";
 
 export function RecentDebates({
   debates,
@@ -22,7 +22,7 @@ export function RecentDebates({
             الأرشيف
           </span>
           <h2 id="recent-title" className="text-h2 text-ink">
-            {variant === "feature" ? "أحدث ندوة" : "الفعاليات السابقة"}
+            {variant === "feature" ? "آخر ندوة" : "الفعاليات السابقة"}
           </h2>
         </div>
         <div className="hidden shrink-0 sm:block">
@@ -73,7 +73,7 @@ function FeatureDebate({ debate }: { debate: DebateSummary }) {
           </p>
         ) : null}
         <div className="mt-5">
-          <ArrowLink href={href}>شاهد الندوة</ArrowLink>
+          <ArrowLink href={href}>{pastEventCtaLabel(debate)}</ArrowLink>
         </div>
       </div>
     </article>

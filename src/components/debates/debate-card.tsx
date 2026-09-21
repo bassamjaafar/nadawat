@@ -4,7 +4,7 @@ import { ArrowLink } from "@/components/ui/arrow-link";
 import { formatDateShort } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { youtubeThumbnailUrl } from "@/lib/youtube";
-import type { DebateSummary } from "@/lib/types";
+import { pastEventCtaLabel, type DebateSummary } from "@/lib/types";
 
 function speakerNames(d: DebateSummary): string {
   return d.speakers.map((s) => s.name_ar).join("  و  ");
@@ -87,7 +87,7 @@ export function DebateCard({
           <p className="text-meta text-muted">{speakerNames(debate)}</p>
         ) : null}
         <div className="mt-1">
-          <ArrowLink href={href}>شاهد الندوة</ArrowLink>
+          <ArrowLink href={href}>{pastEventCtaLabel(debate)}</ArrowLink>
         </div>
       </div>
     </article>
