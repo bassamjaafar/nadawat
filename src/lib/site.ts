@@ -8,7 +8,7 @@ export const SITE_TAGLINE = "نختلف باحترام";
 /** Formal institutional name, set beside the logo mark in the header/footer. */
 export const ORG_NAME = "المنتدى السوري للحوار";
 export const SITE_DESCRIPTION =
-  "منصّة عربية للندوات المنظّمة والحوار العام الرصين حول القضايا السياسية والاقتصادية والاجتماعية والمدنية في سوريا.";
+  "ندوات منصة سورية مستقلة وغير ربحية للحوار العام حول القضايا السياسية والاقتصادية والاجتماعية التي تهم السوريين.";
 
 export const CONTACT_EMAIL = "events@nadawat.org";
 
