@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
+import { SocialLinks } from "@/components/ui/social-icons";
 import { FOOTER_NAV, ORG_NAME, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import { formatYear } from "@/lib/format";
 
@@ -25,6 +26,7 @@ export function SiteFooter() {
               {SITE_NAME} منصّة للندوات المنظّمة والحوار العام حول الشأن
               السوري. {SITE_TAGLINE}.
             </p>
+            <SocialLinks className="mt-5 text-cream/70" />
           </div>
 
           <nav aria-label="روابط أساسية">

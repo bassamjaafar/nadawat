@@ -1,0 +1,29 @@
+/**
+ * Central place for Nadawat's social accounts. Add/remove a platform or
+ * change a URL here only — the footer (and anywhere else) picks it up
+ * automatically and only renders an icon once a real `url` is set.
+ */
+
+export type SocialPlatform =
+  | "twitter"
+  | "facebook"
+  | "instagram"
+  | "youtube"
+  | "telegram"
+  | "linkedin";
+
+export type SocialLink = {
+  platform: SocialPlatform;
+  /** Accessible label, e.g. for screen readers — not shown visually. */
+  label: string;
+  url: string | null;
+};
+
+export const SOCIAL_LINKS: SocialLink[] = [
+  { platform: "twitter", label: "ندوات على إكس (تويتر)", url: null },
+  { platform: "facebook", label: "ندوات على فيسبوك", url: null },
+  { platform: "instagram", label: "ندوات على إنستغرام", url: null },
+  { platform: "youtube", label: "ندوات على يوتيوب", url: null },
+  { platform: "telegram", label: "ندوات على تيليغرام", url: null },
+  { platform: "linkedin", label: "ندوات على لينكدإن", url: null },
+];
