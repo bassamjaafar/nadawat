@@ -150,6 +150,13 @@
   .prose-ar strong {
     font-weight: 600;
   }
+  .prose-ar ul {
+    list-style: disc;
+    padding-inline-start: 1.4em;
+  }
+  .prose-ar li + li {
+    margin-top: 0.5em;
+  }
   .prose-ar a {
     color: var(--color-olive);
     text-decoration: underline;
