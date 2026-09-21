@@ -21,7 +21,7 @@ export async function subscribeAction(
   }
 
   // Honeypot: a bot filled the hidden field — respond as if successful.
-  if (parsed.data.company) {
+  if (parsed.data.hp_field) {
     return { status: "success" };
   }
 

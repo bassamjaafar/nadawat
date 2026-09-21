@@ -43,7 +43,7 @@ export const subscribeSchema = z.object({
     z.literal(true, { message: "يلزم الموافقة لإتمام الاشتراك" }),
   ),
   // Honeypot — must stay empty.
-  company: z.string().max(0).optional(),
+  hp_field: z.string().max(0).optional(),
 });
 
 export type SubscribeInput = z.infer<typeof subscribeSchema>;
@@ -56,7 +56,7 @@ export const registerSchema = z.object({
   email,
   country,
   notifyFutureEvents: checkboxTrue,
-  company: z.string().max(0).optional(),
+  hp_field: z.string().max(0).optional(),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -82,7 +82,7 @@ export const contactSchema = z.object({
     .min(10, "يرجى كتابة رسالة أوضح قليلًا")
     .max(4000, "الرسالة طويلة جدًا"),
   // Honeypot — must stay empty.
-  company: z.string().max(0).optional(),
+  hp_field: z.string().max(0).optional(),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;

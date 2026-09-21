@@ -19,7 +19,7 @@ export async function registerAction(
     };
   }
 
-  if (parsed.data.company) {
+  if (parsed.data.hp_field) {
     return { status: "success" };
   }
 

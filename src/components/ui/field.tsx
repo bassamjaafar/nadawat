@@ -191,12 +191,21 @@ export function CheckboxField({
   );
 }
 
-/** Anti-spam field, visually and semantically hidden from people. */
+/**
+ * Anti-spam field, visually and semantically hidden from people. Named
+ * `hp_field` rather than something like "company" deliberately — Chrome's
+ * autofill matches saved profile data against the `name`/`id` attribute
+ * regardless of `autocomplete="off"` or the field being positioned
+ * off-screen, so a honeypot named after a real-world field silently fills
+ * itself for real visitors with that autofill data saved, making every one
+ * of their submissions look like a bot and get dropped. Confirmed as the
+ * cause of a real, reproducible false-positive on the contact form.
+ */
 export function Honeypot() {
   return (
     <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-      <label htmlFor="company">لا تملأ هذا الحقل</label>
-      <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+      <label htmlFor="hp_field">لا تملأ هذا الحقل</label>
+      <input id="hp_field" name="hp_field" type="text" tabIndex={-1} autoComplete="off" />
     </div>
   );
 }
