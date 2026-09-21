@@ -51,12 +51,12 @@ export default async function ProtectedAdminLayout({
   return (
     <div dir="rtl" className="min-h-screen bg-cream">
       <header className="border-b border-line bg-[#fffdf7]">
-        <div className="container-page flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
+        <div className="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <span className="font-display text-[1.05rem] font-medium text-olive">
               {SITE_NAME} · لوحة التحكم
             </span>
-            <nav className="flex items-center gap-4">
+            <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
               {ADMIN_NAV.map((item) => (
                 <Link
                   key={item.href}

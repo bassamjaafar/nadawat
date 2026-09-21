@@ -49,7 +49,7 @@ export function PhotoUpload({
   const displayUrl = preview ?? url;
 
   return (
-    <div className="flex items-start gap-5">
+    <div className="flex flex-col items-start gap-5 sm:flex-row">
       <div className="relative size-28 shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-cream-deep">
         {displayUrl ? (
           <Image
@@ -62,7 +62,7 @@ export function PhotoUpload({
           />
         ) : null}
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex min-w-0 max-w-full flex-col gap-3">
         {error ? <p className="text-[0.85rem] text-[#8f3520]">{error}</p> : null}
         <input
           ref={inputRef}
