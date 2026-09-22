@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Reem_Kufi, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
+import { FirstVisitIntro } from "@/components/layout/first-visit-intro";
 
 const reemKufi = Reem_Kufi({
   subsets: ["arabic", "latin"],
@@ -63,6 +64,7 @@ export default function RootLayout({
           تخطَّ إلى المحتوى
         </a>
         {children}
+        <FirstVisitIntro />
       </body>
     </html>
   );
