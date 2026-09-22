@@ -35,82 +35,92 @@ export function SiteHeader() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-40 border-b transition-colors duration-300",
-        scrolled || open
-          ? "border-line bg-cream/85 backdrop-blur-md"
-          : "border-transparent bg-cream",
-      )}
-    >
-      <div className="container-page flex h-[7rem] items-center justify-between gap-6">
-        <Link href="/" className="flex items-center gap-3 py-2 pe-2">
-          <Logo />
-          <span
-            aria-hidden="true"
-            className="hidden h-8 w-px bg-line-strong sm:block"
-          />
-          <span className="hidden text-[0.95rem] font-medium leading-tight text-olive sm:block">
-            {ORG_NAME}
-          </span>
-        </Link>
+    // Fragment, not a single <header>: the mobile nav panel below must be a
+    // sibling of <header>, not a descendant. The header gets backdrop-blur
+    // while the menu is open, and backdrop-filter creates a containing
+    // block for `position: fixed` descendants — nested inside it, the
+    // panel's `fixed inset-0` resolved against the ~113px header box
+    // instead of the viewport and collapsed to zero height, so its content
+    // painted outside that box directly over the page instead of covering
+    // it.
+    <>
+      <header
+        className={cn(
+          "sticky top-0 z-40 border-b transition-colors duration-300",
+          scrolled || open
+            ? "border-line bg-cream/85 backdrop-blur-md"
+            : "border-transparent bg-cream",
+        )}
+      >
+        <div className="container-page flex h-[7rem] items-center justify-between gap-6">
+          <Link href="/" className="flex items-center gap-3 py-2 pe-2">
+            <Logo />
+            <span
+              aria-hidden="true"
+              className="hidden h-8 w-px bg-line-strong sm:block"
+            />
+            <span className="hidden text-[0.95rem] font-medium leading-tight text-olive sm:block">
+              {ORG_NAME}
+            </span>
+          </Link>
 
-        <nav aria-label="التنقّل الرئيسي" className="hidden md:block">
-          <ul className="flex items-center gap-1">
-            {PRIMARY_NAV.map((item) => {
-              const active = isActive(item.href);
-              const isSubscribe = item.href === "/subscribe";
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "inline-flex items-center rounded-[var(--radius)] px-3 py-2 text-[0.98rem] transition-colors",
-                      isSubscribe
-                        ? "ms-2 border border-line-strong text-olive hover:border-olive hover:bg-olive/[0.05]"
-                        : "text-ink/80 hover:text-olive",
-                      active && !isSubscribe && "text-olive",
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+          <nav aria-label="التنقّل الرئيسي" className="hidden md:block">
+            <ul className="flex items-center gap-1">
+              {PRIMARY_NAV.map((item) => {
+                const active = isActive(item.href);
+                const isSubscribe = item.href === "/subscribe";
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "inline-flex items-center rounded-[var(--radius)] px-3 py-2 text-[0.98rem] transition-colors",
+                        isSubscribe
+                          ? "ms-2 border border-line-strong text-olive hover:border-olive hover:bg-olive/[0.05]"
+                          : "text-ink/80 hover:text-olive",
+                        active && !isSubscribe && "text-olive",
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
-        <button
-          type="button"
-          className="relative z-50 -me-2 inline-flex size-11 items-center justify-center rounded-[var(--radius)] text-olive md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span className="sr-only">{open ? "إغلاق القائمة" : "فتح القائمة"}</span>
-          <svg viewBox="0 0 24 24" className="size-6" fill="none" aria-hidden="true">
-            {open ? (
-              <path
-                d="m6 6 12 12M18 6 6 18"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            ) : (
-              <path
-                d="M4 7h16M4 12h16M4 17h16"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            )}
-          </svg>
-        </button>
-      </div>
+          <button
+            type="button"
+            className="relative z-50 -me-2 inline-flex size-11 items-center justify-center rounded-[var(--radius)] text-olive md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="sr-only">{open ? "إغلاق القائمة" : "فتح القائمة"}</span>
+            <svg viewBox="0 0 24 24" className="size-6" fill="none" aria-hidden="true">
+              {open ? (
+                <path
+                  d="m6 6 12 12M18 6 6 18"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              ) : (
+                <path
+                  d="M4 7h16M4 12h16M4 17h16"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              )}
+            </svg>
+          </button>
+        </div>
+      </header>
 
-      {/* Mobile navigation */}
+      {/* Mobile navigation — sibling of <header>, see note above. */}
       <div
         id="mobile-nav"
         hidden={!open}
@@ -136,6 +146,6 @@ export function SiteHeader() {
           </ul>
         </nav>
       </div>
-    </header>
+    </>
   );
 }
