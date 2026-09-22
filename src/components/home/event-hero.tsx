@@ -2,7 +2,8 @@ import Image from "next/image";
 import { ButtonLink } from "@/components/ui/button";
 import { SpeakerLineup } from "@/components/debates/speakers";
 import { formatDate, formatTime } from "@/lib/format";
-import type { DebateDetail } from "@/lib/types";
+import { youtubeThumbnailUrl } from "@/lib/youtube";
+import { isUpcoming, pastEventCtaLabel, type DebateDetail } from "@/lib/types";
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
@@ -13,19 +14,30 @@ function MetaRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function UpcomingHero({ debate }: { debate: DebateDetail }) {
+/**
+ * The homepage's single, always-present prominent event slot: the soonest
+ * upcoming event if one is scheduled, otherwise the most recently completed
+ * one. Same hero-level treatment either way — the only differences are the
+ * kicker label, the meta row (date/time/location vs. just a publish date),
+ * and the primary action (register vs. watch).
+ */
+export function EventHero({ debate }: { debate: DebateDetail }) {
   const href = `/events/${debate.slug}`;
+  const upcoming = isUpcoming(debate);
+  const image = debate.youtube_video_id
+    ? youtubeThumbnailUrl(debate.youtube_video_id, debate.updated_at)
+    : debate.cover_image_url;
 
   return (
-    <section aria-labelledby="upcoming-title" className="container-page pt-10 pb-4 sm:pt-16">
+    <section aria-labelledby="event-hero-title" className="container-page pt-10 pb-4 sm:pt-16">
       <p className="text-kicker font-medium uppercase tracking-wide text-clay">
-        الندوة القادمة
+        {upcoming ? "الندوة القادمة" : "آخر ندوة"}
       </p>
 
-      {debate.cover_image_url ? (
+      {image ? (
         <div className="relative mt-6 aspect-[16/8] overflow-hidden rounded-[var(--radius-lg)] bg-cream-deep">
           <Image
-            src={debate.cover_image_url}
+            src={image}
             alt=""
             fill
             priority
@@ -38,7 +50,7 @@ export function UpcomingHero({ debate }: { debate: DebateDetail }) {
       <div className="mt-6 grid gap-x-12 gap-y-10 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="flex flex-col">
           <h1
-            id="upcoming-title"
+            id="event-hero-title"
             className="text-display font-semibold text-ink [text-wrap:balance]"
           >
             {debate.title_ar}
@@ -51,7 +63,7 @@ export function UpcomingHero({ debate }: { debate: DebateDetail }) {
           ) : null}
 
           <dl className="mt-8 max-w-md divide-y divide-line border-y border-line">
-            {debate.starts_at ? (
+            {upcoming && debate.starts_at ? (
               <>
                 <MetaRow
                   label="التاريخ"
@@ -62,19 +74,28 @@ export function UpcomingHero({ debate }: { debate: DebateDetail }) {
                   value={`${formatTime(debate.starts_at, debate.timezone)} بتوقيت دمشق`}
                 />
               </>
+            ) : debate.starts_at ? (
+              <MetaRow
+                label="نُشرت"
+                value={formatDate(debate.starts_at, debate.timezone)}
+              />
             ) : null}
-            {debate.location_ar ? (
+            {upcoming && debate.location_ar ? (
               <MetaRow label="المكان" value={debate.location_ar} />
             ) : null}
           </dl>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            {debate.registration_open ? (
-              <ButtonLink href={`${href}#register`}>سجّل حضورك</ButtonLink>
+            {upcoming ? (
+              debate.registration_open ? (
+                <ButtonLink href={`${href}#register`}>سجّل حضورك</ButtonLink>
+              ) : (
+                <ButtonLink href={href}>تفاصيل الندوة</ButtonLink>
+              )
             ) : (
-              <ButtonLink href={href}>تفاصيل الندوة</ButtonLink>
+              <ButtonLink href={href}>{pastEventCtaLabel(debate)}</ButtonLink>
             )}
-            {debate.broadcast_url ? (
+            {upcoming && debate.broadcast_url ? (
               <ButtonLink href={debate.broadcast_url} variant="outline">
                 رابط البثّ
               </ButtonLink>

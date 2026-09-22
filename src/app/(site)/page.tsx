@@ -1,16 +1,17 @@
-import { UpcomingHero } from "@/components/home/upcoming-hero";
+import { EventHero } from "@/components/home/event-hero";
 import { InstitutionalHero } from "@/components/home/institutional-hero";
 import { BrandStatement } from "@/components/home/brand-statement";
 import { RecentDebates } from "@/components/home/recent-debates";
 import { SubscribeSection } from "@/components/home/subscribe-section";
 import { AboutPreview } from "@/components/home/about-preview";
 import {
+  getDebateBySlug,
   getFeaturedDebate,
   getRecentDebates,
   getUpcomingDebate,
-  toSummary,
 } from "@/lib/data/debates";
 import { isUpcoming } from "@/lib/types";
+import type { DebateDetail, DebateSummary } from "@/lib/types";
 
 // Homepage reflects live scheduling — revalidate frequently.
 export const revalidate = 120;
@@ -31,37 +32,47 @@ export default async function HomePage({
 
   const [autoUpcoming, recent] = await Promise.all([
     featured || forceInstitutional ? Promise.resolve(null) : getUpcomingDebate(),
-    getRecentDebates(3),
+    getRecentDebates(4),
   ]);
 
   const upcoming = featured && isUpcoming(featured) ? featured : autoUpcoming;
 
-  if (upcoming) {
+  // The homepage always keeps exactly one event in the prominent hero slot:
+  // the soonest upcoming one if any is scheduled, otherwise the most
+  // recently completed one — never a generic "no event" hero as long as
+  // *something* has been published. That "otherwise" branch needs the full
+  // DebateDetail (for the speaker lineup), not just the lighter summary
+  // getRecentDebates returns, so it's fetched by slug below.
+  let hero: DebateDetail | null = upcoming;
+  let rest: DebateSummary[] = upcoming ? recent.slice(0, 3) : [];
+
+  if (!hero && !forceInstitutional) {
+    if (featured) {
+      hero = featured;
+      rest = recent.filter((d) => d.id !== featured.id).slice(0, 3);
+    } else if (recent.length) {
+      hero = await getDebateBySlug(recent[0].slug);
+      rest = recent.slice(1, 4);
+    }
+  }
+
+  if (hero) {
     return (
       <>
-        <UpcomingHero debate={upcoming} />
+        <EventHero debate={hero} />
         <BrandStatement />
-        <RecentDebates debates={recent} />
+        <RecentDebates debates={rest} />
         <SubscribeSection />
         <AboutPreview />
       </>
     );
   }
 
-  // A pinned, non-upcoming debate takes the "latest debate" spot instead of
-  // whatever is chronologically newest.
-  const recentForDisplay =
-    featured && !isUpcoming(featured)
-      ? [toSummary(featured), ...recent.filter((d) => d.id !== featured.id)]
-      : recent;
-
+  // Nothing published yet at all — the only time the generic hero shows.
   return (
     <>
       <InstitutionalHero />
       <BrandStatement />
-      {recentForDisplay.length ? (
-        <RecentDebates debates={recentForDisplay} variant="feature" />
-      ) : null}
       <AboutPreview />
       <SubscribeSection />
     </>
