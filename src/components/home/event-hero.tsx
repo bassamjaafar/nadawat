@@ -1,8 +1,6 @@
-import Image from "next/image";
 import { ButtonLink } from "@/components/ui/button";
 import { SpeakerLineup } from "@/components/debates/speakers";
 import { formatDate, formatTime } from "@/lib/format";
-import { youtubeThumbnailUrl } from "@/lib/youtube";
 import { isUpcoming, pastEventCtaLabel, type DebateDetail } from "@/lib/types";
 
 function MetaRow({ label, value }: { label: string; value: string }) {
@@ -24,28 +22,12 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 export function EventHero({ debate }: { debate: DebateDetail }) {
   const href = `/events/${debate.slug}`;
   const upcoming = isUpcoming(debate);
-  const image = debate.youtube_video_id
-    ? youtubeThumbnailUrl(debate.youtube_video_id, debate.updated_at)
-    : debate.cover_image_url;
 
   return (
     <section aria-labelledby="event-hero-title" className="container-page pt-10 pb-4 sm:pt-16">
       <p className="text-kicker font-medium uppercase tracking-wide text-clay">
         {upcoming ? "الندوة القادمة" : "آخر ندوة"}
       </p>
-
-      {image ? (
-        <div className="relative mt-6 aspect-[16/8] overflow-hidden rounded-[var(--radius-lg)] bg-cream-deep">
-          <Image
-            src={image}
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 1100px"
-            className="object-cover"
-          />
-        </div>
-      ) : null}
 
       <div className="mt-6 grid gap-x-12 gap-y-10 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="flex flex-col">
