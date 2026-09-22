@@ -23,7 +23,11 @@ export const SOCIAL_LINKS: SocialLink[] = [
   { platform: "twitter", label: "ندوات على إكس (تويتر)", url: null },
   { platform: "facebook", label: "ندوات على فيسبوك", url: null },
   { platform: "instagram", label: "ندوات على إنستغرام", url: null },
-  { platform: "youtube", label: "ندوات على يوتيوب", url: null },
+  {
+    platform: "youtube",
+    label: "ندوات على يوتيوب",
+    url: "https://www.youtube.com/@nadawatsyr",
+  },
   { platform: "telegram", label: "ندوات على تيليغرام", url: null },
   { platform: "linkedin", label: "ندوات على لينكدإن", url: null },
 ];
