@@ -20,7 +20,11 @@ export type SocialLink = {
 };
 
 export const SOCIAL_LINKS: SocialLink[] = [
-  { platform: "twitter", label: "ندوات على إكس (تويتر)", url: null },
+  {
+    platform: "twitter",
+    label: "ندوات على إكس (تويتر)",
+    url: "https://x.com/Nadawatdorg",
+  },
   {
     platform: "facebook",
     label: "ندوات على فيسبوك",
