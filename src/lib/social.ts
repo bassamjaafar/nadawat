@@ -30,7 +30,11 @@ export const SOCIAL_LINKS: SocialLink[] = [
     label: "ندوات على فيسبوك",
     url: "https://www.facebook.com/nadawatorg",
   },
-  { platform: "instagram", label: "ندوات على إنستغرام", url: null },
+  {
+    platform: "instagram",
+    label: "ندوات على إنستغرام",
+    url: "https://www.instagram.com/nadawatorg/",
+  },
   {
     platform: "youtube",
     label: "ندوات على يوتيوب",
