@@ -10,7 +10,8 @@ export type SocialPlatform =
   | "instagram"
   | "youtube"
   | "telegram"
-  | "linkedin";
+  | "linkedin"
+  | "whatsapp";
 
 export type SocialLink = {
   platform: SocialPlatform;
@@ -42,4 +43,9 @@ export const SOCIAL_LINKS: SocialLink[] = [
   },
   { platform: "telegram", label: "ندوات على تيليغرام", url: null },
   { platform: "linkedin", label: "ندوات على لينكدإن", url: null },
+  {
+    platform: "whatsapp",
+    label: "قناة ندوات على واتساب",
+    url: "https://whatsapp.com/channel/0029Vb8tsGFIN9iwbLvHwN2X",
+  },
 ];
