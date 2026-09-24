@@ -9,22 +9,13 @@ export async function participateAction(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const raw = Object.fromEntries(formData);
-  const parsed = participateSchema.safeParse(raw);
-
-  // Echoed back on any error so a long typed question isn't lost.
-  const values = Object.fromEntries(
-    Object.entries(raw)
-      .filter(([k, v]) => typeof v === "string" && k !== "hp_field")
-      .map(([k, v]) => [k, v as string]),
-  );
+  const parsed = participateSchema.safeParse(Object.fromEntries(formData));
 
   if (!parsed.success) {
     return {
       status: "error",
       message: "يرجى مراجعة الحقول المطلوبة.",
       errors: fieldErrors(parsed.error),
-      values,
     };
   }
 
@@ -36,7 +27,7 @@ export async function participateAction(
   const result = await submitParticipation(parsed.data, fp);
 
   if (result.status === "error") {
-    return { status: "error", message: result.message, values };
+    return { status: "error", message: result.message };
   }
 
   return {

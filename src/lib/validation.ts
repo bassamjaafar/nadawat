@@ -15,8 +15,10 @@ const email = z
   .email("يرجى إدخال بريد إلكتروني صحيح")
   .max(160);
 
+// The select's placeholder option is disabled, so an untouched select sends
+// no value at all — the type-level message covers that case too.
 const country = z
-  .string()
+  .string({ message: "يرجى اختيار بلد الإقامة" })
   .trim()
   .min(1, "يرجى اختيار بلد الإقامة")
   .refine((v) => COUNTRIES.includes(v), "يرجى اختيار بلد من القائمة");

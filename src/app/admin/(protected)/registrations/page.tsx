@@ -60,7 +60,7 @@ function Submission({ r }: { r: AdminRegistrationRow }) {
 
       <dl className="mt-3 grid gap-x-6 gap-y-1 text-[0.88rem] sm:grid-cols-[auto_1fr]">
         <dt className="text-muted">البريد</dt>
-        <dd dir="ltr" className="text-start text-ink">
+        <dd dir="ltr" className="text-end text-ink">
           <a href={`mailto:${r.email}`} className="hover:text-olive">
             {r.email}
           </a>
@@ -68,7 +68,7 @@ function Submission({ r }: { r: AdminRegistrationRow }) {
         {r.phone ? (
           <>
             <dt className="text-muted">واتساب / الهاتف</dt>
-            <dd dir="ltr" className="text-start text-ink">
+            <dd dir="ltr" className="text-end text-ink">
               {waDigits ? (
                 <a
                   href={`https://wa.me/${waDigits}`}
@@ -142,7 +142,7 @@ export default async function AdminRegistrationsPage() {
             <section key={g.title} className="mt-10">
               <h2 className="text-h3 text-ink">{g.title}</h2>
               <p className="mt-1 text-[0.85rem] text-muted">
-                {g.rows.length} طلبات · {liveCount} مشاركة مباشرة
+                عدد الطلبات: {g.rows.length} · طلبات المشاركة المباشرة: {liveCount}
               </p>
               <ul className="mt-4 flex flex-col gap-4">
                 {g.rows.map((r) => (

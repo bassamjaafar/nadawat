@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
 import { updateRegistrationAction } from "@/app/admin/(protected)/registrations/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +25,13 @@ export function RegistrationStatusForm({
 
   return (
     <form
-      action={formAction}
+      // onSubmit, not `action`: React 19's post-action form reset snapped the
+      // status <select> back to its old value after a successful save.
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startTransition(() => formAction(data));
+      }}
       className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
     >
       <label className="flex flex-col gap-1.5">

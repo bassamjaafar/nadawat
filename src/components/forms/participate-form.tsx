@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useId, useState } from "react";
+import { startTransition, useActionState, useId, useState } from "react";
 import { participateAction } from "@/app/(site)/events/[slug]/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,11 +36,9 @@ export function ParticipateForm({
     participateAction,
     IDLE_FORM_STATE,
   );
-  // Controlled, so it survives React's post-action form reset and drives
-  // which extra fields (phone + live acknowledgments) are shown.
+  // Drives which extra fields (phone + live acknowledgments) are shown.
   const [type, setType] = useState<ParticipationType | null>(null);
   const headingId = useId();
-  const v = state.values ?? {};
   const live = type === "live";
 
   if (state.status === "success") {
@@ -59,7 +57,16 @@ export function ParticipateForm({
 
   return (
     <form
-      action={formAction}
+      // Submitted via onSubmit rather than `action={formAction}` on purpose:
+      // React 19 resets a form after every `action` submission, which wiped
+      // a long typed question on any validation error and left the radio
+      // unchecked while its live-only fields stayed visible. Dispatching
+      // manually skips that reset, so what the person typed simply stays.
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startTransition(() => formAction(data));
+      }}
       aria-labelledby={headingId}
       noValidate
       className="flex flex-col gap-5"
@@ -84,7 +91,6 @@ export function ParticipateForm({
         label="الاسم الكامل"
         autoComplete="name"
         required
-        defaultValue={v.fullName}
         error={state.errors?.fullName}
       />
 
@@ -96,7 +102,6 @@ export function ParticipateForm({
         dir="ltr"
         autoComplete="email"
         required
-        defaultValue={v.email}
         error={state.errors?.email}
       />
 
@@ -105,7 +110,7 @@ export function ParticipateForm({
         label="بلد الإقامة"
         options={COUNTRIES}
         placeholder="اختر بلد الإقامة"
-        defaultValue={v.country ?? ""}
+        defaultValue=""
         error={state.errors?.country}
       />
 
@@ -152,7 +157,6 @@ export function ParticipateForm({
         hint="باختصار ووضوح."
         required
         maxLength={1000}
-        defaultValue={v.question}
         className="[&_textarea]:min-h-[6rem]"
         error={state.errors?.question}
       />
@@ -168,26 +172,22 @@ export function ParticipateForm({
             autoComplete="tel"
             hint="مع رمز الدولة، مثال: ‎+963 9xx xxx xxx — نستخدمه فقط للتنسيق إذا تمّ اختيارك."
             required
-            defaultValue={v.phone}
             error={state.errors?.phone}
           />
           <CheckboxField
             id="ackLimited"
-            defaultChecked={v.ackLimited === "on"}
             error={state.errors?.ackLimited}
           >
             {LIVE_ACK_LIMITED_TEXT}
           </CheckboxField>
           <CheckboxField
             id="ackTime"
-            defaultChecked={v.ackTime === "on"}
             error={state.errors?.ackTime}
           >
             {LIVE_ACK_TIME_TEXT}
           </CheckboxField>
           <CheckboxField
             id="consentRecording"
-            defaultChecked={v.consentRecording === "on"}
             error={state.errors?.consentRecording}
           >
             {LIVE_RECORDING_CONSENT_TEXT}
@@ -197,7 +197,6 @@ export function ParticipateForm({
 
       <CheckboxField
         id="notifyFutureEvents"
-        defaultChecked={v.notifyFutureEvents === "on"}
       >
         {PARTICIPATE_NOTIFY_CONSENT_TEXT}
       </CheckboxField>
