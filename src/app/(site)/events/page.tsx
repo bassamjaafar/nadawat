@@ -75,7 +75,7 @@ export default async function DebatesPage() {
               ) : null}
               <div className="mt-4">
                 <ArrowLink href={`/events/${upcoming.slug}`}>
-                  التفاصيل والتسجيل
+                  المشاهدة والمشاركة
                 </ArrowLink>
               </div>
             </div>

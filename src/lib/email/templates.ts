@@ -131,26 +131,45 @@ export function subscribeConfirmedEmail(input: {
   };
 }
 
-export function registrationConfirmedEmail(input: {
-  firstName: string;
+export function participationReceivedEmail(input: {
+  fullName: string;
+  participationType: "written" | "live";
+  question: string;
   debateTitle: string;
   debateWhen: string;
   debateUrl: string;
 }): Email {
-  const body = `<p style="margin:0 0 12px;">مرحبًا ${input.firstName},</p>
-<p style="margin:0 0 12px;">سجّلنا حضورك في ندوة:</p>
+  const live = input.participationType === "live";
+  const name = escapeHtml(input.fullName);
+  const question = escapeHtml(input.question.trim()).replace(/\n/g, "<br>");
+
+  const statusHtml = live
+    ? `<p style="margin:0 0 12px;">تمّ استلام طلب مشاركتك المباشرة بالصوت والصورة. إذا تمّ اختيارك، سيتواصل معك فريق ندوات عبر واتساب أو البريد الإلكتروني قبل فقرة مشاركة الجمهور.</p>
+<p style="margin:0 0 12px;color:${COLORS.muted};">المشاركة المباشرة محدودة، وتقديم الطلب لا يضمن الاختيار.</p>`
+    : `<p style="margin:0 0 12px;">تمّ استلام سؤالك أو مداخلتك. قد يُقرأ أو يُعرض خلال البثّ المباشر، علمًا أنّ إرسال سؤال لا يضمن طرحه خلال الندوة.</p>`;
+  const statusText = live
+    ? "تمّ استلام طلب مشاركتك المباشرة بالصوت والصورة. إذا تمّ اختيارك، سيتواصل معك فريق ندوات عبر واتساب أو البريد الإلكتروني قبل فقرة مشاركة الجمهور.\nالمشاركة المباشرة محدودة، وتقديم الطلب لا يضمن الاختيار."
+    : "تمّ استلام سؤالك أو مداخلتك. قد يُقرأ أو يُعرض خلال البثّ المباشر، علمًا أنّ إرسال سؤال لا يضمن طرحه خلال الندوة.";
+
+  const body = `<p style="margin:0 0 12px;">مرحبًا ${name}،</p>
+${statusHtml}
 <p style="margin:0 0 6px;font-weight:600;color:${COLORS.olive};">«${input.debateTitle}»</p>
-<p style="margin:0 0 12px;">الموعد: ${input.debateWhen}</p>
-<p style="margin:0;">سنرسل إليك تفاصيل الحضور ورابط البثّ قبل الموعد.</p>`;
+<p style="margin:0 0 14px;">الموعد: ${input.debateWhen}</p>
+<p style="margin:0 0 4px;color:${COLORS.muted};font-size:13px;">ما أرسلته:</p>
+<p style="margin:0 0 14px;padding:10px 14px;border-inline-start:3px solid ${COLORS.line};background:${COLORS.page};">${question}</p>
+<p style="margin:0;">للمشاهدة لا تحتاج إلى أيّ تسجيل — تجد روابط البثّ المباشر على صفحة الندوة.</p>`;
+
   return {
-    subject: `تأكيد تسجيلك: ${input.debateTitle}`,
+    subject: `استلمنا طلب مشاركتك: ${input.debateTitle}`,
     html: shell({
-      preview: `تأكيد تسجيلك في ندوة ${input.debateTitle}`,
-      heading: "تمّ تسجيل حضورك",
+      preview: live
+        ? "استلمنا طلب مشاركتك المباشرة في ندوات"
+        : "استلمنا سؤالك أو مداخلتك في ندوات",
+      heading: "تمّ استلام طلب مشاركتك",
       body,
       cta: { label: "صفحة الندوة", href: input.debateUrl },
     }),
-    text: `مرحبًا ${input.firstName}،\n\nسجّلنا حضورك في ندوة «${input.debateTitle}».\nالموعد: ${input.debateWhen}\n\nصفحة الندوة: ${input.debateUrl}\n\n${REPLY_ADDRESS}`,
+    text: `مرحبًا ${input.fullName}،\n\n${statusText}\n\nالندوة: «${input.debateTitle}»\nالموعد: ${input.debateWhen}\n\nما أرسلته:\n${input.question.trim()}\n\nللمشاهدة لا تحتاج إلى أيّ تسجيل — روابط البثّ على صفحة الندوة:\n${input.debateUrl}\n\n${REPLY_ADDRESS}`,
   };
 }
 

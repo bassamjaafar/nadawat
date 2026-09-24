@@ -2,56 +2,70 @@ import "server-only";
 import { hasSupabaseAdmin } from "@/lib/env";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/send";
-import { registrationConfirmedEmail } from "@/lib/email/templates";
+import { participationReceivedEmail } from "@/lib/email/templates";
 import { requestSubscription } from "@/lib/data/subscribers";
 import { absoluteUrl } from "@/lib/url";
 import { formatDate, formatTime } from "@/lib/format";
-import { REGISTER_CONSENT_TEXT, type RegisterInput } from "@/lib/validation";
+import {
+  LIVE_ACK_LIMITED_TEXT,
+  LIVE_ACK_TIME_TEXT,
+  LIVE_RECORDING_CONSENT_TEXT,
+  PARTICIPATE_NOTIFY_CONSENT_TEXT,
+  type ParticipateInput,
+} from "@/lib/validation";
 import { getDebateBySlug } from "@/lib/data/debates";
 import { isUpcoming } from "@/lib/types";
 
 type Fingerprint = { ipHash: string | null; userAgent: string | null };
 
-type RegisterResult =
-  | { status: "registered" }
-  | { status: "already" }
+type ParticipateResult =
+  | { status: "submitted" }
   | { status: "error"; message: string };
 
-export async function registerForDebate(
-  input: RegisterInput,
+/**
+ * A "شارك في الحوار" request: a written question/comment, or a request to
+ * take part live by audio/video. This is not attendance registration —
+ * watching needs none. The `registrations` table name is historical.
+ */
+export async function submitParticipation(
+  input: ParticipateInput,
   fp: Fingerprint,
-): Promise<RegisterResult> {
-  const email = String(input.email).trim().toLowerCase();
-  const firstName = input.firstName.trim();
+): Promise<ParticipateResult> {
+  const email = input.email.trim().toLowerCase();
+  const fullName = input.fullName.trim();
+  const live = input.participationType === "live";
   const debate = await getDebateBySlug(input.debateSlug);
 
   if (!debate || !isUpcoming(debate) || !debate.registration_open) {
-    return { status: "error", message: "التسجيل غير متاح لهذه الندوة حاليًا." };
+    return {
+      status: "error",
+      message: "المشاركة غير متاحة لهذه الندوة حاليًا.",
+    };
   }
-
-  const debateWhen = debate.starts_at
-    ? `${formatDate(debate.starts_at, debate.timezone)} — ${formatTime(debate.starts_at, debate.timezone)}`
-    : "يُعلَن لاحقًا";
-  const debateUrl = absoluteUrl(`/events/${debate.slug}`);
 
   const sendConfirmation = () =>
     sendEmail({
       to: email,
-      ...registrationConfirmedEmail({
-        firstName,
+      ...participationReceivedEmail({
+        fullName,
+        participationType: input.participationType,
+        question: input.question,
         debateTitle: debate.title_ar,
-        debateWhen,
-        debateUrl,
+        debateWhen: debate.starts_at
+          ? `${formatDate(debate.starts_at, debate.timezone)} — ${formatTime(debate.starts_at, debate.timezone)} بتوقيت دمشق`
+          : "يُعلَن لاحقًا",
+        debateUrl: absoluteUrl(`/events/${debate.slug}`),
       }),
     });
 
-  // Marketing consent is handled through the standard double opt-in flow,
-  // entirely separate from the registration record.
+  // General updates are a separate, explicit, double-opt-in subscription —
+  // never implied by taking part.
   if (input.notifyFutureEvents) {
+    const [firstName, ...rest] = fullName.split(/\s+/);
     await requestSubscription(
       {
         firstName,
-        lastName: input.lastName.trim(),
+        lastName: rest.join(" "),
         email,
         country: input.country.trim(),
         consent: true,
@@ -62,32 +76,25 @@ export async function registerForDebate(
 
   if (!hasSupabaseAdmin) {
     await sendConfirmation();
-    return { status: "registered" };
+    return { status: "submitted" };
   }
 
   const supabase = getSupabaseAdminClient();
   const now = new Date().toISOString();
 
-  const { data: existing } = await supabase
-    .from("registrations")
-    .select("id")
-    .eq("debate_id", debate.id)
-    .eq("email", email)
-    .maybeSingle();
-
-  if (existing) {
-    await sendConfirmation();
-    return { status: "already" };
-  }
-
   const { data: inserted, error } = await supabase
     .from("registrations")
     .insert({
       debate_id: debate.id,
-      first_name: firstName,
-      last_name: input.lastName.trim(),
+      full_name: fullName,
       email,
       country: input.country.trim(),
+      participation_type: input.participationType,
+      question: input.question.trim(),
+      phone: live ? (input.phone ?? "").trim() : null,
+      ack_limited_selection: live && input.ackLimited,
+      ack_time_limit: live && input.ackTime,
+      consent_recording_at: live && input.consentRecording ? now : null,
       notify_future_events: input.notifyFutureEvents,
       consent_at: input.notifyFutureEvents ? now : null,
       confirmation_sent_at: now,
@@ -97,18 +104,31 @@ export async function registerForDebate(
     .select("id")
     .single();
 
-  if (error) return { status: "error", message: error.message };
+  if (error) {
+    console.error("submitParticipation", error.message);
+    return {
+      status: "error",
+      message: "تعذّر إرسال طلبك الآن. يرجى المحاولة مجدّدًا بعد قليل.",
+    };
+  }
+
+  const agreed = [
+    ...(live
+      ? [LIVE_ACK_LIMITED_TEXT, LIVE_ACK_TIME_TEXT, LIVE_RECORDING_CONSENT_TEXT]
+      : []),
+    ...(input.notifyFutureEvents ? [PARTICIPATE_NOTIFY_CONSENT_TEXT] : []),
+  ];
 
   await supabase.from("consent_events").insert({
     subject_type: "registration",
     subject_id: inserted.id,
     email,
-    action: "registration",
-    consent_text: input.notifyFutureEvents ? REGISTER_CONSENT_TEXT : null,
+    action: live ? "participation_live" : "participation_written",
+    consent_text: agreed.length ? agreed.join("\n") : null,
     ip_hash: fp.ipHash,
     user_agent: fp.userAgent,
   });
 
   await sendConfirmation();
-  return { status: "registered" };
+  return { status: "submitted" };
 }

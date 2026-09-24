@@ -43,7 +43,9 @@ export type DebateSummary = {
 
 export type DebateDetail = DebateSummary & {
   description_ar: string | null;
-  broadcast_url: string | null;
+  /** Public watch-live links. Studio links (Zoom/StreamYard) never go here. */
+  youtube_live_url: string | null;
+  facebook_live_url: string | null;
   youtube_url: string | null;
   participants: DebateParticipant[];
 };

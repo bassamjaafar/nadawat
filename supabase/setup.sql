@@ -352,4 +352,26 @@ insert into site_content (key, value) values
 --
 -- Delete the row (or set the value to null) to go back to automatic.
 
+-- ---------------------------------------------------------------------------
+-- Watch-live links + "شارك في الحوار" participation form
+-- (mirrors supabase/migrations/0003_participation.sql)
+-- ---------------------------------------------------------------------------
+alter table debates add column youtube_live_url  text;
+alter table debates add column facebook_live_url text;
+
+alter table registrations add column full_name text;
+alter table registrations alter column first_name drop not null;
+alter table registrations alter column last_name  drop not null;
+alter table registrations add column participation_type text
+  check (participation_type in ('written', 'live'));
+alter table registrations add column question text;
+alter table registrations add column phone text;
+alter table registrations add column ack_limited_selection boolean not null default false;
+alter table registrations add column ack_time_limit       boolean not null default false;
+alter table registrations add column consent_recording_at timestamptz;
+alter table registrations add column status text not null default 'new'
+  check (status in ('new', 'selected', 'not_selected', 'participated'));
+alter table registrations add column admin_note text;
+alter table registrations drop constraint registrations_debate_id_email_key;
+
 commit;

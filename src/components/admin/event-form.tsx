@@ -115,24 +115,40 @@ export function EventForm({
         error={state.errors?.location_ar}
       />
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <TextField
-          id="broadcast_url"
-          label="رابط البثّ المباشر"
-          dir="ltr"
-          optional
-          defaultValue={event?.broadcast_url ?? ""}
-          error={state.errors?.broadcast_url}
-        />
-        <TextField
-          id="youtube_url"
-          label="رابط يوتيوب (بعد انتهاء البثّ)"
-          dir="ltr"
-          optional
-          defaultValue={event?.youtube_url ?? ""}
-          error={state.errors?.youtube_url}
-        />
+      <div className="flex flex-col gap-3">
+        <p className="text-[0.85rem] leading-6 text-muted">
+          روابط المشاهدة العامة فقط — تظهر للجمهور كأزرار «شاهد على يوتيوب» و«شاهد
+          على فيسبوك». لا تضع هنا رابط Zoom أو StreamYard أو أيّ رابط مخصّص للضيوف
+          أو فريق الإنتاج.
+        </p>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <TextField
+            id="youtube_live_url"
+            label="رابط البث على يوتيوب"
+            dir="ltr"
+            optional
+            defaultValue={event?.youtube_live_url ?? ""}
+            error={state.errors?.youtube_live_url}
+          />
+          <TextField
+            id="facebook_live_url"
+            label="رابط البث على فيسبوك"
+            dir="ltr"
+            optional
+            defaultValue={event?.facebook_live_url ?? ""}
+            error={state.errors?.facebook_live_url}
+          />
+        </div>
       </div>
+
+      <TextField
+        id="youtube_url"
+        label="رابط يوتيوب (بعد انتهاء البثّ)"
+        dir="ltr"
+        optional
+        defaultValue={event?.youtube_url ?? ""}
+        error={state.errors?.youtube_url}
+      />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <TextField
@@ -162,7 +178,7 @@ export function EventForm({
           id="registration_open"
           defaultChecked={event?.registration_open}
         >
-          التسجيل مفتوح لهذه الندوة
+          نموذج «شارك في الحوار» مفتوح لهذه الندوة
         </CheckboxField>
       </div>
 

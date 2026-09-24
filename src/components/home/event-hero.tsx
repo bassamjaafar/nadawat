@@ -1,5 +1,6 @@
 import { ButtonLink } from "@/components/ui/button";
 import { SpeakerLineup } from "@/components/debates/speakers";
+import { WatchButtons, hasWatchLinks } from "@/components/debates/watch-buttons";
 import { formatDate, formatTime } from "@/lib/format";
 import { isUpcoming, pastEventCtaLabel, type DebateDetail } from "@/lib/types";
 
@@ -17,11 +18,12 @@ function MetaRow({ label, value }: { label: string; value: string }) {
  * upcoming event if one is scheduled, otherwise the most recently completed
  * one. Same hero-level treatment either way — the only differences are the
  * kicker label, the meta row (date/time/location vs. just a publish date),
- * and the primary action (register vs. watch).
+ * and the actions (watch live / take part vs. watch the recording).
  */
 export function EventHero({ debate }: { debate: DebateDetail }) {
   const href = `/events/${debate.slug}`;
   const upcoming = isUpcoming(debate);
+  const watching = hasWatchLinks(debate);
 
   return (
     <section aria-labelledby="event-hero-title" className="container-page pt-10 pb-4 sm:pt-16">
@@ -67,22 +69,31 @@ export function EventHero({ debate }: { debate: DebateDetail }) {
             ) : null}
           </dl>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            {upcoming ? (
-              debate.registration_open ? (
-                <ButtonLink href={`${href}#register`}>سجّل حضورك</ButtonLink>
-              ) : (
-                <ButtonLink href={href}>تفاصيل الندوة</ButtonLink>
-              )
-            ) : (
+          {upcoming ? (
+            <>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <WatchButtons debate={debate} />
+                {debate.registration_open ? (
+                  <ButtonLink
+                    href={`${href}#participate`}
+                    variant={watching ? "outline" : "primary"}
+                  >
+                    شارك في الحوار
+                  </ButtonLink>
+                ) : null}
+                {!watching && !debate.registration_open ? (
+                  <ButtonLink href={href}>تفاصيل الندوة</ButtonLink>
+                ) : null}
+              </div>
+              <p className="mt-4 text-[0.9rem] leading-7 text-muted">
+                المشاهدة مفتوحة للجميع ولا تحتاج إلى تسجيل.
+              </p>
+            </>
+          ) : (
+            <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href={href}>{pastEventCtaLabel(debate)}</ButtonLink>
-            )}
-            {upcoming && debate.broadcast_url ? (
-              <ButtonLink href={debate.broadcast_url} variant="outline">
-                رابط البثّ
-              </ButtonLink>
-            ) : null}
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="lg:ps-8 lg:border-s lg:border-line">

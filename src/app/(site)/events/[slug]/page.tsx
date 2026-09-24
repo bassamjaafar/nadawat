@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import { YouTubeEmbed } from "@/components/debates/youtube-embed";
 import { ParticipantProfiles } from "@/components/debates/speakers";
 import { DebateCard } from "@/components/debates/debate-card";
-import { RegisterForm } from "@/components/forms/register-form";
+import { WatchButtons, hasWatchLinks } from "@/components/debates/watch-buttons";
+import { ParticipateForm } from "@/components/forms/participate-form";
 import { ArrowLink } from "@/components/ui/arrow-link";
 import {
   getDebateBySlug,
@@ -110,6 +111,56 @@ export default async function DebatePage({ params }: Params) {
         ) : null}
       </div>
 
+      {upcoming ? (
+        <section
+          aria-label="المشاهدة والمشاركة"
+          className="container-page mt-10"
+        >
+          <div
+            className={
+              debate.registration_open
+                ? "grid gap-4 md:grid-cols-2"
+                : "grid gap-4 md:max-w-xl"
+            }
+          >
+            <div className="flex flex-col rounded-[var(--radius-md)] border border-line bg-[#fffdf7] p-6">
+              <p className="text-kicker font-medium uppercase text-clay">
+                للمشاهدة
+              </p>
+              <p className="mt-2 text-h3 text-ink">لا يحتاج إلى تسجيل</p>
+              <p className="mt-2 text-[0.95rem] leading-7 text-muted">
+                {hasWatchLinks(debate)
+                  ? "تابع البثّ المباشر على يوتيوب أو فيسبوك في موعد الندوة."
+                  : "ستُضاف روابط البثّ المباشر على يوتيوب وفيسبوك هنا قبل موعد الندوة."}
+              </p>
+              {hasWatchLinks(debate) ? (
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <WatchButtons debate={debate} />
+                </div>
+              ) : null}
+            </div>
+
+            {debate.registration_open ? (
+              <div className="flex flex-col rounded-[var(--radius-md)] border border-line p-6">
+                <p className="text-kicker font-medium uppercase text-clay">
+                  للمشاركة في الحوار
+                </p>
+                <p className="mt-2 text-h3 text-ink">
+                  استخدم نموذج «شارك في الحوار»
+                </p>
+                <p className="mt-2 text-[0.95rem] leading-7 text-muted">
+                  أرسل سؤالًا أو مداخلة، أو اطلب المشاركة مباشرةً بالصوت والصورة
+                  خلال فقرة مشاركة الجمهور.
+                </p>
+                <div className="mt-5">
+                  <ArrowLink href="#participate">إلى النموذج</ArrowLink>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
       <div className="container-page mt-12 grid gap-x-14 gap-y-12 lg:grid-cols-[1fr_18rem] lg:items-start">
         <div className="min-w-0">
           {debate.description_ar ? (
@@ -132,16 +183,16 @@ export default async function DebatePage({ params }: Params) {
 
           {upcoming && debate.registration_open ? (
             <section
-              id="register"
+              id="participate"
               className="mt-14 scroll-mt-[7rem] border-t border-line pt-10"
             >
-              <h2 className="text-h2 text-ink">سجّل حضورك</h2>
+              <h2 className="text-h2 text-ink">شارك في الحوار</h2>
               <p className="mt-3 max-w-[40rem] text-[1rem] leading-8 text-muted">
-                التسجيل مجاني ويتمّ على موقع ندوات مباشرةً. نرسل تفاصيل الحضور
-                ورابط البثّ إلى بريدك قبل الموعد.
+                هذا النموذج لمن يرغب بالمشاركة في فقرة مشاركة الجمهور فقط — أما
+                المشاهدة فمفتوحة للجميع ولا تحتاج إلى تسجيل.
               </p>
               <div className="mt-8 max-w-xl">
-                <RegisterForm
+                <ParticipateForm
                   debateId={debate.id}
                   debateSlug={debate.slug}
                   debateTitle={debate.title_ar}
@@ -161,7 +212,7 @@ export default async function DebatePage({ params }: Params) {
             ) : null}
             {upcoming && debate.registration_open ? (
               <div className="mt-4">
-                <ArrowLink href="#register">إلى نموذج التسجيل</ArrowLink>
+                <ArrowLink href="#participate">شارك في الحوار</ArrowLink>
               </div>
             ) : null}
             {debate.youtube_url ? (

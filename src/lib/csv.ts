@@ -4,8 +4,12 @@ export function toCsv(
   columns: { key: string; label: string }[],
 ): string {
   const escape = (v: unknown) => {
-    const s = v === null || v === undefined ? "" : String(v);
-    return /["\n,]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    let s = v === null || v === undefined ? "" : String(v);
+    // Public free text (names, questions) can start with = + - @ and run as
+    // a formula when the file is opened in Excel. A leading apostrophe makes
+    // Excel treat it as plain text (and keeps "+963…" phone numbers intact).
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+    return /["\n\r,]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   const header = columns.map((c) => escape(c.label)).join(",");
   const lines = rows.map((row) =>

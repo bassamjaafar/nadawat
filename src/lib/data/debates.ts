@@ -18,7 +18,8 @@ const PERSON_COLUMNS = "id, name_ar, title_ar, bio_ar, image_url, slug";
 
 const DEBATE_SELECT = `
   id, slug, title_ar, summary_ar, description_ar, status, starts_at, timezone,
-  location_ar, registration_open, broadcast_url, youtube_url, youtube_video_id,
+  location_ar, registration_open, youtube_live_url, facebook_live_url,
+  youtube_url, youtube_video_id,
   cover_image_url, updated_at,
   moderator:people!debates_moderator_id_fkey ( ${PERSON_COLUMNS} ),
   participants:debate_participants (
@@ -52,7 +53,8 @@ function mapDetail(row: Row): DebateDetail {
     timezone: (row.timezone as string | null) ?? "Asia/Damascus",
     location_ar: (row.location_ar as string | null) ?? null,
     registration_open: Boolean(row.registration_open),
-    broadcast_url: (row.broadcast_url as string | null) ?? null,
+    youtube_live_url: (row.youtube_live_url as string | null) ?? null,
+    facebook_live_url: (row.facebook_live_url as string | null) ?? null,
     youtube_url: (row.youtube_url as string | null) ?? null,
     youtube_video_id: (row.youtube_video_id as string | null) ?? null,
     cover_image_url: (row.cover_image_url as string | null) ?? null,

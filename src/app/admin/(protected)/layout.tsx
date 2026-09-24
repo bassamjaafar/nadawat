@@ -10,7 +10,7 @@ const ADMIN_NAV = [
   { href: "/admin", label: "لوحة التحكم" },
   { href: "/admin/events", label: "الفعاليات" },
   { href: "/admin/people", label: "الأشخاص" },
-  { href: "/admin/registrations", label: "التسجيلات" },
+  { href: "/admin/registrations", label: "طلبات المشاركة" },
   { href: "/admin/subscribers", label: "المشتركون" },
 ];
 
