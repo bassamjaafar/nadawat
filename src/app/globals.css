@@ -26,8 +26,8 @@
   --color-line-strong: #c3b795;
 
   /* --- Type --------------------------------------------------- */
-  --font-display: var(--font-reem-kufi), "Reem Kufi", "Noto Kufi Arabic",
-    system-ui, sans-serif;
+  --font-display: var(--font-noto-kufi), "Noto Kufi Arabic", system-ui,
+    sans-serif;
   --font-sans: var(--font-plex-arabic), "IBM Plex Sans Arabic", "Segoe UI",
     system-ui, sans-serif;
 
@@ -97,6 +97,13 @@
     font-weight: 600;
     line-height: 1.35;
     text-wrap: balance;
+  }
+
+  /* Page and section titles are structural → Bold. Expressive display
+     headings (homepage hero, brand statement) opt back into SemiBold. */
+  h1,
+  h2 {
+    font-weight: 700;
   }
 
   p {

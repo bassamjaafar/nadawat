@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Reem_Kufi, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Noto_Kufi_Arabic, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import { FirstVisitIntro } from "@/components/layout/first-visit-intro";
 
-const reemKufi = Reem_Kufi({
+const notoKufi = Noto_Kufi_Arabic({
   subsets: ["arabic", "latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-reem-kufi",
+  variable: "--font-noto-kufi",
   display: "swap",
 });
 
@@ -54,7 +54,7 @@ export default function RootLayout({
       lang="ar"
       dir="rtl"
       data-scroll-behavior="smooth"
-      className={`${reemKufi.variable} ${plexArabic.variable}`}
+      className={`${notoKufi.variable} ${plexArabic.variable}`}
     >
       <body className="flex min-h-dvh flex-col bg-cream text-ink">
         <a

@@ -27,7 +27,7 @@ export function EventHero({ debate }: { debate: DebateDetail }) {
 
   return (
     <section aria-labelledby="event-hero-title" className="container-page pt-10 pb-4 sm:pt-16">
-      <p className="text-kicker font-medium uppercase tracking-wide text-clay">
+      <p className="text-[0.975rem] leading-[1.6] font-medium uppercase tracking-wide text-clay">
         {upcoming ? "الندوة القادمة" : "آخر ندوة"}
       </p>
 

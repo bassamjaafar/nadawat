@@ -16,7 +16,9 @@ export function SpeakerLineup({
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-kicker font-medium uppercase text-muted">الضيوف</p>
+      <p className="text-[0.975rem] leading-[1.6] font-medium uppercase text-muted">
+        الضيوف
+      </p>
       <ul className="grid grid-cols-2 gap-5 sm:gap-6">
         {speakers.map(({ person, position_label_ar }) => (
           <li key={person.id} className="flex flex-col gap-3">
