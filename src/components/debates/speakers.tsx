@@ -46,7 +46,7 @@ export function SpeakerLineup({
         <div className="flex items-center gap-3 border-t border-line pt-4">
           <PersonAvatarSmall person={moderator} />
           <p className="text-meta text-muted">
-            المحاور:{" "}
+            المحاور/ة:{" "}
             <span className="text-ink">{moderator.name_ar}</span>
           </p>
         </div>
@@ -100,15 +100,15 @@ export function ParticipantProfiles({
       </div>
 
       {moderator ? (
-        <div className="flex gap-4 border-t border-line pt-8">
+        <div className="flex flex-col gap-4 border-t border-line pt-8 sm:flex-row">
           <PersonPortrait
             person={moderator}
-            className="w-24 shrink-0"
+            className="w-48 shrink-0"
             ratio="square"
           />
           <div>
             <p className="text-kicker font-medium uppercase text-muted">
-              المحاور
+              المحاور/ة
             </p>
             <h3 className="mt-1 font-display text-[1.1rem] font-medium text-ink">
               {moderator.name_ar}
