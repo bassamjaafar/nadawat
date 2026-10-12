@@ -1,5 +1,5 @@
 import {
-  PersonAvatarSmall,
+  PersonAvatar,
   PersonPortrait,
 } from "@/components/ui/person-portrait";
 import type { DebateParticipant, Person } from "@/lib/types";
@@ -43,12 +43,21 @@ export function SpeakerLineup({
       </ul>
 
       {moderator ? (
-        <div className="flex items-center gap-3 border-t border-line pt-4">
-          <PersonAvatarSmall person={moderator} />
-          <p className="text-meta text-muted">
-            المحاور/ة:{" "}
-            <span className="text-ink">{moderator.name_ar}</span>
-          </p>
+        // Same 2-column grid as the guests, so the circle (80% of its
+        // column, capped at 80% of 9rem) is always 80% of a guest photo.
+        <div className="grid grid-cols-2 items-center gap-5 border-t border-line pt-5 sm:gap-6">
+          <PersonAvatar person={moderator} className="w-[80%] max-w-[7.2rem]" />
+          <div>
+            <p className="text-meta text-muted">المحاور/ة</p>
+            <p className="mt-0.5 font-display text-[1.05rem] font-medium text-ink">
+              {moderator.name_ar}
+            </p>
+            {moderator.title_ar ? (
+              <p className="mt-0.5 text-[0.85rem] text-muted">
+                {moderator.title_ar}
+              </p>
+            ) : null}
+          </div>
         </div>
       ) : null}
     </div>

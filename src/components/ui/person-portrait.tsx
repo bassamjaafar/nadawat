@@ -44,19 +44,31 @@ export function PersonPortrait({
   );
 }
 
-export function PersonAvatarSmall({ person }: { person: Person }) {
+/** Circular portrait; the caller sets its width (height follows). */
+export function PersonAvatar({
+  person,
+  className,
+}: {
+  person: Person;
+  className?: string;
+}) {
   return (
-    <span className="relative inline-flex size-18 shrink-0 items-center justify-center overflow-hidden rounded-full bg-cream-deep">
+    <span
+      className={cn(
+        "relative inline-flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded-full bg-cream-deep",
+        className,
+      )}
+    >
       {person.image_url ? (
         <Image
           src={person.image_url}
           alt={person.name_ar}
           fill
-          sizes="72px"
+          sizes="(max-width: 640px) 40vw, 120px"
           className="object-cover"
         />
       ) : (
-        <span className="font-display text-[1.2rem] text-olive/60">
+        <span className="font-display text-[1.4rem] text-olive/60">
           {firstName(person.name_ar).slice(0, 2)}
         </span>
       )}
