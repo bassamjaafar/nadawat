@@ -100,10 +100,10 @@ export function ParticipantProfiles({
       </div>
 
       {moderator ? (
-        <div className="flex flex-col gap-4 border-t border-line pt-8 sm:flex-row">
+        <div className="flex gap-4 border-t border-line pt-8">
           <PersonPortrait
             person={moderator}
-            className="w-48 shrink-0"
+            className="w-24 shrink-0"
             ratio="square"
           />
           <div>

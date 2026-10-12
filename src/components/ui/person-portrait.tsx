@@ -46,17 +46,17 @@ export function PersonPortrait({
 
 export function PersonAvatarSmall({ person }: { person: Person }) {
   return (
-    <span className="relative inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-cream-deep">
+    <span className="relative inline-flex size-18 shrink-0 items-center justify-center overflow-hidden rounded-full bg-cream-deep">
       {person.image_url ? (
         <Image
           src={person.image_url}
           alt={person.name_ar}
           fill
-          sizes="36px"
+          sizes="72px"
           className="object-cover"
         />
       ) : (
-        <span className="font-display text-[0.85rem] text-olive/60">
+        <span className="font-display text-[1.2rem] text-olive/60">
           {firstName(person.name_ar).slice(0, 2)}
         </span>
       )}
