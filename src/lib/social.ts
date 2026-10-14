@@ -42,7 +42,11 @@ export const SOCIAL_LINKS: SocialLink[] = [
     url: "https://www.youtube.com/@nadawatorg",
   },
   { platform: "telegram", label: "ندوات على تيليغرام", url: null },
-  { platform: "linkedin", label: "ندوات على لينكدإن", url: null },
+  {
+    platform: "linkedin",
+    label: "ندوات على لينكدإن",
+    url: "https://www.linkedin.com/company/nadawat",
+  },
   {
     platform: "whatsapp",
     label: "قناة ندوات على واتساب",
