@@ -26,12 +26,12 @@ export function EventHero({ debate }: { debate: DebateDetail }) {
   const watching = hasWatchLinks(debate);
 
   return (
-    <section aria-labelledby="event-hero-title" className="container-page pt-10 pb-4 sm:pt-16">
+    <section aria-labelledby="event-hero-title" className="container-page pt-7 pb-4 sm:pt-10">
       <p className="text-[0.975rem] leading-[1.6] font-medium uppercase tracking-wide text-clay">
         {upcoming ? "الندوة القادمة" : "آخر ندوة"}
       </p>
 
-      <div className="mt-6 grid gap-x-12 gap-y-10 lg:grid-cols-[1.15fr_0.85fr]">
+      <div className="mt-6 grid gap-x-12 gap-y-10 xl:grid-cols-[0.9fr_1.1fr]">
         <div className="flex flex-col">
           <h1
             id="event-hero-title"
@@ -96,7 +96,7 @@ export function EventHero({ debate }: { debate: DebateDetail }) {
           )}
         </div>
 
-        <div className="lg:ps-8 lg:border-s lg:border-line">
+        <div className="max-w-xl xl:max-w-none xl:ps-8 xl:border-s xl:border-line">
           <SpeakerLineup
             participants={debate.participants}
             moderator={debate.moderator}

@@ -3,7 +3,13 @@ import { Reveal } from "@/components/ui/reveal";
 
 export function AboutPreview() {
   return (
-    <section aria-labelledby="about-preview-title" className="container-page section-y">
+    // Sits right after «الفعاليات السابقة» on the same cream ground, so the
+    // top is lighter (that section already supplies bottom padding); the
+    // bottom matches «الفعاليات السابقة» before the subscription band.
+    <section
+      aria-labelledby="about-preview-title"
+      className="container-page pt-[clamp(2.5rem,5vw,4rem)] pb-[clamp(3.5rem,5vw,4rem)]"
+    >
       <Reveal className="grid gap-x-14 gap-y-6 md:grid-cols-[0.7fr_1.3fr]">
         <div>
           <span className="text-kicker font-medium uppercase text-muted">

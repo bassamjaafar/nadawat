@@ -13,27 +13,38 @@ export function SpeakerLineup({
   moderator: Person | null;
 }) {
   const speakers = participants.filter((p) => p.role === "speaker");
+  // Three guests sit in one row; any other count falls back to two columns.
+  const threeUp = speakers.length === 3;
+  const cols = threeUp ? "grid-cols-3" : "grid-cols-2";
 
   return (
     <div className="flex flex-col gap-6">
       <p className="text-[0.975rem] leading-[1.6] font-medium uppercase text-muted">
         الضيوف
       </p>
-      <ul className="grid grid-cols-2 gap-5 sm:gap-6">
+      {/* Each card spans four shared rows (portrait, name, title, position)
+          via subgrid, so names and titles start on the same line in every
+          card even when one of them wraps onto more lines. */}
+      <ul className={`grid ${cols} gap-x-3 sm:gap-x-5`}>
         {speakers.map(({ person, position_label_ar }) => (
-          <li key={person.id} className="flex flex-col gap-3">
-            <PersonPortrait person={person} className="w-full max-w-[9rem]" />
+          <li
+            key={person.id}
+            className={`row-span-4 grid grid-rows-subgrid ${threeUp ? "" : "pb-6"}`}
+          >
+            <PersonPortrait person={person} className="w-full max-w-[11rem]" />
+            <p className="pt-3 font-display text-[0.95rem] leading-snug font-medium text-ink sm:text-[1.05rem]">
+              {person.name_ar}
+            </p>
             <div>
-              <p className="font-display text-[1.05rem] font-medium text-ink">
-                {person.name_ar}
-              </p>
               {person.title_ar ? (
-                <p className="mt-0.5 text-[0.85rem] text-muted">
+                <p className="pt-1 text-[0.8rem] leading-5 text-muted [text-wrap:pretty] sm:text-[0.85rem]">
                   {person.title_ar}
                 </p>
               ) : null}
+            </div>
+            <div>
               {position_label_ar ? (
-                <p className="mt-1.5 text-[0.85rem] leading-6 text-olive">
+                <p className="pt-1.5 text-[0.8rem] leading-5 text-olive [text-wrap:pretty] sm:text-[0.85rem]">
                   {position_label_ar}
                 </p>
               ) : null}
@@ -43,17 +54,19 @@ export function SpeakerLineup({
       </ul>
 
       {moderator ? (
-        // Same 2-column grid as the guests, so the circle (80% of its
-        // column, capped at 80% of 9rem) is always 80% of a guest photo.
-        <div className="grid grid-cols-2 items-center gap-5 border-t border-line pt-5 sm:gap-6">
-          <PersonAvatar person={moderator} className="w-[80%] max-w-[7.2rem]" />
-          <div>
+        // Moderator strip on the guests' column grid: the circle fills 80% of
+        // the first column (so it is always 80% of a guest photo's width) and
+        // the text spans the remaining columns. mt-4 + the gap-6 above puts
+        // ~40px between the guest text and the separator.
+        <div className={`mt-4 grid ${cols} items-center gap-3 border-t border-line pt-6 sm:gap-5`}>
+          <PersonAvatar person={moderator} className="w-[80%] max-w-[8.8rem]" />
+          <div className={threeUp ? "col-span-2" : undefined}>
             <p className="text-meta text-muted">المحاور/ة</p>
-            <p className="mt-0.5 font-display text-[1.05rem] font-medium text-ink">
+            <p className="mt-0.5 font-display text-[0.95rem] leading-snug font-medium text-ink sm:text-[1.05rem]">
               {moderator.name_ar}
             </p>
             {moderator.title_ar ? (
-              <p className="mt-0.5 text-[0.85rem] text-muted">
+              <p className="mt-1 text-[0.8rem] leading-5 text-muted sm:text-[0.85rem]">
                 {moderator.title_ar}
               </p>
             ) : null}

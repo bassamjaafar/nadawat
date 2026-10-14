@@ -64,7 +64,7 @@ export function SiteHeader() {
             </span>
           </Link>
 
-          <nav aria-label="التنقّل الرئيسي" className="hidden md:block">
+          <nav aria-label="التنقّل الرئيسي" className="hidden lg:block">
             <ul className="flex items-center gap-1">
               {PRIMARY_NAV.map((item) => {
                 const active = isActive(item.href);
@@ -92,7 +92,7 @@ export function SiteHeader() {
 
           <button
             type="button"
-            className="relative z-50 -me-2 inline-flex size-11 items-center justify-center rounded-[var(--radius)] text-olive md:hidden"
+            className="relative z-50 -me-2 inline-flex size-11 items-center justify-center rounded-[var(--radius)] text-olive lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
@@ -124,7 +124,7 @@ export function SiteHeader() {
       <div
         id="mobile-nav"
         hidden={!open}
-        className="fixed inset-0 top-[7rem] z-40 bg-cream md:hidden"
+        className="fixed inset-0 top-[7rem] z-40 bg-cream lg:hidden"
       >
         <nav aria-label="التنقّل الرئيسي" className="container-page py-6">
           <ul className="flex flex-col divide-y divide-line">

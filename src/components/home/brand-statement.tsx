@@ -5,7 +5,8 @@ import { SITE_TAGLINE } from "@/lib/site";
 export function BrandStatement() {
   return (
     <section aria-label="مبدأ ندوات" className="bg-olive text-cream">
-      <div className="container-page section-y">
+      {/* Same padding as .section-y on mobile/tablet; ~20% tighter on desktop. */}
+      <div className="container-page py-[clamp(3.5rem,8vw,7rem)] lg:py-[clamp(2.8rem,6.4vw,5.6rem)]">
         <Reveal className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center">
           <span className="block h-px w-10 bg-gold" aria-hidden="true" />
           {/* ~8% below text-display: an important brand line, but it

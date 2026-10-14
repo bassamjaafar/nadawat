@@ -15,7 +15,18 @@ import { IDLE_FORM_STATE } from "@/lib/forms";
 import { SUBSCRIBE_CONSENT_TEXT } from "@/lib/validation";
 import { env } from "@/lib/env";
 
-export function SubscribeForm({ compact = false }: { compact?: boolean }) {
+/**
+ * `compact` stacks the name fields in one column. `tight` uses 16px instead
+ * of 20px between form rows (homepage section only; /subscribe keeps 20px).
+ */
+export function SubscribeForm({
+  compact = false,
+  tight = false,
+}: {
+  compact?: boolean;
+  tight?: boolean;
+}) {
+  const rowGap = tight ? "gap-4" : "gap-5";
   const [state, formAction, pending] = useActionState(
     subscribeAction,
     IDLE_FORM_STATE,
@@ -53,7 +64,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean }) {
       action={formAction}
       aria-labelledby={headingId}
       noValidate
-      className="flex flex-col gap-5"
+      className={`flex flex-col ${rowGap}`}
     >
       <span id={headingId} className="sr-only">
         نموذج الاشتراك في إشعارات ندوات
@@ -68,7 +79,14 @@ export function SubscribeForm({ compact = false }: { compact?: boolean }) {
         </p>
       ) : null}
 
-      <div className={compact ? "flex flex-col gap-5" : "grid gap-5 sm:grid-cols-2"}>
+      {/* Column gap stays 20px either way so input widths don't change. */}
+      <div
+        className={
+          compact
+            ? `flex flex-col ${rowGap}`
+            : `grid gap-x-5 sm:grid-cols-2 ${tight ? "gap-y-4" : "gap-y-5"}`
+        }
+      >
         <TextField
           id="firstName"
           label="الاسم الأول"

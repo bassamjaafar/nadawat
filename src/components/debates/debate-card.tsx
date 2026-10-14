@@ -55,40 +55,57 @@ export function DebateThumb({
   );
 }
 
-/** Card used on the homepage and in "related debates". */
+/**
+ * Card used on the homepage and in "related debates".
+ *
+ * With `subgrid`, the card spans five rows of its parent grid (thumbnail,
+ * date, title, speakers, link) so that every card in a row shares those
+ * rows: titles, speaker lines and the link all line up across cards. The
+ * parent must place the card on a grid with `row-span-5 grid-rows-subgrid`.
+ * Spacing uses padding rather than gap/margins so it stays identical in
+ * both modes.
+ */
 export function DebateCard({
   debate,
   priority,
+  subgrid = false,
 }: {
   debate: DebateSummary;
   priority?: boolean;
+  subgrid?: boolean;
 }) {
   const href = `/events/${debate.slug}`;
   return (
-    <article className="group flex flex-col gap-4">
+    <article
+      className={cn(
+        "group",
+        subgrid ? "row-span-5 grid grid-rows-subgrid" : "flex flex-col",
+      )}
+    >
       <Link href={href} tabIndex={-1} aria-hidden="true" className="block">
         <DebateThumb debate={debate} priority={priority} />
       </Link>
-      <div className="flex flex-col gap-2">
-        <p className="text-meta text-muted">
-          <time dateTime={debate.starts_at ?? undefined}>
-            {debate.starts_at ? formatDateShort(debate.starts_at, debate.timezone) : ""}
-          </time>
-        </p>
-        <h3 className="text-h3 text-ink">
-          <Link
-            href={href}
-            className="transition-colors hover:text-olive focus-visible:text-olive"
-          >
-            {debate.title_ar}
-          </Link>
-        </h3>
-        {debate.speakers.length ? (
-          <p className="text-meta text-muted">{speakerNames(debate)}</p>
-        ) : null}
-        <div className="mt-1">
-          <ArrowLink href={href}>{pastEventCtaLabel(debate)}</ArrowLink>
-        </div>
+      <p className="pt-4 text-meta text-muted">
+        <time dateTime={debate.starts_at ?? undefined}>
+          {debate.starts_at ? formatDateShort(debate.starts_at, debate.timezone) : ""}
+        </time>
+      </p>
+      <h3 className="pt-2 text-h3 text-ink">
+        <Link
+          href={href}
+          className="transition-colors hover:text-olive focus-visible:text-olive"
+        >
+          {debate.title_ar}
+        </Link>
+      </h3>
+      {debate.speakers.length ? (
+        <p className="pt-2 text-meta text-muted">{speakerNames(debate)}</p>
+      ) : subgrid ? (
+        // Keeps the five-row structure when an event has no speakers.
+        <span aria-hidden="true" />
+      ) : null}
+      <div className="pt-3">
+        <ArrowLink href={href}>{pastEventCtaLabel(debate)}</ArrowLink>
       </div>
     </article>
   );

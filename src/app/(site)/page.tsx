@@ -62,8 +62,8 @@ export default async function HomePage({
         <EventHero debate={hero} />
         <BrandStatement />
         <RecentDebates debates={rest} />
-        <SubscribeSection />
         <AboutPreview />
+        <SubscribeSection />
       </>
     );
   }
