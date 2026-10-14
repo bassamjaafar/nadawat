@@ -3,14 +3,8 @@
 import { useActionState, useId } from "react";
 import { subscribeAction } from "@/app/(site)/subscribe/actions";
 import { Button } from "@/components/ui/button";
-import {
-  CheckboxField,
-  Honeypot,
-  SelectField,
-  TextField,
-} from "@/components/ui/field";
+import { CheckboxField, Honeypot, TextField } from "@/components/ui/field";
 import { TurnstileWidget } from "@/components/ui/turnstile-widget";
-import { COUNTRIES } from "@/lib/countries";
 import { IDLE_FORM_STATE } from "@/lib/forms";
 import { SUBSCRIBE_CONSENT_TEXT } from "@/lib/validation";
 import { env } from "@/lib/env";
@@ -67,7 +61,7 @@ export function SubscribeForm({
       className={`flex flex-col ${rowGap}`}
     >
       <span id={headingId} className="sr-only">
-        نموذج الاشتراك في إشعارات ندوات
+        نموذج الاشتراك في رسائل ندوات
       </span>
 
       {state.status === "error" && state.message ? (
@@ -79,7 +73,8 @@ export function SubscribeForm({
         </p>
       ) : null}
 
-      {/* Column gap stays 20px either way so input widths don't change. */}
+      {/* Email-only signup: optional first name beside the required email
+          (side by side from sm:, stacked on phones or when compact). */}
       <div
         className={
           compact
@@ -91,36 +86,20 @@ export function SubscribeForm({
           id="firstName"
           label="الاسم الأول"
           autoComplete="given-name"
-          required
+          optional
           error={state.errors?.firstName}
         />
         <TextField
-          id="lastName"
-          label="اسم العائلة"
-          autoComplete="family-name"
+          id="email"
+          label="البريد الإلكتروني"
+          type="email"
+          inputMode="email"
+          dir="ltr"
+          autoComplete="email"
           required
-          error={state.errors?.lastName}
+          error={state.errors?.email}
         />
       </div>
-
-      <TextField
-        id="email"
-        label="البريد الإلكتروني"
-        type="email"
-        inputMode="email"
-        dir="ltr"
-        autoComplete="email"
-        required
-        error={state.errors?.email}
-      />
-
-      <SelectField
-        id="country"
-        label="بلد الإقامة"
-        options={COUNTRIES}
-        placeholder="اختر بلد الإقامة"
-        error={state.errors?.country}
-      />
 
       <CheckboxField id="consent" error={state.errors?.consent}>
         {SUBSCRIBE_CONSENT_TEXT}
@@ -142,7 +121,7 @@ export function SubscribeForm({
           {pending ? "جارٍ الإرسال…" : "اشترك"}
         </Button>
         <p className="text-[0.85rem] leading-6 text-muted">
-          نستخدم بريدك للإشعارات فقط. اطّلع على{" "}
+          نستخدم بريدك لرسائل ندوات فقط. اطّلع على{" "}
           <a href="/privacy" className="underline underline-offset-4">
             سياسة الخصوصية
           </a>

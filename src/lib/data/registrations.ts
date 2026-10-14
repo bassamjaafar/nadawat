@@ -69,6 +69,8 @@ export async function submitParticipation(
         email,
         country: input.country.trim(),
         consent: true,
+        // Record the exact wording this participant was shown.
+        consentText: PARTICIPATE_NOTIFY_CONSENT_TEXT,
       },
       fp,
     );

@@ -198,7 +198,8 @@ export function ParticipateForm({
       <CheckboxField
         id="notifyFutureEvents"
       >
-        {PARTICIPATE_NOTIFY_CONSENT_TEXT}
+        {PARTICIPATE_NOTIFY_CONSENT_TEXT}{" "}
+        <span className="text-muted">(اختياري)</span>
       </CheckboxField>
 
       <Honeypot />

@@ -23,13 +23,22 @@ const country = z
   .min(1, "يرجى اختيار بلد الإقامة")
   .refine((v) => COUNTRIES.includes(v), "يرجى اختيار بلد من القائمة");
 
-/** Exact wording shown next to the subscription consent checkbox. Stored with each record. */
+/**
+ * Exact wording shown next to the subscription consent checkbox. Stored with
+ * each new record (subscribers.consent_text + consent_events), so earlier
+ * records keep the wording their subscribers actually agreed to.
+ */
 export const SUBSCRIBE_CONSENT_TEXT =
-  "أوافق على تلقّي إشعارات من ندوات حول الندوات القادمة، وأفهم أنّ بإمكاني إلغاء الاشتراك في أي وقت.";
+  "أوافق على تلقّي رسائل من ندوات تتضمن مواعيد الندوات وأخبارها وتحديثاتها، مع إمكانية إلغاء الاشتراك في أي وقت.";
 
-/** Optional, unchecked-by-default opt-in on the participation form. */
-export const PARTICIPATE_NOTIFY_CONSENT_TEXT =
-  "أرغب أيضًا بتلقّي تحديثات ندوات حول الندوات القادمة (اختياري).";
+/**
+ * Optional, unchecked-by-default newsletter opt-in on the participation form.
+ * Same wording as the subscribe form; the "(اختياري)" marker is rendered
+ * beside it in the UI, not stored as part of the consent text.
+ * (Before 2026-10-14 this read «أرغب أيضًا بتلقّي تحديثات ندوات حول الندوات
+ * القادمة (اختياري).» — records from then keep that wording.)
+ */
+export const PARTICIPATE_NOTIFY_CONSENT_TEXT = SUBSCRIBE_CONSENT_TEXT;
 
 // --- "شارك في الحوار" ------------------------------------------------------
 // Exact wording is shown on the form and stored with each submission.
@@ -55,11 +64,12 @@ const checkboxTrue = z.preprocess(
   z.boolean(),
 );
 
+// Email-only signup: the first name is optional, and last name / country are
+// no longer collected by the subscribe form (the DB columns stay; new form
+// signups store "" there — see requestSubscription()).
 export const subscribeSchema = z.object({
-  firstName: name,
-  lastName: name,
+  firstName: z.string().trim().max(80, "الاسم طويل جدًا").optional().default(""),
   email,
-  country,
   consent: z.preprocess(
     (v) => v === "on" || v === "true" || v === true,
     z.literal(true, { message: "يلزم الموافقة لإتمام الاشتراك" }),

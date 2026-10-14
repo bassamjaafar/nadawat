@@ -38,8 +38,9 @@ export default async function ConfirmSubscriptionPage({
         action={{ href: "/events", label: "تصفّح الفعاليات" }}
       >
         <p>
-          شكرًا {result.firstName}. سنرسل إليك إشعارًا موجزًا عند تحديد موعد كلّ
-          ندوة جديدة.
+          شكرًا{result.firstName ? ` ${result.firstName}` : ""}. ستصلك رسائل عن
+          الندوات القادمة، وأخبار ندوات وتحديثاتها. ويمكنك إلغاء الاشتراك في أي
+          وقت.
         </p>
       </NoticePage>
     );

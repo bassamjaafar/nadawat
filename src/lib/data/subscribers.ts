@@ -36,12 +36,31 @@ async function logConsent(
   });
 }
 
+/**
+ * The subscribe form sends email (+ optional first name). The participation
+ * form's newsletter opt-in still supplies a last name and country, and passes
+ * the exact consent wording it displayed (defaults to the subscribe form's).
+ */
+type SubscriptionRequest = SubscribeInput & {
+  lastName?: string;
+  country?: string;
+  consentText?: string;
+};
+
 export async function requestSubscription(
-  input: SubscribeInput,
+  input: SubscriptionRequest,
   fp: Fingerprint,
 ): Promise<RequestResult> {
   const email = String(input.email).trim().toLowerCase();
-  const firstName = input.firstName.trim();
+  const firstName = (input.firstName ?? "").trim();
+  const consentText = input.consentText ?? SUBSCRIBE_CONSENT_TEXT;
+  // The DB columns are NOT NULL, so fields the form no longer collects are
+  // stored as "" rather than null — no migration needed.
+  const profile = {
+    first_name: firstName,
+    last_name: (input.lastName ?? "").trim(),
+    country: (input.country ?? "").trim(),
+  };
 
   if (!hasSupabaseAdmin) {
     const token = randomUUID();
@@ -67,12 +86,9 @@ export async function requestSubscription(
   const confirmationToken = randomUUID();
   const now = new Date().toISOString();
   const payload = {
-    first_name: firstName,
-    last_name: input.lastName.trim(),
     email,
-    country: input.country.trim(),
     status: "pending" as const,
-    consent_text: SUBSCRIBE_CONSENT_TEXT,
+    consent_text: consentText,
     consent_at: now,
     confirmation_token: confirmationToken,
     confirmation_sent_at: now,
@@ -84,9 +100,15 @@ export async function requestSubscription(
 
   let subscriberId: string;
   if (existing) {
+    // Re-subscribing (pending/unsubscribed) — refresh consent and token, but
+    // never overwrite a stored name or country with a blank from the shorter
+    // form: only non-empty profile values are written.
+    const filledProfile = Object.fromEntries(
+      Object.entries(profile).filter(([, v]) => v !== ""),
+    );
     const { data, error } = await supabase
       .from("subscribers")
-      .update(payload)
+      .update({ ...payload, ...filledProfile })
       .eq("id", existing.id)
       .select("id")
       .single();
@@ -95,7 +117,7 @@ export async function requestSubscription(
   } else {
     const { data, error } = await supabase
       .from("subscribers")
-      .insert(payload)
+      .insert({ ...payload, ...profile })
       .select("id")
       .single();
     if (error) return { status: "error", message: error.message };
@@ -107,7 +129,7 @@ export async function requestSubscription(
     email,
     "opt_in_requested",
     fp,
-    SUBSCRIBE_CONSENT_TEXT,
+    consentText,
   );
 
   const result = await sendEmail({

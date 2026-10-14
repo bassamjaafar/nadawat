@@ -46,12 +46,13 @@ export default async function AdminSubscribersPage() {
               {subscribers.map((s) => (
                 <tr key={s.id} className="border-b border-line/60">
                   <td className="py-3 pe-4 text-ink">
-                    {s.first_name} {s.last_name}
+                    {/* Email-only signups have no name. */}
+                    {`${s.first_name} ${s.last_name}`.trim() || "—"}
                   </td>
                   <td className="py-3 pe-4 text-muted" dir="ltr">
                     {s.email}
                   </td>
-                  <td className="py-3 pe-4 text-muted">{s.country}</td>
+                  <td className="py-3 pe-4 text-muted">{s.country || "—"}</td>
                   <td className="py-3 pe-4 text-muted">
                     {STATUS_LABEL[s.status] ?? s.status}
                   </td>
