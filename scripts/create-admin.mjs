@@ -39,11 +39,21 @@ if (!email) {
   console.error('Usage: node scripts/create-admin.mjs someone@example.com "الاسم"');
   process.exit(1);
 }
+// Guard against running the usage example verbatim (example.com can't
+// receive email, so the account would be unusable).
+if (/@example\.(com|org|net)$/i.test(email)) {
+  console.error(`"${email}" is a placeholder address — use the person's real email.`);
+  process.exit(1);
+}
 
 const env = loadEnvLocal();
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const adminKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SECRET_KEY;
-const siteUrl = env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+// The link is opened on the new admin's own device, so it must point at the
+// live site — NOT .env.local's NEXT_PUBLIC_SITE_URL, which is localhost for
+// development (that sent a coordinator to "Safari can't connect").
+// Set ADMIN_LINK_BASE_URL=http://localhost:3000 only to test locally.
+const siteUrl = process.env.ADMIN_LINK_BASE_URL || "https://nadawat.org";
 
 if (!supabaseUrl || !adminKey) {
   console.error(
