@@ -103,9 +103,20 @@ async function main() {
     });
   if (linkError) throw linkError;
 
+  // Point straight at our own page with the hashed token, instead of
+  // Supabase's verify URL (action_link): opening ours does NOT use the token —
+  // the person presses «متابعة» first — so link previews (e.g. pasting into
+  // WhatsApp) and email scanners can no longer burn it.
+  const link = `${siteUrl}/admin/set-password?token_hash=${encodeURIComponent(
+    linkData.properties.hashed_token,
+  )}&type=recovery`;
+
   console.log("\nOne-time link to set the password (open it in a browser):\n");
-  console.log(linkData.properties.action_link);
-  console.log("\nThis link works once and expires — re-run this script for a new one.");
+  console.log(link);
+  console.log(
+    "\nIt's used when the person presses «متابعة» on that page; then it expires.\n" +
+      "Running this script again issues a new link and replaces the old one.",
+  );
 }
 
 main().catch((err) => {

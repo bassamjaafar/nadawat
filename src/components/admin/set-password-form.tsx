@@ -4,20 +4,26 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
-type Stage = "checking-link" | "ready" | "invalid-link";
+type Stage = "checking-link" | "confirm" | "ready" | "invalid-link";
 
 /**
- * Recovery links generated via the Admin API (`auth.admin.generateLink`)
- * deliver the session as `#access_token=...&refresh_token=...` in the URL
- * fragment — never a `?code=` — because the PKCE flow needs a code_verifier
- * only the *original requesting client* holds, which doesn't exist when an
- * admin generates the link for someone else. A fragment never reaches the
- * server (browsers strip it before sending the request), so this has to run
- * entirely client-side: read the hash, hand it to Supabase, then render.
+ * Two link formats land here:
+ *
+ * 1. `?token_hash=…&type=recovery` (what scripts/create-admin.mjs prints now).
+ *    Loading the page does NOT use the one-time token — the person must press
+ *    «متابعة», which calls verifyOtp(). Link previews (WhatsApp, Slack…),
+ *    email scanners and accidental double-opens only fetch the page, so they
+ *    can no longer burn the link before the real person uses it.
+ *
+ * 2. Legacy Supabase verify links, which redirect here with the session as
+ *    `#access_token=...&refresh_token=...` in the URL fragment (the token was
+ *    already consumed by the redirect). A fragment never reaches the server,
+ *    so this runs client-side: read the hash, hand it to Supabase, render.
  */
 export function SetPasswordForm() {
   const router = useRouter();
   const [stage, setStage] = useState<Stage>("checking-link");
+  const [tokenHash, setTokenHash] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +34,14 @@ export function SetPasswordForm() {
     // rather than the effect body itself) so this reads as reacting to an
     // external system rather than a synchronous render-time state update.
     Promise.resolve().then(async () => {
+      const query = new URLSearchParams(window.location.search);
+      const hashedToken = query.get("token_hash");
+      if (hashedToken && query.get("type") === "recovery") {
+        setTokenHash(hashedToken);
+        setStage("confirm");
+        return;
+      }
+
       const hash = new URLSearchParams(window.location.hash.slice(1));
       const accessToken = hash.get("access_token");
       const refreshToken = hash.get("refresh_token");
@@ -47,6 +61,21 @@ export function SetPasswordForm() {
       setStage(error ? "invalid-link" : "ready");
     });
   }, []);
+
+  // Uses the one-time token only now, on an explicit click.
+  async function onContinue() {
+    if (!tokenHash) return;
+    setPending(true);
+    const supabase = getSupabaseBrowserClient();
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: "recovery",
+    });
+    setPending(false);
+    // Clean the token out of the visible URL either way.
+    window.history.replaceState(null, "", window.location.pathname);
+    setStage(error ? "invalid-link" : "ready");
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -77,6 +106,24 @@ export function SetPasswordForm() {
 
   if (stage === "checking-link") {
     return <p className="text-[0.9rem] text-muted">جارٍ التحقق من الرابط…</p>;
+  }
+
+  if (stage === "confirm") {
+    return (
+      <div className="flex flex-col gap-4">
+        <p className="text-center text-[0.9rem] leading-7 text-muted">
+          اضغط «متابعة» لتعيين كلمة مرور حسابك.
+        </p>
+        <button
+          type="button"
+          onClick={onContinue}
+          disabled={pending}
+          className="inline-flex items-center justify-center rounded-[var(--radius)] bg-olive px-5 py-2.5 text-[0.95rem] font-medium text-cream transition-opacity hover:opacity-90 disabled:opacity-60"
+        >
+          {pending ? "جارٍ التحقق…" : "متابعة"}
+        </button>
+      </div>
+    );
   }
 
   if (stage === "invalid-link") {
