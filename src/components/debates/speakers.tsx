@@ -19,9 +19,8 @@ export function SpeakerLineup({
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-[0.975rem] leading-[1.6] font-medium uppercase text-muted">
-        الضيوف
-      </p>
+      <p className="text-[0.975rem] leading-[1.6] font-medium uppercase text-muted">        الضيوف/ات
+</p>
       {/* Each card spans four shared rows (portrait, name, title, position)
           via subgrid, so names and titles start on the same line in every
           card even when one of them wraps onto more lines. */}

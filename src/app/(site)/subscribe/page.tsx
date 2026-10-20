@@ -3,9 +3,9 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SubscribeForm } from "@/components/forms/subscribe-form";
 
 export const metadata: Metadata = {
-  title: "اشترك بالتحديثات",
+  title: "الاشتراك بالتحديثات",
   description:
-    "اشترك ليصلك موعد كل ندوة جديدة، وأبرز أخبار ندوات وتحديثاتها. رسائل قليلة، ويمكنك إلغاء الاشتراك في أي وقت.",
+    "بالاشتراك، يصلك موعد كل ندوة جديدة، وأبرز أخبار ندوات وتحديثاتها. رسائل قليلة، ويمكنك إلغاء الاشتراك في أي وقت.",
   alternates: { canonical: "/subscribe" },
 };
 
@@ -14,8 +14,8 @@ export default function SubscribePage() {
     <div className="pb-24">
       <PageHeader
         kicker="الاشتراك"
-        title="اعرف بموعد كل ندوة جديدة"
-        lede="اشترك ليصلك موعد كل ندوة جديدة، وأبرز أخبار ندوات وتحديثاتها. رسائل قليلة، ويمكنك إلغاء الاشتراك في أي وقت."
+        title="موعد كل ندوة جديدة، في بريدك"
+        lede="بالاشتراك، يصلك موعد كل ندوة جديدة، وأبرز أخبار ندوات وتحديثاتها. رسائل قليلة، ويمكنك إلغاء الاشتراك في أي وقت."
       />
 
       <div className="container-page section-y">

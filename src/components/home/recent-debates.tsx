@@ -30,7 +30,7 @@ export function RecentDebates({ debates }: { debates: DebateSummary[] }) {
       </div>
 
       {/* Cards share the grid's rows (subgrid) so dates, titles, speaker
-          lines and the «شاهد الندوة» links line up across each row. Row
+          lines and the «مشاهدة الندوة» links line up across each row. Row
           spacing between stacked cards is padding, not gap-y, because a
           row gap would also open up inside each card. */}
       <div className="mt-10 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">

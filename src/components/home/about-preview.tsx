@@ -26,11 +26,10 @@ export function AboutPreview() {
             على الآراء المختلفة.
           </p>
           <p className="mt-4 text-[1rem] leading-8 text-muted">
-            لا تتبنّى ندوات موقفًا مسبقًا من القضايا التي تطرحها، ويُمنح كلّ ضيفٍ
-            مجالًا عادلًا لعرض أفكاره ومناقشتها.
+            لا تتبنّى ندوات موقفًا مسبقًا من القضايا التي تطرحها، ويُمنح كلّ ضيف/ة مجالًا عادلًا لعرض الأفكار ومناقشتها.
           </p>
           <div className="mt-6">
-            <ArrowLink href="/about">تعرّف على ندوات</ArrowLink>
+            <ArrowLink href="/about">المزيد عن ندوات</ArrowLink>
           </div>
         </div>
       </Reveal>

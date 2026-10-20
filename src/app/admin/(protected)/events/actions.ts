@@ -130,6 +130,6 @@ export async function saveParticipantsAction(
     revalidatePublicPages(event?.slug);
     return { ok: true };
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "تعذّر حفظ الضيوف." };
+    return { error: err instanceof Error ? err.message : "تعذّر حفظ الضيوف/ات." };
   }
 }

@@ -31,7 +31,7 @@ export async function subscribeAction(
   if (!turnstileOk) {
     return {
       status: "error",
-      message: "تعذّر التحقّق من أنّك لست روبوتًا. أعد المحاولة.",
+      message: "تعذّر التحقّق من أنّك لست روبوتًا. يُرجى المحاولة مجدّدًا.",
     };
   }
 

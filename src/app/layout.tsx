@@ -61,7 +61,7 @@ export default function RootLayout({
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:end-4 focus:top-4 focus:z-50 focus:rounded focus:bg-olive focus:px-4 focus:py-2 focus:text-cream"
         >
-          تخطَّ إلى المحتوى
+          الانتقال إلى المحتوى
         </a>
         {children}
         <FirstVisitIntro />

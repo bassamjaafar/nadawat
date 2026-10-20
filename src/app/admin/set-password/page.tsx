@@ -16,7 +16,7 @@ export default function SetPasswordPage() {
         </p>
         <h1 className="mt-2 text-center text-h3 text-ink">تعيين كلمة المرور</h1>
         <p className="mt-2 text-center text-[0.9rem] text-muted">
-          اختر كلمة مرور لحسابك في لوحة التحكم.
+          اختيار كلمة مرور للحساب في لوحة التحكم.
         </p>
         <div className="mt-8">
           <SetPasswordForm />

@@ -80,7 +80,7 @@ ${
 }
 <tr><td style="padding:18px 32px 26px;border-top:1px solid ${COLORS.line};">
 <p style="margin:0;font-size:12px;color:${COLORS.muted};line-height:1.8;">
-هذه الرسالة من ${SITE_NAME}. للردّ أو الاستفسار راسلنا على
+هذه الرسالة من ${SITE_NAME}. للردّ أو الاستفسار:
 <a href="mailto:${REPLY_ADDRESS}" style="color:${COLORS.olive};">${REPLY_ADDRESS}</a> — نقرأ الردود.
 <br>${SITE_URL.replace(/^https?:\/\//, "")}
 </p>
@@ -106,7 +106,7 @@ export function subscribeConfirmEmail(input: {
   const body = `<p style="margin:0 0 12px;">${greeting(input.firstName, true)}</p>
 <p style="margin:0 0 12px;">تلقّينا طلب اشتراكك في رسائل ندوات. لم يكتمل اشتراكك بعد: لتأكيده، يرجى الضغط على الزرّ أدناه.</p>
 <p style="margin:0 0 12px;">بعد التأكيد، ستصلك رسائل عن الندوات القادمة، وأخبار ندوات وتحديثاتها. ويمكنك إلغاء الاشتراك في أي وقت.</p>
-<p style="margin:0;">إن لم تكن أنت من طلب ذلك، تجاهل هذه الرسالة ولن يُضاف بريدك إلى أي قائمة.</p>`;
+<p style="margin:0;">إن لم يكن هذا الطلب منك، يمكن تجاهل هذه الرسالة، ولن يُضاف البريد إلى أي قائمة.</p>`;
   return {
     subject: "أكِّد اشتراكك في ندوات",
     html: shell({
@@ -116,7 +116,7 @@ export function subscribeConfirmEmail(input: {
       cta: { label: "تأكيد الاشتراك", href: input.confirmUrl },
       footNote: "الرابط صالح لهذا الطلب فقط.",
     }),
-    text: `${greeting(input.firstName, false)}\n\nتلقّينا طلب اشتراكك في رسائل ندوات. لم يكتمل اشتراكك بعد: لتأكيده افتح الرابط التالي:\n${input.confirmUrl}\n\nبعد التأكيد، ستصلك رسائل عن الندوات القادمة، وأخبار ندوات وتحديثاتها. ويمكنك إلغاء الاشتراك في أي وقت.\n\nإن لم تطلب ذلك، تجاهل هذه الرسالة.\n\n${REPLY_ADDRESS}`,
+    text: `${greeting(input.firstName, false)}\n\nتلقّينا طلب اشتراكك في رسائل ندوات. لم يكتمل اشتراكك بعد. رابط التأكيد:\n${input.confirmUrl}\n\nبعد التأكيد، ستصلك رسائل عن الندوات القادمة، وأخبار ندوات وتحديثاتها. ويمكنك إلغاء الاشتراك في أي وقت.\n\nإن لم يكن هذا الطلب منك، يمكن تجاهل هذه الرسالة.\n\n${REPLY_ADDRESS}`,
   };
 }
 
@@ -126,14 +126,14 @@ export function subscribeConfirmedEmail(input: {
 }): Email {
   const body = `<p style="margin:0 0 12px;">${greeting(input.firstName, true)}</p>
 <p style="margin:0 0 12px;">تمّ تأكيد اشتراكك. ستصلك رسائل عن الندوات القادمة، وأخبار ندوات وتحديثاتها. ويمكنك إلغاء الاشتراك في أي وقت.</p>
-<p style="margin:0;">لإلغاء الاشتراك، استخدم الرابط أدناه أو الرابط في تذييل أي رسالة.</p>`;
+<p style="margin:0;">يمكن إلغاء الاشتراك من الرابط أدناه أو من الرابط في تذييل أي رسالة.</p>`;
   return {
     subject: "تمّ تأكيد اشتراكك في ندوات",
     html: shell({
       preview: "تمّ تأكيد اشتراكك في رسائل ندوات",
       heading: "تمّ تأكيد اشتراكك",
       body,
-      footNote: `لإلغاء الاشتراك: <a href="${input.unsubscribeUrl}" style="color:${COLORS.olive};">اضغط هنا</a>`,
+      footNote: `لإلغاء الاشتراك: <a href="${input.unsubscribeUrl}" style="color:${COLORS.olive};">من هنا</a>`,
     }),
     text: `${greeting(input.firstName, false)}\n\nتمّ تأكيد اشتراكك. ستصلك رسائل عن الندوات القادمة، وأخبار ندوات وتحديثاتها. ويمكنك إلغاء الاشتراك في أي وقت.\n\nلإلغاء الاشتراك:\n${input.unsubscribeUrl}\n\n${REPLY_ADDRESS}`,
   };
@@ -165,7 +165,7 @@ ${statusHtml}
 <p style="margin:0 0 14px;">الموعد: ${input.debateWhen}</p>
 <p style="margin:0 0 4px;color:${COLORS.muted};font-size:13px;">ما أرسلته:</p>
 <p style="margin:0 0 14px;padding:10px 14px;border-inline-start:3px solid ${COLORS.line};background:${COLORS.page};">${question}</p>
-<p style="margin:0;">للمشاهدة لا تحتاج إلى أيّ تسجيل — تجد روابط البثّ المباشر على صفحة الندوة.</p>`;
+<p style="margin:0;">المشاهدة لا تتطلّب أيّ تسجيل، وروابط البثّ المباشر متاحة على صفحة الندوة.</p>`;
 
   return {
     subject: `استلمنا طلب مشاركتك: ${input.debateTitle}`,

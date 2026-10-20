@@ -36,8 +36,7 @@ export default async function EditPersonPage({
 
       <div className="mt-14 border-t border-line pt-8">
         <p className="mb-3 text-[0.85rem] text-muted">
-          حذف الشخص نهائي. لن يكون ممكنًا إذا كان لا يزال ضيفًا أو محاورًا في
-          ندوة.
+          حذف الشخص نهائي. لن يكون ممكنًا ما دام مُدرَجًا في ندوة بصفة ضيف/ة أو محاور/ة.
         </p>
         <DeleteForm
           action={deletePersonAction}

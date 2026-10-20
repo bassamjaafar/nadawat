@@ -73,7 +73,7 @@ export async function adminDeletePerson(id: string): Promise<void> {
   if (modErr) throw new Error(modErr.message);
   if (asModerator) {
     throw new Error(
-      `لا يمكن حذف هذا الشخص لأنّه محاور ندوة «${asModerator.title_ar}». عدّل المحاور من صفحة الندوة أولًا.`,
+      `لا يمكن حذف هذا الشخص لأنّه مُدرَج بصفة محاور/ة في ندوة «${asModerator.title_ar}». يُرجى تغيير المحاور/ة من صفحة الندوة أولًا.`,
     );
   }
 
@@ -82,7 +82,7 @@ export async function adminDeletePerson(id: string): Promise<void> {
     // debate_participants.person_id IS restrict — this is the speaker case.
     if (error.code === "23503") {
       throw new Error(
-        "لا يمكن حذف هذا الشخص لأنّه لا يزال ضيفًا في ندوة واحدة على الأقل.",
+        "لا يمكن حذف هذا الشخص لأنّه لا يزال مُدرَجًا بصفة ضيف/ة في ندوة واحدة على الأقل.",
       );
     }
     throw new Error(error.message);

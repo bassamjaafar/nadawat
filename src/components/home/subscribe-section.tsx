@@ -12,10 +12,10 @@ export function SubscribeSection() {
               الاشتراك
             </span>
             <h2 id="subscribe-title" className="mt-2 text-h2 text-ink">
-              اعرف بموعد كل ندوة جديدة
+              موعد كل ندوة جديدة، في بريدك
             </h2>
             <p className="mt-4 max-w-md text-[1rem] leading-8 text-muted">
-              اشترك ليصلك موعد كل ندوة جديدة، وأبرز أخبار ندوات وتحديثاتها.
+              بالاشتراك، يصلك موعد كل ندوة جديدة، وأبرز أخبار ندوات وتحديثاتها.
               رسائل قليلة، ويمكنك إلغاء الاشتراك في أي وقت.
             </p>
           </div>

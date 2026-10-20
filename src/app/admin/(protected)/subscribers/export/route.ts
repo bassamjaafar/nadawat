@@ -6,7 +6,7 @@ import { toCsv } from "@/lib/csv";
 const STATUS_LABEL: Record<string, string> = {
   pending: "بانتظار التأكيد",
   confirmed: "مؤكَّد",
-  unsubscribed: "ألغى الاشتراك",
+  unsubscribed: "أُلغي الاشتراك",
 };
 
 export async function GET() {

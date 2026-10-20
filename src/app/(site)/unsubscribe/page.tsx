@@ -19,7 +19,7 @@ export default async function UnsubscribePage({
   if (!token) {
     return (
       <NoticePage kicker="الاشتراك" title="رابط غير مكتمل">
-        <p>لم نجد رمز الإلغاء في الرابط. استخدم الرابط الوارد في الرسالة كاملًا.</p>
+        <p>لم نجد رمز الإلغاء في الرابط. يُرجى استخدام الرابط الوارد في الرسالة كاملًا.</p>
       </NoticePage>
     );
   }
@@ -43,7 +43,7 @@ export default async function UnsubscribePage({
 
   return (
     <NoticePage kicker="الاشتراك" title="رابط غير صالح">
-      <p>قد يكون الاشتراك أُلغي سابقًا. إن استمرّت الرسائل راسلنا وسنعالج الأمر.</p>
+      <p>قد يكون الاشتراك أُلغي سابقًا. إن استمرّت الرسائل، يُرجى مراسلتنا وسنعالج الأمر.</p>
     </NoticePage>
   );
 }

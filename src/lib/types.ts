@@ -60,9 +60,9 @@ export function isUpcoming(d: Pick<DebateSummary, "starts_at">): boolean {
   return !!d.starts_at && new Date(d.starts_at).getTime() > Date.now();
 }
 
-/** "شاهد الندوة" only makes sense once a recording actually exists. */
+/** "مشاهدة الندوة" only makes sense once a recording actually exists. */
 export function pastEventCtaLabel(
   d: Pick<DebateSummary, "youtube_video_id">,
 ): string {
-  return d.youtube_video_id ? "شاهد الندوة" : "تفاصيل الندوة";
+  return d.youtube_video_id ? "مشاهدة الندوة" : "تفاصيل الندوة";
 }

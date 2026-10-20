@@ -78,7 +78,7 @@ export function EventHero({ debate }: { debate: DebateDetail }) {
                     href={`${href}#participate`}
                     variant={watching ? "outline" : "primary"}
                   >
-                    شارك في الحوار
+                    المشاركة في الحوار
                   </ButtonLink>
                 ) : null}
                 {!watching && !debate.registration_open ? (

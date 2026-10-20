@@ -5,8 +5,8 @@ type WatchLinks = Pick<DebateDetail, "youtube_live_url" | "facebook_live_url">;
 
 function links(debate: WatchLinks) {
   return [
-    { href: debate.youtube_live_url, label: "شاهد على يوتيوب" },
-    { href: debate.facebook_live_url, label: "شاهد على فيسبوك" },
+    { href: debate.youtube_live_url, label: "المشاهدة على يوتيوب" },
+    { href: debate.facebook_live_url, label: "المشاهدة على فيسبوك" },
   ].filter((l): l is { href: string; label: string } => !!l.href);
 }
 

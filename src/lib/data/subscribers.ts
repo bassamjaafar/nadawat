@@ -154,7 +154,7 @@ export async function confirmSubscription(
 ): Promise<ConfirmResult> {
   if (!hasSupabaseAdmin) {
     // Demo mode: any non-empty token "confirms".
-    return token ? { status: "confirmed", firstName: "صديقنا" } : { status: "invalid" };
+    return token ? { status: "confirmed", firstName: "" } : { status: "invalid" };
   }
 
   const supabase = getSupabaseAdminClient();
@@ -207,7 +207,7 @@ type UnsubResult =
 
 export async function unsubscribe(token: string): Promise<UnsubResult> {
   if (!hasSupabaseAdmin) {
-    return token ? { status: "done", firstName: "صديقنا" } : { status: "invalid" };
+    return token ? { status: "done", firstName: "" } : { status: "invalid" };
   }
 
   const supabase = getSupabaseAdminClient();

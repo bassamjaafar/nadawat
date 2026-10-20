@@ -23,7 +23,7 @@ export default async function ConfirmSubscriptionPage({
         title="رابط غير مكتمل"
         action={{ href: "/subscribe", label: "العودة إلى صفحة الاشتراك" }}
       >
-        <p>لم نجد رمز التأكيد في الرابط. تأكّد من نسخه كاملًا من الرسالة.</p>
+        <p>لم نجد رمز التأكيد في الرابط. يُرجى التأكّد من نسخه كاملًا من الرسالة.</p>
       </NoticePage>
     );
   }

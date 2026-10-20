@@ -3,14 +3,14 @@ import { adminListSubscribers } from "@/lib/admin/subscribers";
 import { formatDateShort } from "@/lib/format";
 
 export const metadata: Metadata = {
-  title: "المشتركون",
+  title: "المشتركون/ات",
   robots: { index: false, follow: false },
 };
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "بانتظار التأكيد",
   confirmed: "مؤكَّد",
-  unsubscribed: "ألغى الاشتراك",
+  unsubscribed: "أُلغي الاشتراك",
 };
 
 export default async function AdminSubscribersPage() {
@@ -19,7 +19,7 @@ export default async function AdminSubscribersPage() {
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-h2 text-ink">المشتركون</h1>
+        <h1 className="text-h2 text-ink">المشتركون/ات</h1>
         <a
           href="/admin/subscribers/export"
           className="text-[0.9rem] text-olive underline underline-offset-4 hover:no-underline"
@@ -29,7 +29,7 @@ export default async function AdminSubscribersPage() {
       </div>
 
       {subscribers.length === 0 ? (
-        <p className="mt-8 text-[0.95rem] text-muted">لا يوجد مشتركون بعد.</p>
+        <p className="mt-8 text-[0.95rem] text-muted">لا يوجد مشتركون/ات بعد.</p>
       ) : (
         <div className="mt-8 overflow-x-auto">
           <table className="w-full min-w-[46rem] border-collapse text-[0.9rem]">

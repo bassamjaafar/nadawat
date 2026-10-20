@@ -12,7 +12,7 @@ export default function NewPersonPage() {
     <div className="max-w-xl">
       <h1 className="text-h2 text-ink">شخص جديد</h1>
       <p className="mt-2 text-[0.9rem] text-muted">
-        بعد الإنشاء يمكنك رفع صورته من صفحة التعديل.
+        بعد الإنشاء يمكن رفع الصورة من صفحة التعديل.
       </p>
       <div className="mt-8">
         <PersonForm action={createPersonFormAction} submitLabel="إنشاء" />

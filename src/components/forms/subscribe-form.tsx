@@ -33,10 +33,9 @@ export function SubscribeForm({
         className="rounded-[var(--radius-md)] border border-line bg-[#fffdf7] p-6"
         role="status"
       >
-        <h3 className="text-h3 text-olive">تفقّد بريدك الإلكتروني</h3>
+        <h3 className="text-h3 text-olive">يُرجى تفقّد البريد الإلكتروني</h3>
         <p className="mt-2 text-[0.98rem] leading-8 text-muted">
-          أرسلنا رسالة تحتوي رابط تأكيد. اضغط الرابط لإتمام اشتراكك. إن لم تجد
-          الرسالة خلال دقائق، تحقّق من مجلّد الرسائل غير المرغوبة.
+          أرسلنا رسالة تحتوي رابط تأكيد، ويكتمل الاشتراك بالضغط عليه. إن لم تصل الرسالة خلال دقائق، يُرجى التحقّق من مجلّد الرسائل غير المرغوبة.
         </p>
         {state.devConfirmUrl ? (
           <p className="mt-4 text-[0.85rem] text-muted">
@@ -118,10 +117,10 @@ export function SubscribeForm({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <Button type="submit" disabled={pending}>
-          {pending ? "جارٍ الإرسال…" : "اشترك"}
+          {pending ? "جارٍ الإرسال…" : "الاشتراك"}
         </Button>
         <p className="text-[0.85rem] leading-6 text-muted">
-          نستخدم بريدك لرسائل ندوات فقط. اطّلع على{" "}
+          نستخدم البريد لرسائل ندوات فقط. التفاصيل في{" "}
           <a href="/privacy" className="underline underline-offset-4">
             سياسة الخصوصية
           </a>

@@ -109,7 +109,7 @@ export function ParticipateForm({
         id="country"
         label="بلد الإقامة"
         options={COUNTRIES}
-        placeholder="اختر بلد الإقامة"
+        placeholder="اختيار بلد الإقامة"
         defaultValue=""
         error={state.errors?.country}
       />
@@ -121,7 +121,7 @@ export function ParticipateForm({
         }
       >
         <legend className="mb-1 text-meta font-medium text-ink">
-          كيف ترغب بالمشاركة؟
+          طريقة المشاركة
         </legend>
         {(Object.keys(PARTICIPATION_TYPES) as ParticipationType[]).map((key) => (
           <label
@@ -153,7 +153,7 @@ export function ParticipateForm({
 
       <TextareaField
         id="question"
-        label="السؤال أو الفكرة التي ترغب بطرحها"
+        label="السؤال أو الفكرة المراد طرحها"
         hint="باختصار ووضوح."
         required
         maxLength={1000}
@@ -211,7 +211,7 @@ export function ParticipateForm({
           </p>
         ) : null}
         <Button type="submit" disabled={pending} className="sm:self-start">
-          {pending ? "جارٍ الإرسال…" : "أرسل طلب المشاركة"}
+          {pending ? "جارٍ الإرسال…" : "إرسال طلب المشاركة"}
         </Button>
       </div>
     </form>

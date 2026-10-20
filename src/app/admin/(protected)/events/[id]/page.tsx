@@ -36,7 +36,7 @@ export default async function EditEventPage({
       </div>
 
       <div className="mt-14 border-t border-line pt-10">
-        <h2 className="text-h3 text-ink">الضيوف والمحاور</h2>
+        <h2 className="text-h3 text-ink">الضيوف/ات والمحاور/ة</h2>
         <div className="mt-6">
           <ParticipantsEditor
             debateId={event.id}

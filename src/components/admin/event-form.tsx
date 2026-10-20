@@ -95,7 +95,7 @@ export function EventForm({
           options={STATUS_OPTIONS}
           defaultValue={event?.status ?? "draft"}
           error={state.errors?.status}
-          hint="لا يحدّد ظهورها في «القادمة» أو «الأرشيف» — ذلك يُحسب تلقائيًّا من الموعد أدناه. اختر «مسودّة» فقط لإخفائها مؤقتًا."
+          hint="لا يحدّد ظهورها في «القادمة» أو «الأرشيف» — ذلك يُحسب تلقائيًّا من الموعد أدناه. «مسودّة» لإخفائها مؤقتًا فقط."
         />
         <TextField
           id="starts_at"
@@ -117,9 +117,7 @@ export function EventForm({
 
       <div className="flex flex-col gap-3">
         <p className="text-[0.85rem] leading-6 text-muted">
-          روابط المشاهدة العامة فقط — تظهر للجمهور كأزرار «شاهد على يوتيوب» و«شاهد
-          على فيسبوك». لا تضع هنا رابط Zoom أو StreamYard أو أيّ رابط مخصّص للضيوف
-          أو فريق الإنتاج.
+          روابط المشاهدة العامة فقط — تظهر للجمهور كأزرار «المشاهدة على يوتيوب» و«المشاهدة على فيسبوك». يُرجى عدم وضع رابط Zoom أو StreamYard أو أيّ رابط مخصّص للضيوف/ات أو فريق الإنتاج.
         </p>
         <div className="grid gap-5 sm:grid-cols-2">
           <TextField
@@ -178,7 +176,7 @@ export function EventForm({
           id="registration_open"
           defaultChecked={event?.registration_open}
         >
-          نموذج «شارك في الحوار» مفتوح لهذه الندوة
+          نموذج «المشاركة في الحوار» مفتوح لهذه الندوة
         </CheckboxField>
       </div>
 

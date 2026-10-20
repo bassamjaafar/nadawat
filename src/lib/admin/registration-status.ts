@@ -1,8 +1,8 @@
 export const REGISTRATION_STATUSES = {
   new: "جديد",
-  selected: "تمّ اختياره للمشاركة المباشرة",
-  not_selected: "لم يتم اختياره",
-  participated: "شارك",
+  selected: "تمّ الاختيار للمشاركة المباشرة",
+  not_selected: "لم يتمّ الاختيار",
+  participated: "تمّت المشاركة",
 } as const;
 
 export type RegistrationStatus = keyof typeof REGISTRATION_STATUSES;

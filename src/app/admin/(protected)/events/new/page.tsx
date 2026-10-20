@@ -12,7 +12,7 @@ export default function NewEventPage() {
     <div className="max-w-2xl">
       <h1 className="text-h2 text-ink">ندوة جديدة</h1>
       <p className="mt-2 text-[0.9rem] text-muted">
-        بعد إنشاء الندوة يمكنك إضافة الضيوف والمحاور من صفحة التعديل.
+        بعد إنشاء الندوة يمكن إضافة الضيوف/ات والمحاور/ة من صفحة التعديل.
       </p>
       <div className="mt-8">
         <EventForm action={createEventAction} submitLabel="إنشاء الندوة" />

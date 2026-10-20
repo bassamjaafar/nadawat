@@ -121,16 +121,15 @@ export function ParticipantsEditor({
       ) : null}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={moderatorSelectId} className="text-meta font-medium text-ink">
-          المحاور
-        </label>
+        <label htmlFor={moderatorSelectId} className="text-meta font-medium text-ink">          المحاور/ة
+</label>
         <select
           id={moderatorSelectId}
           value={moderatorId}
           onChange={(e) => setModeratorId(e.target.value)}
           className="w-full rounded-[var(--radius)] border border-line-strong bg-[#fffdf7] px-3.5 py-2.5 text-[1rem] text-ink"
         >
-          <option value="">بلا محاور</option>
+          <option value="">بلا محاور/ة</option>
           {people.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name_ar}
@@ -140,9 +139,9 @@ export function ParticipantsEditor({
       </div>
 
       <div className="flex flex-col gap-4">
-        <p className="text-meta font-medium text-ink">الضيوف</p>
+        <p className="text-meta font-medium text-ink">الضيوف/ات</p>
         {speakers.length === 0 ? (
-          <p className="text-[0.9rem] text-muted">لا يوجد ضيوف بعد.</p>
+          <p className="text-[0.9rem] text-muted">لا يوجد ضيوف/ات بعد.</p>
         ) : (
           speakers.map((row) => (
             <div
@@ -155,7 +154,7 @@ export function ParticipantsEditor({
                 className="w-full rounded-[var(--radius)] border border-line-strong bg-[#fffdf7] px-3.5 py-2.5 text-[0.95rem] text-ink"
               >
                 <option value="" disabled>
-                  اختر شخصًا
+                  اختيار شخص
                 </option>
                 {people.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -184,7 +183,7 @@ export function ParticipantsEditor({
         )}
         <div>
           <Button type="button" variant="outline" size="sm" onClick={addSpeakerRow}>
-            + إضافة ضيف
+            + إضافة ضيف/ة
           </Button>
         </div>
       </div>
@@ -234,14 +233,14 @@ export function ParticipantsEditor({
             onClick={() => setNewPersonOpen(true)}
             className="text-[0.9rem] text-olive hover:underline"
           >
-            الشخص غير موجود في القائمة؟ أضِف شخصًا جديدًا
+            الشخص غير موجود في القائمة؟ إضافة شخص جديد
           </button>
         )}
       </div>
 
       <div>
         <Button type="button" disabled={saving} onClick={handleSave}>
-          {saving ? "جارٍ الحفظ…" : "حفظ الضيوف والمحاور"}
+          {saving ? "جارٍ الحفظ…" : "حفظ الضيوف/ات والمحاور/ة"}
         </Button>
       </div>
     </div>

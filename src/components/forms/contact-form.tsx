@@ -80,7 +80,7 @@ export function ContactForm() {
         id="category"
         label="نوع الرسالة"
         options={[...CONTACT_CATEGORIES]}
-        placeholder="اختر نوع الرسالة"
+        placeholder="اختيار نوع الرسالة"
         required
         error={state.errors?.category}
       />

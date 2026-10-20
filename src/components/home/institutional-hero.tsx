@@ -9,17 +9,16 @@ export function InstitutionalHero() {
         </h1>
         <p className="mt-6 max-w-[42rem] text-body-lg leading-9 text-muted">
           ندوات منصة سورية مستقلة للحوار العام، تستضيف أصواتاً ووجهات نظر
-          مختلفة لمناقشة القضايا السياسية والاقتصادية والاجتماعية التي تهم
-          السوريين.
+          مختلفة لمناقشة القضايا السياسية والاقتصادية والاجتماعية التي تهمّ السوريات والسوريين.
         </p>
         <p className="mt-3 max-w-[42rem] text-body-lg leading-9 text-muted">
           نسعى إلى خلق مساحة لحوار جاد ومنظم، تُعرض فيها الآراء بوضوح، وتُناقش
           الأفكار باحترام.
         </p>
         <div className="mt-9 flex flex-wrap gap-3">
-          <ButtonLink href="/subscribe">اشترك لتصلك الندوات القادمة</ButtonLink>
+          <ButtonLink href="/subscribe">الاشتراك بمواعيد الندوات القادمة</ButtonLink>
           <ButtonLink href="/about" variant="outline">
-            تعرّف على ندوات
+            المزيد عن ندوات
           </ButtonLink>
         </div>
       </div>

@@ -130,7 +130,7 @@ export default async function DebatePage({ params }: Params) {
               <p className="mt-2 text-h3 text-ink">لا يحتاج إلى تسجيل</p>
               <p className="mt-2 text-[0.95rem] leading-7 text-muted">
                 {hasWatchLinks(debate)
-                  ? "تابع البثّ المباشر على يوتيوب أو فيسبوك في موعد الندوة."
+                  ? "البثّ المباشر متاح على يوتيوب وفيسبوك في موعد الندوة."
                   : "ستُضاف روابط البثّ المباشر على يوتيوب وفيسبوك هنا قبل موعد الندوة."}
               </p>
               {hasWatchLinks(debate) ? (
@@ -146,11 +146,10 @@ export default async function DebatePage({ params }: Params) {
                   للمشاركة في الحوار
                 </p>
                 <p className="mt-2 text-h3 text-ink">
-                  استخدم نموذج «شارك في الحوار»
+                  عبر نموذج «المشاركة في الحوار»
                 </p>
                 <p className="mt-2 text-[0.95rem] leading-7 text-muted">
-                  أرسل سؤالًا أو مداخلة، أو اطلب المشاركة مباشرةً بالصوت والصورة
-                  خلال فقرة مشاركة الجمهور.
+                  إرسال سؤال أو مداخلة، أو طلب المشاركة مباشرةً بالصوت والصورة خلال فقرة مشاركة الجمهور.
                 </p>
                 <div className="mt-5">
                   <ArrowLink href="#participate">إلى النموذج</ArrowLink>
@@ -172,7 +171,7 @@ export default async function DebatePage({ params }: Params) {
           ) : null}
 
           <div className="mt-14 border-t border-line pt-10">
-            <h2 className="text-h2 text-ink">الضيوف</h2>
+            <h2 className="text-h2 text-ink">الضيوف/ات</h2>
             <div className="mt-8">
               <ParticipantProfiles
                 participants={debate.participants}
@@ -186,9 +185,9 @@ export default async function DebatePage({ params }: Params) {
               id="participate"
               className="mt-14 scroll-mt-[7rem] border-t border-line pt-10"
             >
-              <h2 className="text-h2 text-ink">شارك في الحوار</h2>
+              <h2 className="text-h2 text-ink">المشاركة في الحوار</h2>
               <p className="mt-3 max-w-[40rem] text-[1rem] leading-8 text-muted">
-                هذا النموذج لمن يرغب بالمشاركة في فقرة مشاركة الجمهور فقط — أما
+                هذا النموذج مخصّص للمشاركة في فقرة مشاركة الجمهور فقط — أما
                 المشاهدة فمفتوحة للجميع ولا تحتاج إلى تسجيل.
               </p>
               <div className="mt-8 max-w-xl">
@@ -212,7 +211,7 @@ export default async function DebatePage({ params }: Params) {
             ) : null}
             {upcoming && debate.registration_open ? (
               <div className="mt-4">
-                <ArrowLink href="#participate">شارك في الحوار</ArrowLink>
+                <ArrowLink href="#participate">المشاركة في الحوار</ArrowLink>
               </div>
             ) : null}
             {debate.youtube_url ? (

@@ -154,7 +154,7 @@ export function SelectField({
         {...props}
       >
         <option value="" disabled>
-          {placeholder ?? "اختر…"}
+          {placeholder ?? "اختيار…"}
         </option>
         {normalized.map((o) => (
           <option key={o.value} value={o.value}>
@@ -212,7 +212,7 @@ export function CheckboxField({
 export function Honeypot() {
   return (
     <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-      <label htmlFor="hp_field">لا تملأ هذا الحقل</label>
+      <label htmlFor="hp_field">يُترك هذا الحقل فارغًا</label>
       <input id="hp_field" name="hp_field" type="text" tabIndex={-1} autoComplete="off" />
     </div>
   );

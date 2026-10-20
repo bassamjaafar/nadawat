@@ -11,7 +11,7 @@ const ADMIN_NAV = [
   { href: "/admin/events", label: "الفعاليات" },
   { href: "/admin/people", label: "الأشخاص" },
   { href: "/admin/registrations", label: "طلبات المشاركة" },
-  { href: "/admin/subscribers", label: "المشتركون" },
+  { href: "/admin/subscribers", label: "المشتركون/ات" },
 ];
 
 export default async function ProtectedAdminLayout({

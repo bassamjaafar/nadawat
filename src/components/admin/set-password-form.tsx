@@ -96,7 +96,7 @@ export function SetPasswordForm() {
     setPending(false);
 
     if (error) {
-      setError("تعذّر حفظ كلمة المرور. حاول مجدّدًا.");
+      setError("تعذّر حفظ كلمة المرور. يُرجى المحاولة مجدّدًا.");
       return;
     }
 
@@ -112,7 +112,7 @@ export function SetPasswordForm() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-center text-[0.9rem] leading-7 text-muted">
-          اضغط «متابعة» لتعيين كلمة مرور حسابك.
+          يُرجى الضغط على «متابعة» لتعيين كلمة مرور الحساب.
         </p>
         <button
           type="button"
@@ -132,7 +132,7 @@ export function SetPasswordForm() {
         role="alert"
         className="rounded-[var(--radius)] border border-[#d8b9ad] bg-[#f3e4de] px-4 py-3 text-[0.9rem] text-[#8f3520]"
       >
-        هذا الرابط غير صالح أو منتهي الصلاحية. اطلب رابطًا جديدًا.
+        هذا الرابط غير صالح أو منتهي الصلاحية. يُرجى طلب رابط جديد.
       </p>
     );
   }
