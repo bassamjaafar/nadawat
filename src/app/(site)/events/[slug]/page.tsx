@@ -15,7 +15,7 @@ import {
 } from "@/lib/data/debates";
 import { formatDate, formatTime } from "@/lib/format";
 import { absoluteUrl } from "@/lib/url";
-import { youtubeThumbnailUrl } from "@/lib/youtube";
+import { youtubeShareImage } from "@/lib/youtube";
 import { isUpcoming } from "@/lib/types";
 import { SITE_NAME } from "@/lib/site";
 
@@ -35,20 +35,34 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   const description =
     debate.summary_ar ?? debate.description_ar?.slice(0, 160) ?? undefined;
+  // Share image: full-resolution YouTube thumbnail when available (falls
+  // back to hqdefault), else the cover image. None → opengraph-image.tsx.
   const image = debate.youtube_video_id
-    ? youtubeThumbnailUrl(debate.youtube_video_id, debate.updated_at)
-    : (debate.cover_image_url ?? undefined);
+    ? {
+        ...(await youtubeShareImage(debate.youtube_video_id, debate.updated_at)),
+        alt: debate.title_ar,
+      }
+    : debate.cover_image_url
+      ? { url: debate.cover_image_url, alt: debate.title_ar }
+      : undefined;
 
   return {
     title: debate.title_ar,
     description,
     alternates: { canonical: `/events/${debate.slug}` },
+    // A page-level openGraph replaces the root layout's, so siteName and
+    // locale must be repeated here.
     openGraph: {
       type: "article",
+      siteName: SITE_NAME,
+      locale: "ar_SY",
       title: `${debate.title_ar} — ${SITE_NAME}`,
       description,
       url: absoluteUrl(`/events/${debate.slug}`),
-      images: image ? [{ url: image }] : undefined,
+      // Keep `images: undefined` when there's no image: omitting the key
+      // would let Next.js apply opengraph-image.tsx, whose Arabic currently
+      // renders in reversed word order (satori has no bidi support).
+      images: image ? [image] : undefined,
     },
     twitter: {
       card: "summary_large_image",
