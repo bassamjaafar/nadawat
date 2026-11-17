@@ -41,7 +41,7 @@ if (process.env.VERCEL) {
   console.log(
     `[nadawat] deployment=${vercelEnv ?? "unknown"} branch=${gitBranch ?? "unknown"} supabase-project=${supabaseRef ?? "none"} ` +
       `server-key=${keyVar ?? "none"}:${keyKind}:${keyFingerprint} ` +
-      `turnstile-secret=${shape("TURNSTILE_SECRET_KEY", /^0x4[A-Za-z0-9_-]{20,}$/)} ` +
+      `turnstile-secret=${shape("TURNSTILE_SECRET_KEY", /^0x4[A-Za-z0-9_-]{26,}$/)} ` +
       `poll-secret=${shape("POLL_SECRET", /^[A-Za-z0-9+/=_-]{32,}$/)} ` +
       `consent-salt=${shape("CONSENT_IP_SALT", /^[A-Za-z0-9+/=_-]{32,}$/)}`,
   );
