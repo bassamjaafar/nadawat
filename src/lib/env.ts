@@ -34,6 +34,12 @@ const schema = z.object({
   // NEXT_PUBLIC_SUPABASE_* incident for exactly why that silently breaks.
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1).optional(),
   TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+
+  // «سؤال ندوات»: signs the anonymous voter cookie and keys the browser and
+  // network codes stored with each vote. Server-only, different per
+  // environment. Read through pollSecret() (src/lib/polls/voter-cookie.ts),
+  // which middleware can also use; listed here so it's documented with the rest.
+  POLL_SECRET: z.string().min(1).optional(),
 });
 
 // A dashboard-added env var left blank arrives as "" (not unset) — treat that
@@ -59,6 +65,7 @@ const parsed = schema.safeParse({
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   ),
   TURNSTILE_SECRET_KEY: orUnset(process.env.TURNSTILE_SECRET_KEY),
+  POLL_SECRET: orUnset(process.env.POLL_SECRET),
 });
 
 if (!parsed.success) {

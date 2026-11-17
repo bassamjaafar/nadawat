@@ -203,6 +203,22 @@
     opacity: 1;
     transform: none;
   }
+
+  /* «سؤال ندوات» results: bars grow once from the reading start (right).
+     The global reduced-motion rule below makes this instant. */
+  .poll-bar {
+    transform-origin: right;
+    animation: poll-bar-grow 1.1s var(--ease-out-soft) both;
+  }
+}
+
+@keyframes poll-bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

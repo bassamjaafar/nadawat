@@ -15,6 +15,7 @@ declare global {
           "expired-callback"?: () => void;
         },
       ) => string;
+      reset: (widgetId: string) => void;
     };
   }
 }
@@ -27,10 +28,27 @@ declare global {
  * silently dropping the whole widget (confirmed via a React error #418 in
  * production). Rendering it ourselves in an effect, which only ever runs
  * after hydration completes, avoids that race by construction.
+ *
+ * `resetSignal`: changing it asks Cloudflare for a fresh token — a token is
+ * single-use, so a form that lets the visitor retry after a failed
+ * submission (the «سؤال ندوات» vote form) bumps it after each attempt.
  */
-export function TurnstileWidget({ siteKey }: { siteKey: string }) {
+export function TurnstileWidget({
+  siteKey,
+  resetSignal = 0,
+}: {
+  siteKey: string;
+  resetSignal?: number;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
   const [token, setToken] = useState("");
+
+  useEffect(() => {
+    if (resetSignal === 0 || !widgetIdRef.current || !window.turnstile) return;
+    setToken("");
+    window.turnstile.reset(widgetIdRef.current);
+  }, [resetSignal]);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,7 +59,7 @@ export function TurnstileWidget({ siteKey }: { siteKey: string }) {
         setTimeout(tryRender, 100);
         return;
       }
-      window.turnstile.render(containerRef.current, {
+      widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
         theme: "light",
         callback: (t) => setToken(t),

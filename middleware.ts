@@ -1,5 +1,43 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  createVoterCookie,
+  pollSecret,
+  verifyVoterCookie,
+  VOTER_COOKIE,
+  VOTER_COOKIE_MAX_AGE,
+} from "@/lib/polls/voter-cookie";
+
+/**
+ * /vote: make sure the browser has a signed «سؤال ندوات» voter cookie before
+ * it can vote. Only on GET/HEAD — the vote itself (a POST to /vote) must
+ * arrive with a cookie issued earlier, or a script could get a fresh
+ * identity with every submission.
+ */
+async function ensureVoterCookie(request: NextRequest) {
+  const secret = pollSecret();
+  const isRead = request.method === "GET" || request.method === "HEAD";
+  if (
+    !secret ||
+    !isRead ||
+    (await verifyVoterCookie(request.cookies.get(VOTER_COOKIE)?.value, secret))
+  ) {
+    return NextResponse.next();
+  }
+
+  const value = await createVoterCookie(secret);
+  // Also set it on the request, so this same page render already sees it.
+  request.cookies.set(VOTER_COOKIE, value);
+  const response = NextResponse.next({ request });
+  response.cookies.set(VOTER_COOKIE, value, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/vote",
+    maxAge: VOTER_COOKIE_MAX_AGE,
+  });
+  return response;
+}
 
 /**
  * Guards /admin/*. This only checks *authentication* (is there a valid
@@ -17,6 +55,10 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (pathname === "/vote") {
+    return ensureVoterCookie(request);
+  }
+
   const isLoginPage = pathname === "/admin/login";
   // Recovery links land here with the session only in a URL fragment, which
   // this server-side check can never see — the page itself establishes the
@@ -74,5 +116,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/vote"],
 };
