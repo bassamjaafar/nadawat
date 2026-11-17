@@ -6,13 +6,17 @@ const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 /**
  * - passed:      Cloudflare confirmed the token.
- * - failed:      no token, or Cloudflare rejected it (forged, expired, reused).
+ * - failed:      no token, Cloudflare rejected it (forged, expired, reused),
+ *                or it was issued on a hostname other than `expectedHostname`.
  * - unavailable: Turnstile isn't configured here, or Cloudflare couldn't be
  *                reached from the server.
  */
 export type TurnstileStatus = "passed" | "failed" | "unavailable";
 
-export async function verifyTurnstileStatus(token: string | null): Promise<TurnstileStatus> {
+export async function verifyTurnstileStatus(
+  token: string | null,
+  expectedHostname?: string,
+): Promise<TurnstileStatus> {
   if (!hasTurnstile) return "unavailable";
   if (!token) return "failed";
 
@@ -32,8 +36,11 @@ export async function verifyTurnstileStatus(token: string | null): Promise<Turns
       body,
       signal: AbortSignal.timeout(8000),
     });
-    const data = (await res.json()) as { success: boolean };
-    return data.success === true ? "passed" : "failed";
+    const data = (await res.json()) as { success: boolean; hostname?: string };
+    if (data.success !== true) return "failed";
+    // A token solved on another site that uses the same key isn't ours.
+    if (expectedHostname && data.hostname !== expectedHostname) return "failed";
+    return "passed";
   } catch {
     return "unavailable";
   }
