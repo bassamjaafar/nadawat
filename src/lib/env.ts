@@ -44,9 +44,11 @@ const schema = z.object({
 
 // A dashboard-added env var left blank arrives as "" (not unset) — treat that
 // the same as unset, or every `.optional()`/`.default()` below would still
-// try to validate an empty string and fail the whole parse.
+// try to validate an empty string and fail the whole parse. The literal value
+// "disabled" also counts as unset: Vercel won't store an empty value, and the
+// staging preview uses RESEND_API_KEY=disabled so it can never send email.
 const orUnset = (v: string | undefined) =>
-  v && v.trim() !== "" ? v : undefined;
+  v && v.trim() !== "" && v.trim() !== "disabled" ? v : undefined;
 
 const parsed = schema.safeParse({
   NEXT_PUBLIC_SITE_URL: orUnset(process.env.NEXT_PUBLIC_SITE_URL),
