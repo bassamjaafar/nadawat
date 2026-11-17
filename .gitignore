@@ -44,3 +44,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+supabase/staging-setup.generated.sql
+supabase/staging-fix-arabic.generated.sql

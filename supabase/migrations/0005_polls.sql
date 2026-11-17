@@ -754,7 +754,7 @@ begin
     or (eff = 'closed'    and p_to = 'published')
     or (eff = 'published' and p_to = 'closed')
   ) then
-    raise exception 'Status change % → % is not allowed.', eff, p_to using errcode = 'P0001';
+    raise exception 'Status change % to % is not allowed.', eff, p_to using errcode = 'P0001';
   end if;
 
   if p_to in ('scheduled', 'open')
