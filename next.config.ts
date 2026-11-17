@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { createHash } from "node:crypto";
 
 const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
@@ -16,8 +17,25 @@ const vercelEnv = process.env.VERCEL_ENV;
 const gitBranch = process.env.VERCEL_GIT_COMMIT_REF;
 if (process.env.VERCEL) {
   // Shown in the Vercel build log: confirms the target without any secret.
+  // The server key is identified only by the variable that supplied it, its
+  // kind and an 8-character one-way fingerprint — enough to tell keys apart.
+  const keyVar = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+    ? "SUPABASE_SERVICE_ROLE_KEY"
+    : process.env.SUPABASE_SECRET_KEY?.trim()
+      ? "SUPABASE_SECRET_KEY"
+      : null;
+  const key = keyVar ? process.env[keyVar]!.trim() : "";
+  const keyKind = !keyVar
+    ? "none"
+    : key.startsWith("sb_secret_")
+      ? "sb_secret"
+      : key.startsWith("eyJ")
+        ? "legacy-jwt"
+        : "not-a-key";
+  const keyFingerprint = keyVar ? createHash("sha256").update(key).digest("hex").slice(0, 8) : "-";
   console.log(
-    `[nadawat] deployment=${vercelEnv ?? "unknown"} branch=${gitBranch ?? "unknown"} supabase-project=${supabaseRef ?? "none"}`,
+    `[nadawat] deployment=${vercelEnv ?? "unknown"} branch=${gitBranch ?? "unknown"} supabase-project=${supabaseRef ?? "none"} ` +
+      `server-key=${keyVar ?? "none"}:${keyKind}:${keyFingerprint}`,
   );
 }
 if (
