@@ -36,10 +36,22 @@ export async function verifyTurnstileStatus(
       body,
       signal: AbortSignal.timeout(8000),
     });
-    const data = (await res.json()) as { success: boolean; hostname?: string };
-    if (data.success !== true) return "failed";
+    const data = (await res.json()) as {
+      success: boolean;
+      hostname?: string;
+      "error-codes"?: string[];
+    };
+    // Logged for diagnosis: Cloudflare's reason codes and hostnames only,
+    // never the token or the secret.
+    if (data.success !== true) {
+      console.warn("turnstile failed:", (data["error-codes"] ?? []).join(",") || "no-code", "hostname:", data.hostname ?? "-");
+      return "failed";
+    }
     // A token solved on another site that uses the same key isn't ours.
-    if (expectedHostname && data.hostname !== expectedHostname) return "failed";
+    if (expectedHostname && data.hostname !== expectedHostname) {
+      console.warn("turnstile hostname mismatch:", data.hostname ?? "-", "expected:", expectedHostname);
+      return "failed";
+    }
     return "passed";
   } catch {
     return "unavailable";
