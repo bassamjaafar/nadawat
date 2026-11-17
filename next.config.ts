@@ -33,9 +33,17 @@ if (process.env.VERCEL) {
         ? "legacy-jwt"
         : "not-a-key";
   const keyFingerprint = keyVar ? createHash("sha256").update(key).digest("hex").slice(0, 8) : "-";
+  // Other secrets: only whether they look like what they should be.
+  const shape = (name: string, ok: RegExp) => {
+    const v = process.env[name]?.trim();
+    return !v ? "none" : ok.test(v) ? "ok" : "wrong-format";
+  };
   console.log(
     `[nadawat] deployment=${vercelEnv ?? "unknown"} branch=${gitBranch ?? "unknown"} supabase-project=${supabaseRef ?? "none"} ` +
-      `server-key=${keyVar ?? "none"}:${keyKind}:${keyFingerprint}`,
+      `server-key=${keyVar ?? "none"}:${keyKind}:${keyFingerprint} ` +
+      `turnstile-secret=${shape("TURNSTILE_SECRET_KEY", /^0x4[A-Za-z0-9_-]{20,}$/)} ` +
+      `poll-secret=${shape("POLL_SECRET", /^[A-Za-z0-9+/=_-]{32,}$/)} ` +
+      `consent-salt=${shape("CONSENT_IP_SALT", /^[A-Za-z0-9+/=_-]{32,}$/)}`,
   );
 }
 if (
