@@ -13,12 +13,34 @@ const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
  */
 export type TurnstileStatus = "passed" | "failed" | "unavailable";
 
-export async function verifyTurnstileStatus(
+/**
+ * Why a check failed, in the words stored by poll_refusals (0006). Only
+ * Cloudflare's reason category — never the token, the secret or the visitor.
+ */
+export type TurnstileRefusal =
+  | "no_token"
+  | "invalid_token"
+  | "expired_or_reused"
+  | "hostname_mismatch"
+  | "server_config"
+  | "other";
+
+function refusalFromCodes(codes: string[]): TurnstileRefusal {
+  if (codes.includes("missing-input-secret") || codes.includes("invalid-input-secret")) {
+    return "server_config";
+  }
+  if (codes.includes("timeout-or-duplicate")) return "expired_or_reused";
+  if (codes.includes("missing-input-response")) return "no_token";
+  if (codes.includes("invalid-input-response")) return "invalid_token";
+  return "other";
+}
+
+export async function verifyTurnstileDetailed(
   token: string | null,
   expectedHostname?: string,
-): Promise<TurnstileStatus> {
-  if (!hasTurnstile) return "unavailable";
-  if (!token) return "failed";
+): Promise<{ status: TurnstileStatus; refusal?: TurnstileRefusal }> {
+  if (!hasTurnstile) return { status: "unavailable" };
+  if (!token) return { status: "failed", refusal: "no_token" };
 
   const h = await headers();
   const forwarded = h.get("x-forwarded-for");
@@ -44,18 +66,26 @@ export async function verifyTurnstileStatus(
     // Logged for diagnosis: Cloudflare's reason codes and hostnames only,
     // never the token or the secret.
     if (data.success !== true) {
-      console.warn("turnstile failed:", (data["error-codes"] ?? []).join(",") || "no-code", "hostname:", data.hostname ?? "-");
-      return "failed";
+      const codes = data["error-codes"] ?? [];
+      console.warn("turnstile failed:", codes.join(",") || "no-code", "hostname:", data.hostname ?? "-");
+      return { status: "failed", refusal: refusalFromCodes(codes) };
     }
     // A token solved on another site that uses the same key isn't ours.
     if (expectedHostname && data.hostname !== expectedHostname) {
       console.warn("turnstile hostname mismatch:", data.hostname ?? "-", "expected:", expectedHostname);
-      return "failed";
+      return { status: "failed", refusal: "hostname_mismatch" };
     }
-    return "passed";
+    return { status: "passed" };
   } catch {
-    return "unavailable";
+    return { status: "unavailable" };
   }
+}
+
+export async function verifyTurnstileStatus(
+  token: string | null,
+  expectedHostname?: string,
+): Promise<TurnstileStatus> {
+  return (await verifyTurnstileDetailed(token, expectedHostname)).status;
 }
 
 /**

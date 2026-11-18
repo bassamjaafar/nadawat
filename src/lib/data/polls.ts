@@ -143,3 +143,17 @@ export async function castVote(args: {
   if (error) throw new Error(error.message);
   return data as CastResult;
 }
+
+/**
+ * Counts one refused submission by reason (0006 poll_refusals) — no browser
+ * or network code is stored. Best effort: a failure here is logged and never
+ * changes what the visitor sees.
+ */
+export async function notePollRefusal(pollId: string, reason: string): Promise<void> {
+  if (!hasSupabaseAdmin) return;
+  const { error } = await getSupabaseAdminClient().rpc("note_poll_refusal", {
+    p_poll: pollId,
+    p_reason: reason,
+  });
+  if (error) console.error("note_poll_refusal failed:", error.message);
+}

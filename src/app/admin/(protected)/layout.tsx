@@ -1,18 +1,9 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { hasSupabase } from "@/lib/env";
-import { SITE_NAME } from "@/lib/site";
-import { SignOutButton } from "@/components/admin/sign-out-button";
-
-const ADMIN_NAV = [
-  { href: "/admin", label: "لوحة التحكم" },
-  { href: "/admin/events", label: "الفعاليات" },
-  { href: "/admin/people", label: "الأشخاص" },
-  { href: "/admin/registrations", label: "طلبات المشاركة" },
-  { href: "/admin/subscribers", label: "المشتركون/ات" },
-];
+import { getAdminRole } from "@/lib/admin/polls";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { AdminShell, NotAuthorized } from "@/components/admin/admin-shell";
 
 export default async function ProtectedAdminLayout({
   children,
@@ -23,55 +14,26 @@ export default async function ProtectedAdminLayout({
     redirect("/admin/login");
   }
 
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/admin/login");
-  }
-
   // Authoritative authorization check — the middleware only verified this is
-  // a real, logged-in Supabase user, not that they're an admin. This RPC
-  // calls the is_admin() Postgres function under the signed-in user's own
-  // RLS context, so it can't be spoofed from the client.
-  const { data: isAdmin } = await supabase.rpc("is_admin");
-
-  if (!isAdmin) {
-    return (
-      <div dir="rtl" className="flex min-h-screen items-center justify-center bg-cream px-6">
-        <p className="max-w-sm text-center text-[0.95rem] leading-7 text-muted">
-          حسابك مسجَّل الدخول لكنّه غير مخوَّل بالوصول إلى لوحة التحكم.
-        </p>
-      </div>
-    );
+  // a real, logged-in Supabase user, not that they're an admin. is_admin()
+  // and can_manage_polls() run under the signed-in user's own RLS context,
+  // so they can't be spoofed from the client.
+  const role = await getAdminRole();
+  if (role === null) {
+    // Either not signed in (middleware normally catches this) or no admin row.
+    const {
+      data: { user },
+    } = await (await getSupabaseServerClient()).auth.getUser();
+    if (!user) redirect("/admin/login");
+    return <NotAuthorized />;
   }
 
-  return (
-    <div dir="rtl" className="min-h-screen bg-cream">
-      <header className="border-b border-line bg-[#fffdf7]">
-        <div className="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <span className="font-display text-[1.05rem] font-medium text-olive">
-              {SITE_NAME} · لوحة التحكم
-            </span>
-            <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              {ADMIN_NAV.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-[0.9rem] text-ink/80 transition-colors hover:text-olive"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <SignOutButton />
-        </div>
-      </header>
-      <main className="container-page py-10">{children}</main>
-    </div>
-  );
+  // Everything under (protected) is for full administrators. A «سؤال ندوات»
+  // producer is sent to the polls section — the only one they may open (the
+  // database refuses them everything else in any case).
+  if (role === "polls_only") {
+    redirect("/admin/polls");
+  }
+
+  return <AdminShell role={role}>{children}</AdminShell>;
 }

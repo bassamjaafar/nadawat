@@ -1,11 +1,11 @@
 "use server";
 
 import { z } from "zod";
-import { castVote, getPollProtection, noteVoteAttempt } from "@/lib/data/polls";
+import { castVote, getPollProtection, notePollRefusal, noteVoteAttempt } from "@/lib/data/polls";
 import { networkKey, readVoter, requestIp, voterKey } from "@/lib/polls/keys";
 import { POLL_TEXT } from "@/lib/polls/text";
 import type { VoteOutcome } from "@/lib/polls/types";
-import { verifyTurnstileStatus } from "@/lib/turnstile";
+import { verifyTurnstileDetailed } from "@/lib/turnstile";
 import { env } from "@/lib/env";
 
 const voteSchema = z.object({
@@ -54,6 +54,7 @@ export async function voteAction(formData: FormData): Promise<VoteOutcome> {
 
     // Per-browser limit, checked before the (external) Turnstile call.
     if (!(await noteVoteAttempt(pollId, vKey))) {
+      await notePollRefusal(pollId, "rate_limited");
       return { outcome: "error", message: POLL_TEXT.errorTooManyAttempts };
     }
 
@@ -61,12 +62,14 @@ export async function voteAction(formData: FormData): Promise<VoteOutcome> {
     if (poll.require_turnstile) {
       // Tokens must come from this deployment's own hostname
       // (nadawat.org in production, the branch address on staging).
-      const status = await verifyTurnstileStatus(
+      const { status, refusal } = await verifyTurnstileDetailed(
         (formData.get("cf-turnstile-response") as string | null) || null,
         new URL(env.NEXT_PUBLIC_SITE_URL).hostname,
       );
       // A failed or forged check is never accepted, however often it's retried.
+      // The reason is counted (no visitor data) for the admin monitoring page.
       if (status === "failed") {
+        await notePollRefusal(pollId, refusal ?? "other");
         return { outcome: "error", message: POLL_TEXT.errorVerification };
       }
       checkStatus = status;
