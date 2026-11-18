@@ -75,6 +75,10 @@ export default async function ReviewNetworkPage({
   const status = effectiveStatus(poll);
   const published = status === "published";
   const mine = exclusions.filter((e) => e.network_label === label);
+  // Excluding again after an undo: start from the last reversed exclusion
+  // (period, evidence and reason), still editable. Otherwise the period
+  // runs from this network's first to its last vote.
+  const lastReverted = mine.find((e) => e.reverted_at);
 
   return (
     <div className="flex max-w-3xl flex-col gap-10">
@@ -185,8 +189,11 @@ export default async function ReviewNetworkPage({
           <div className="mt-6">
             <ExclusionForm
               label={label}
-              defaultFrom={toDamascusInputValue(review.first_at)}
-              defaultTo={toDamascusInputValue(review.last_at)}
+              defaultFrom={toDamascusInputValue(lastReverted?.from_at ?? review.first_at)}
+              defaultTo={toDamascusInputValue(lastReverted?.to_at ?? review.last_at)}
+              defaultEvidence={lastReverted?.evidence ?? []}
+              defaultReason={lastReverted?.reason ?? ""}
+              filledFromReverted={!!lastReverted}
               action={excludeVotesAction.bind(null, poll.id)}
             />
           </div>

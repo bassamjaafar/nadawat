@@ -12,11 +12,17 @@ export function ExclusionForm({
   label,
   defaultFrom,
   defaultTo,
+  defaultEvidence = [],
+  defaultReason = "",
+  filledFromReverted = false,
   action,
 }: {
   label: string;
   defaultFrom: string;
   defaultTo: string;
+  defaultEvidence?: string[];
+  defaultReason?: string;
+  filledFromReverted?: boolean;
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
 }) {
   const [state, formAction, pending] = useActionState(action, IDLE_FORM_STATE);
@@ -30,6 +36,11 @@ export function ExclusionForm({
     >
       <FormMessage state={state} />
       <input type="hidden" name="label" value={label} />
+      <p className="text-[0.85rem] text-muted">
+        {filledFromReverted
+          ? "الحقول معبّأة من آخر استبعاد تمّ التراجع عنه لهذه الشبكة، ويمكن تعديلها."
+          : "الفترة معبّأة من أول صوت إلى آخر صوت من هذه الشبكة، ويمكن تعديلها."}
+      </p>
       <div className="grid gap-5 sm:grid-cols-2">
         <TextField id="from" type="datetime-local" label="من (بتوقيت دمشق)" defaultValue={defaultFrom}
           error={state.errors?.from} required />
@@ -42,7 +53,13 @@ export function ExclusionForm({
           عدد الأصوات أو مشاركة الشبكة وحدهما ليسا دليلًا. والصوت غير المتحقَّق منه ليس مشبوهًا إذا كان التحقّق مُوقَفًا عمدًا.
         </p>
         {Object.entries(EVIDENCE).map(([key, text]) => (
-          <CheckboxField key={key} id={`evidence_${key}`} name="evidence" value={key}>
+          <CheckboxField
+            key={key}
+            id={`evidence_${key}`}
+            name="evidence"
+            value={key}
+            defaultChecked={defaultEvidence.includes(key)}
+          >
             {text}
           </CheckboxField>
         ))}
@@ -54,6 +71,7 @@ export function ExclusionForm({
         id="reason"
         label="السبب المكتوب"
         hint="يُحفظ في السجلّ مع اسمك. 20 حرفًا على الأقل."
+        defaultValue={defaultReason}
         error={state.errors?.reason}
         required
       />
