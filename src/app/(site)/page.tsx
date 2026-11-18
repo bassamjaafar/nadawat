@@ -4,6 +4,8 @@ import { BrandStatement } from "@/components/home/brand-statement";
 import { RecentDebates } from "@/components/home/recent-debates";
 import { SubscribeSection } from "@/components/home/subscribe-section";
 import { AboutPreview } from "@/components/home/about-preview";
+import { PollHomeStrip, promoState } from "@/components/polls/poll-promo";
+import { getCurrentPoll } from "@/lib/data/polls";
 import {
   getDebateBySlug,
   getFeaturedDebate,
@@ -30,10 +32,15 @@ export default async function HomePage({
   // that's the "convenient way to control the homepage" without an admin UI yet.
   const featured = forceInstitutional ? null : await getFeaturedDebate();
 
-  const [autoUpcoming, recent] = await Promise.all([
+  const [autoUpcoming, recent, poll] = await Promise.all([
     featured || forceInstitutional ? Promise.resolve(null) : getUpcomingDebate(),
     getRecentDebates(4),
+    getCurrentPoll(),
   ]);
+
+  // «سؤال ندوات» strip under the hero: status only, never figures.
+  const pollState = promoState(poll, "home");
+  const pollStrip = poll && pollState ? <PollHomeStrip poll={poll} state={pollState} /> : null;
 
   const upcoming = featured && isUpcoming(featured) ? featured : autoUpcoming;
 
@@ -60,6 +67,7 @@ export default async function HomePage({
     return (
       <>
         <EventHero debate={hero} />
+        {pollStrip}
         <BrandStatement />
         <RecentDebates debates={rest} />
         <AboutPreview />
@@ -72,6 +80,7 @@ export default async function HomePage({
   return (
     <>
       <InstitutionalHero />
+      {pollStrip}
       <BrandStatement />
       <AboutPreview />
       <SubscribeSection />

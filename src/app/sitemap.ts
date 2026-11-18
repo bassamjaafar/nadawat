@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/site";
 import { getPublishedDebateSlugs } from "@/lib/data/debates";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticRoutes = ["", "/events", "/about", "/subscribe", "/contact", "/privacy"];
+  const staticRoutes = ["", "/events", "/vote", "/about", "/subscribe", "/contact", "/privacy"];
 
   const now = new Date();
   const base: MetadataRoute.Sitemap = staticRoutes.map((path) => ({

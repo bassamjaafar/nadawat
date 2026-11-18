@@ -18,7 +18,7 @@ import { PollForm } from "@/components/admin/polls/poll-form";
 import { StatusControls } from "@/components/admin/polls/status-controls";
 import { ClosesAtForm } from "@/components/admin/polls/closes-at-form";
 import { ProtectionForm } from "@/components/admin/polls/protection-form";
-import { AutoRefresh } from "@/components/admin/polls/auto-refresh";
+import { AutoRefresh } from "@/components/polls/auto-refresh";
 import { StatusBadge, clock, when } from "@/components/admin/polls/status-badge";
 import { DeleteForm } from "@/components/admin/delete-button";
 import { PollResultsView } from "@/components/polls/poll-results";
@@ -141,11 +141,21 @@ export default async function PollControlPage({ params }: { params: Promise<{ id
       <Section
         title="التحكّم بالتصويت"
         aside={
-          status !== "draft" ? (
-            <Link href="/vote" target="_blank" className="text-[0.88rem] text-olive underline underline-offset-4">
-              فتح الصفحة العامة /vote
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-[0.88rem]">
+            {status !== "draft" ? (
+              <>
+                <Link href="/vote" target="_blank" className="text-olive underline underline-offset-4">
+                  فتح الصفحة العامة /vote
+                </Link>
+                <Link href="/vote/screen" target="_blank" className="text-olive underline underline-offset-4">
+                  فتح شاشة البث
+                </Link>
+              </>
+            ) : null}
+            <Link href={`/admin/polls/${poll.id}/screen`} className="text-olive underline underline-offset-4">
+              معاينة شاشة البث
             </Link>
-          ) : null
+          </div>
         }
       >
         <div className="flex flex-col gap-6">

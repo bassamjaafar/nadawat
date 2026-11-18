@@ -52,14 +52,54 @@ const demoVoters: Set<string> = ((globalThis as Record<string, unknown>).__nadaw
 
 // ---------------------------------------------------------------------------
 
-export async function getCurrentPoll(): Promise<PublicPoll | null> {
+/**
+ * The poll /vote shows: open, else scheduled, else the latest closed or
+ * published one. With a slug (/vote?poll=…, used by the event page's
+ * permanent results link), that poll instead — never a draft.
+ */
+export async function getCurrentPoll(slug?: string): Promise<PublicPoll | null> {
   if (!hasSupabaseAdmin) return DEMO_POLL;
-  const { data, error } = await getSupabaseAdminClient().rpc("public_poll_state");
+  const { data, error } = await getSupabaseAdminClient().rpc(
+    "public_poll_state",
+    slug ? { p_slug: slug } : {},
+  );
   if (error) {
     console.error("public_poll_state failed:", error.message);
     return null;
   }
   return (data as PublicPoll | null) ?? null;
+}
+
+/**
+ * The poll attached to an event (newest non-draft one), public fields only —
+ * for the event page's «سؤال ندوات» box. Demo mode: the fixture poll when the
+ * event's slug matches DEMO_POLL_EVENT (default: the fixture poll's event).
+ */
+export async function getPollForDebate(debate: { id: string; slug: string }): Promise<PublicPoll | null> {
+  if (!hasSupabaseAdmin) {
+    const demoEvent = process.env.DEMO_POLL_EVENT || DEMO_POLL.debate?.slug;
+    return debate.slug === demoEvent ? DEMO_POLL : null;
+  }
+  const admin = getSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("polls")
+    .select("slug")
+    .eq("debate_id", debate.id)
+    .neq("status", "draft")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    console.error("poll for event failed:", error.message);
+    return null;
+  }
+  if (!data) return null;
+  const state = await admin.rpc("public_poll_state", { p_slug: data.slug });
+  if (state.error) {
+    console.error("public_poll_state failed:", state.error.message);
+    return null;
+  }
+  return (state.data as PublicPoll | null) ?? null;
 }
 
 export async function getPollProtection(

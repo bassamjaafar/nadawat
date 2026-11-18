@@ -49,6 +49,9 @@ export function FirstVisitIntro() {
     Promise.resolve().then(() => {
       if (cancelled) return;
 
+      // Never over the livestream screen (shared into the broadcast).
+      if (window.location.pathname.startsWith("/vote/screen")) return;
+
       let alreadySeen = false;
       try {
         alreadySeen = localStorage.getItem(STORAGE_KEY) === "1";

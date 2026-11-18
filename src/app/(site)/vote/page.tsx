@@ -14,9 +14,18 @@ import { opensAtText, POLL_TEXT } from "@/lib/polls/text";
 
 // Always rendered per request, never prerendered or cached: vote state,
 // "already voted" and results can't end up in a shared copy.
-export async function generateMetadata(): Promise<Metadata> {
+type Props = { searchParams: Promise<{ poll?: string | string[] }> };
+
+/** ?poll=<slug>: a specific poll (the event page links to its own results). */
+async function requestedSlug(searchParams: Props["searchParams"]): Promise<string | undefined> {
+  const v = (await searchParams).poll;
+  const slug = Array.isArray(v) ? v[0] : v;
+  return slug && /^[a-z0-9][a-z0-9-]{0,80}$/.test(slug) ? slug : undefined;
+}
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   await connection();
-  const poll = await getCurrentPoll();
+  const poll = await getCurrentPoll(await requestedSlug(searchParams));
   const title = poll ? `${POLL_TEXT.name}: ${poll.question_ar}` : POLL_TEXT.name;
   return {
     title: POLL_TEXT.name,
@@ -27,9 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function VotePage() {
+export default async function VotePage({ searchParams }: Props) {
   await connection();
-  const poll = await getCurrentPoll();
+  const poll = await getCurrentPoll(await requestedSlug(searchParams));
 
   if (!poll) {
     return (

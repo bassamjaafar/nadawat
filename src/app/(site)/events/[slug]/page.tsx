@@ -18,6 +18,8 @@ import { absoluteUrl } from "@/lib/url";
 import { youtubeShareImage } from "@/lib/youtube";
 import { isUpcoming } from "@/lib/types";
 import { SITE_NAME } from "@/lib/site";
+import { PollEventBox, promoState } from "@/components/polls/poll-promo";
+import { getPollForDebate } from "@/lib/data/polls";
 
 export const revalidate = 300;
 
@@ -78,7 +80,12 @@ export default async function DebatePage({ params }: Params) {
   const debate = await getDebateBySlug(slug);
   if (!debate) notFound();
 
-  const related = await getRelatedDebates(debate.id, 2);
+  const [related, poll] = await Promise.all([
+    getRelatedDebates(debate.id, 2),
+    getPollForDebate(debate),
+  ]);
+  // «سؤال ندوات» box: open / closed / published (results link is permanent here).
+  const pollState = promoState(poll, "event");
   const upcoming = isUpcoming(debate);
   const when = debate.starts_at
     ? `${formatDate(debate.starts_at, debate.timezone)} · ${formatTime(debate.starts_at, debate.timezone)} بتوقيت دمشق`
@@ -174,6 +181,12 @@ export default async function DebatePage({ params }: Params) {
         </section>
       ) : null}
 
+      {poll && pollState ? (
+        <div className="container-page mt-6 lg:hidden">
+          <PollEventBox poll={poll} state={pollState} className="md:max-w-xl" />
+        </div>
+      ) : null}
+
       <div className="container-page mt-12 grid gap-x-14 gap-y-12 lg:grid-cols-[1fr_18rem] lg:items-start">
         <div className="min-w-0">
           {debate.description_ar ? (
@@ -236,6 +249,9 @@ export default async function DebatePage({ params }: Params) {
               </div>
             ) : null}
           </div>
+          {poll && pollState ? (
+            <PollEventBox poll={poll} state={pollState} className="mt-4 hidden lg:flex" />
+          ) : null}
         </aside>
       </div>
 
