@@ -1,19 +1,17 @@
-import Link from "next/link";
+import type { ReactNode } from "react";
+import { ButtonLink } from "@/components/ui/button";
+import { EventBallot } from "@/components/polls/event-ballot";
 import { PollLockup } from "@/components/polls/poll-mark";
-import { ArrowLink } from "@/components/ui/arrow-link";
+import { PollResultsView } from "@/components/polls/poll-results";
+import { VoteNotice } from "@/components/polls/vote-form";
 import { POLL_PROMO_TEXT, POLL_TEXT } from "@/lib/polls/text";
-import type { PublicPoll } from "@/lib/polls/types";
+import type { PollResults, PublicPoll } from "@/lib/polls/types";
 import { cn } from "@/lib/cn";
 
 /** Days the homepage keeps «عرض النتائج» after publication. */
 const HOMEPAGE_RESULTS_DAYS = 14;
 
-type PromoState = "open" | "closed" | "published";
-
-/** Open polls are always the current one; results link to their own poll. */
-function voteHref(poll: PublicPoll, state: PromoState) {
-  return state === "published" ? `/vote?poll=${poll.slug}` : "/vote";
-}
+export type PromoState = "open" | "closed" | "published";
 
 /**
  * What a promotion surface may show for this poll: the poll's status only,
@@ -36,48 +34,60 @@ export function promoState(
   return null;
 }
 
-function Chip({ state }: { state: PromoState }) {
+function StatusChip({ state }: { state: PromoState }) {
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center whitespace-nowrap rounded-[3px] border px-2 py-0.5 text-[0.78rem] font-semibold",
+        "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[3px] border px-2 py-0.5 text-[0.8rem] font-semibold",
         state === "closed" ? "border-line-strong text-muted" : "border-olive/45 text-olive",
       )}
     >
-      {state === "open" ? POLL_PROMO_TEXT.open : state === "closed" ? POLL_PROMO_TEXT.closed : POLL_PROMO_TEXT.published}
+      {state === "open" ? (
+        <span aria-hidden="true" className="size-1.5 rounded-full bg-olive" />
+      ) : null}
+      {POLL_PROMO_TEXT[state]}
     </span>
   );
 }
 
-/** Homepage strip, directly under the event hero. */
-export function PollHomeStrip({ poll, state }: { poll: PublicPoll; state: PromoState }) {
+/**
+ * The one «سؤال ندوات» frame used on the homepage and on event pages: the
+ * identity and status on one line, then the question. Slightly lighter than
+ * the cream page, with an olive hairline, so it reads as its own object
+ * without competing with the event title.
+ */
+function PollFrame({
+  state,
+  question,
+  questionAs: Question = "p",
+  questionId,
+  children,
+}: {
+  state: PromoState;
+  question: string;
+  questionAs?: "p" | "h2";
+  questionId?: string;
+  children: ReactNode;
+}) {
   return (
-    <section aria-label={POLL_TEXT.name} className="border-y border-line bg-cream">
-      <div className="container-page flex flex-wrap items-center gap-x-5 gap-y-3 py-4">
+    <div className="rounded-[var(--radius-md)] border border-olive/25 bg-[#fffdf7] p-5 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <PollLockup tagline={false} size="sm" />
-        <Chip state={state} />
-        {state === "closed" ? (
-          <p className="min-w-0 flex-[1_1_16rem] text-[0.95rem] text-muted">{POLL_TEXT.resultsPending}</p>
-        ) : (
-          <>
-            <Link
-              href={voteHref(poll, state)}
-              className="min-w-0 flex-[1_1_16rem] font-display text-[1rem] font-semibold leading-7 text-ink transition-colors hover:text-olive"
-            >
-              {poll.question_ar}
-            </Link>
-            <ArrowLink href={voteHref(poll, state)} className="whitespace-nowrap text-[0.95rem]">
-              {state === "open" ? POLL_PROMO_TEXT.openLink : POLL_PROMO_TEXT.publishedLink}
-            </ArrowLink>
-          </>
-        )}
+        <StatusChip state={state} />
       </div>
-    </section>
+      <Question
+        id={questionId}
+        className="mt-4 font-display text-[1.2rem] font-semibold leading-[1.75] text-ink [text-wrap:balance] sm:text-[1.3rem]"
+      >
+        {question}
+      </Question>
+      {children}
+    </div>
   );
 }
 
-/** Event page box, under «الموعد» in the side column. */
-export function PollEventBox({
+/** Homepage: inside the event hero, between the summary and the date. */
+export function PollHomeCard({
   poll,
   state,
   className,
@@ -87,21 +97,73 @@ export function PollEventBox({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col gap-3 rounded-[var(--radius-md)] border border-line p-5", className)}>
-      <PollLockup size="sm" />
-      <div>
-        <Chip state={state} />
-      </div>
-      <p className="font-display text-[0.98rem] font-semibold leading-7 text-ink">{poll.question_ar}</p>
-      {state === "closed" ? (
-        <p className="text-[0.9rem] text-muted">{POLL_TEXT.resultsPending}</p>
-      ) : (
-        <div>
-          <ArrowLink href={voteHref(poll, state)}>
-            {state === "open" ? POLL_PROMO_TEXT.openLink : POLL_PROMO_TEXT.publishedLink}
-          </ArrowLink>
+    <section aria-label={POLL_TEXT.name} className={className}>
+      <PollFrame state={state} question={poll.question_ar}>
+        {state === "open" ? (
+          <>
+            <p className="mt-2 text-[0.95rem] leading-7 text-muted">{POLL_PROMO_TEXT.homeInvitation}</p>
+            <ButtonLink href="/vote" className="mt-5 w-full sm:w-auto">
+              {POLL_PROMO_TEXT.homeCta}
+            </ButtonLink>
+          </>
+        ) : state === "published" ? (
+          <ButtonLink
+            href={`/vote?poll=${poll.slug}`}
+            variant="outline"
+            className="mt-4 w-full sm:w-auto"
+          >
+            {POLL_PROMO_TEXT.publishedLink}
+          </ButtonLink>
+        ) : null}
+      </PollFrame>
+    </section>
+  );
+}
+
+/**
+ * Event page: the full ballot while the poll is open (same form, same
+ * checks as /vote), «بانتظار النتائج» once closed, and the published
+ * results permanently after that. `results` is only ever fetched for a
+ * published poll, and the database returns nothing before publication.
+ */
+export function PollEventPanel({
+  poll,
+  state,
+  results,
+  turnstileSiteKey,
+  className,
+}: {
+  poll: PublicPoll;
+  state: PromoState;
+  results: PollResults | null;
+  turnstileSiteKey: string | null;
+  className?: string;
+}) {
+  return (
+    <section aria-labelledby="event-poll-question" className={className}>
+      <PollFrame
+        state={state}
+        question={poll.question_ar}
+        questionAs="h2"
+        questionId="event-poll-question"
+      >
+        {poll.note_ar ? (
+          <p className="mt-2 text-[0.95rem] leading-7 text-muted">{poll.note_ar}</p>
+        ) : null}
+        <div className="mt-5">
+          {state === "open" ? (
+            <EventBallot
+              pollId={poll.id}
+              options={poll.options}
+              turnstileSiteKey={turnstileSiteKey}
+            />
+          ) : state === "published" && results ? (
+            <PollResultsView results={results} />
+          ) : (
+            <VoteNotice state="closed" />
+          )}
         </div>
-      )}
-    </div>
+      </PollFrame>
+    </section>
   );
 }

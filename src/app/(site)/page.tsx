@@ -4,7 +4,7 @@ import { BrandStatement } from "@/components/home/brand-statement";
 import { RecentDebates } from "@/components/home/recent-debates";
 import { SubscribeSection } from "@/components/home/subscribe-section";
 import { AboutPreview } from "@/components/home/about-preview";
-import { PollHomeStrip, promoState } from "@/components/polls/poll-promo";
+import { PollHomeCard, promoState } from "@/components/polls/poll-promo";
 import { getCurrentPoll } from "@/lib/data/polls";
 import {
   getDebateBySlug,
@@ -12,6 +12,7 @@ import {
   getRecentDebates,
   getUpcomingDebate,
 } from "@/lib/data/debates";
+import type { ReactNode } from "react";
 import { isUpcoming } from "@/lib/types";
 import type { DebateDetail, DebateSummary } from "@/lib/types";
 
@@ -38,9 +39,9 @@ export default async function HomePage({
     getCurrentPoll(),
   ]);
 
-  // «سؤال ندوات» strip under the hero: status only, never figures.
+  // «سؤال ندوات» card: status only, never figures. Results stay 14 days.
   const pollState = promoState(poll, "home");
-  const pollStrip = poll && pollState ? <PollHomeStrip poll={poll} state={pollState} /> : null;
+  const pollCard = poll && pollState ? <PollHomeCard poll={poll} state={pollState} /> : null;
 
   const upcoming = featured && isUpcoming(featured) ? featured : autoUpcoming;
 
@@ -64,10 +65,13 @@ export default async function HomePage({
   }
 
   if (hero) {
+    // Inside the hero when the poll belongs to the featured event; otherwise
+    // (a poll for another event) on its own right under the hero.
+    const inHero = pollCard && poll?.debate?.slug === hero.slug;
     return (
       <>
-        <EventHero debate={hero} />
-        {pollStrip}
+        <EventHero debate={hero} poll={inHero ? pollCard : undefined} />
+        {pollCard && !inHero ? <StandalonePoll>{pollCard}</StandalonePoll> : null}
         <BrandStatement />
         <RecentDebates debates={rest} />
         <AboutPreview />
@@ -80,10 +84,18 @@ export default async function HomePage({
   return (
     <>
       <InstitutionalHero />
-      {pollStrip}
+      {pollCard ? <StandalonePoll>{pollCard}</StandalonePoll> : null}
       <BrandStatement />
       <AboutPreview />
       <SubscribeSection />
     </>
+  );
+}
+
+function StandalonePoll({ children }: { children: ReactNode }) {
+  return (
+    <div className="container-page pt-4 pb-6">
+      <div className="max-w-[40rem]">{children}</div>
+    </div>
   );
 }

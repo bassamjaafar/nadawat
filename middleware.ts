@@ -9,10 +9,10 @@ import {
 } from "@/lib/polls/voter-cookie";
 
 /**
- * /vote: make sure the browser has a signed «سؤال ندوات» voter cookie before
- * it can vote. Only on GET/HEAD — the vote itself (a POST to /vote) must
- * arrive with a cookie issued earlier, or a script could get a fresh
- * identity with every submission.
+ * /vote and /vote/ballot (the event pages' ballot): make sure the browser has
+ * a signed «سؤال ندوات» voter cookie before it can vote. Only on GET/HEAD —
+ * the vote itself (a POST) must arrive with a cookie issued earlier, or a
+ * script could get a fresh identity with every submission.
  */
 async function ensureVoterCookie(request: NextRequest) {
   const secret = pollSecret();
@@ -55,7 +55,7 @@ async function ensureVoterCookie(request: NextRequest) {
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (pathname === "/vote") {
+  if (pathname === "/vote" || pathname === "/vote/ballot") {
     return ensureVoterCookie(request);
   }
 
@@ -116,5 +116,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/vote"],
+  matcher: ["/admin/:path*", "/vote", "/vote/ballot"],
 };

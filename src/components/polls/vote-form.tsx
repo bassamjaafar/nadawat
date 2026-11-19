@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Honeypot } from "@/components/ui/field";
 import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 import { POLL_TEXT } from "@/lib/polls/text";
+import type { VoteOutcome } from "@/lib/polls/types";
 import { cn } from "@/lib/cn";
 
 type Done = "voted" | "already_voted" | "closed";
@@ -20,15 +21,20 @@ type Done = "voted" | "already_voted" | "closed";
  * `turnstileSiteKey` is decided on the server (poll setting + site key) and
  * passed in, never derived from env here — see the hydration note in
  * subscribe-form.tsx.
+ *
+ * `send` changes only how the ballot travels (event pages post it to
+ * /vote/ballot); both ways end in the same server-side recordVote().
  */
 export function VoteForm({
   pollId,
   options,
   turnstileSiteKey,
+  send = voteAction,
 }: {
   pollId: string;
   options: { id: string; label_ar: string }[];
   turnstileSiteKey: string | null;
+  send?: (formData: FormData) => Promise<VoteOutcome>;
 }) {
   const [choice, setChoice] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -46,7 +52,7 @@ export function VoteForm({
     setPending(true);
     setError(null);
     try {
-      const res = await voteAction(new FormData(e.currentTarget));
+      const res = await send(new FormData(e.currentTarget));
       if (res.outcome === "error") {
         setError(res.message);
         setResetSignal((n) => n + 1);

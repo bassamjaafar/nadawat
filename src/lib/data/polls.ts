@@ -33,7 +33,8 @@ const DEMO_POLL: PublicPoll = {
   published_at: DEMO_STATUS === "published" ? "2026-11-29T19:30:00Z" : null,
   require_turnstile: true,
   debate: {
-    slug: "syrian-economic-policies-transition",
+    // DEMO_POLL_EVENT attaches the fixture poll to another demo event.
+    slug: process.env.DEMO_POLL_EVENT || "syrian-economic-policies-transition",
     title_ar: "سوريا في المرحلة الانتقالية: إلى أين تقود السياسات الاقتصادية؟",
     starts_at: "2026-11-29T17:00:00Z",
     timezone: "Asia/Damascus",

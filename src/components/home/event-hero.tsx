@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { SpeakerLineup } from "@/components/debates/speakers";
 import { WatchButtons, hasWatchLinks } from "@/components/debates/watch-buttons";
@@ -19,8 +20,11 @@ function MetaRow({ label, value }: { label: string; value: string }) {
  * one. Same hero-level treatment either way — the only differences are the
  * kicker label, the meta row (date/time/location vs. just a publish date),
  * and the actions (watch live / take part vs. watch the recording).
+ *
+ * `poll` is this event's «سؤال ندوات» card, placed between the summary and
+ * the date so it's seen without scrolling, while the title stays dominant.
  */
-export function EventHero({ debate }: { debate: DebateDetail }) {
+export function EventHero({ debate, poll }: { debate: DebateDetail; poll?: ReactNode }) {
   const href = `/events/${debate.slug}`;
   const upcoming = isUpcoming(debate);
   const watching = hasWatchLinks(debate);
@@ -45,6 +49,8 @@ export function EventHero({ debate }: { debate: DebateDetail }) {
               {debate.summary_ar}
             </p>
           ) : null}
+
+          {poll ? <div className="mt-7 max-w-[40rem]">{poll}</div> : null}
 
           <dl className="mt-8 max-w-md divide-y divide-line border-y border-line">
             {upcoming && debate.starts_at ? (

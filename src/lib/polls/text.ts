@@ -43,13 +43,18 @@ export function opensAtText(date: string, time: string): string {
   return `يُفتح التصويت يوم ${date}، الساعة ${time} بتوقيت دمشق.`;
 }
 
-/** Homepage strip, event-page box and livestream screen (approved 16 Nov 2026). */
+/**
+ * Homepage card, event-page panel and livestream screen (approved 16 Nov
+ * 2026; homepage invitation, call to action and «بانتظار النتائج» added
+ * 19 Nov 2026).
+ */
 export const POLL_PROMO_TEXT = {
   open: "التصويت مفتوح",
-  openLink: "المشاركة في التصويت",
-  closed: "انتهى التصويت",
+  closed: "بانتظار النتائج",
   published: "النتائج منشورة",
   publishedLink: "عرض النتائج",
+  homeInvitation: "المشاركة متاحة قبل الندوة وأثناءها. نعرض النتائج في ختام الحوار.",
+  homeCta: "شارِك/ي برأيك",
 
   screenInvitation: "التصويت مفتوح الآن · لا يتطلّب تسجيلًا",
   screenUnderQr: "للمشاركة في التصويت عبر الهاتف",

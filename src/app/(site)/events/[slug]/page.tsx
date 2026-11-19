@@ -18,8 +18,9 @@ import { absoluteUrl } from "@/lib/url";
 import { youtubeShareImage } from "@/lib/youtube";
 import { isUpcoming } from "@/lib/types";
 import { SITE_NAME } from "@/lib/site";
-import { PollEventBox, promoState } from "@/components/polls/poll-promo";
-import { getPollForDebate } from "@/lib/data/polls";
+import { PollEventPanel, promoState } from "@/components/polls/poll-promo";
+import { getPollForDebate, getPublishedResults } from "@/lib/data/polls";
+import { env } from "@/lib/env";
 
 export const revalidate = 300;
 
@@ -84,8 +85,24 @@ export default async function DebatePage({ params }: Params) {
     getRelatedDebates(debate.id, 2),
     getPollForDebate(debate),
   ]);
-  // «سؤال ندوات» box: open / closed / published (results link is permanent here).
+  // «سؤال ندوات»: the ballot while open, «بانتظار النتائج» once closed, and
+  // the published results permanently. Figures are only fetched (and only
+  // returned by the database) once results are published.
   const pollState = promoState(poll, "event");
+  const results =
+    poll && pollState === "published" ? await getPublishedResults(poll.id) : null;
+  const pollPanel =
+    poll && pollState ? (
+      <PollEventPanel
+        poll={poll}
+        state={pollState}
+        results={results}
+        turnstileSiteKey={
+          poll.require_turnstile ? (env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? null) : null
+        }
+        className="max-w-[44rem]"
+      />
+    ) : null;
   const upcoming = isUpcoming(debate);
   const when = debate.starts_at
     ? `${formatDate(debate.starts_at, debate.timezone)} · ${formatTime(debate.starts_at, debate.timezone)} بتوقيت دمشق`
@@ -109,6 +126,8 @@ export default async function DebatePage({ params }: Params) {
         {debate.location_ar ? (
           <p className="mt-1 text-meta text-muted">{debate.location_ar}</p>
         ) : null}
+        {/* Upcoming event: the question comes straight after the title and date. */}
+        {upcoming && pollPanel ? <div className="mt-8">{pollPanel}</div> : null}
       </div>
 
       <div className="container-page mt-10">
@@ -181,14 +200,10 @@ export default async function DebatePage({ params }: Params) {
         </section>
       ) : null}
 
-      {poll && pollState ? (
-        <div className="container-page mt-6 lg:hidden">
-          <PollEventBox poll={poll} state={pollState} className="md:max-w-xl" />
-        </div>
-      ) : null}
-
       <div className="container-page mt-12 grid gap-x-14 gap-y-12 lg:grid-cols-[1fr_18rem] lg:items-start">
         <div className="min-w-0">
+          {/* Past event: the results lead the main column, after the recording. */}
+          {!upcoming && pollPanel ? <div className="mb-12">{pollPanel}</div> : null}
           {debate.description_ar ? (
             <div className="prose-ar">
               {debate.description_ar.split(/\n{2,}/).map((para, i) => (
@@ -249,9 +264,6 @@ export default async function DebatePage({ params }: Params) {
               </div>
             ) : null}
           </div>
-          {poll && pollState ? (
-            <PollEventBox poll={poll} state={pollState} className="mt-4 hidden lg:flex" />
-          ) : null}
         </aside>
       </div>
 
