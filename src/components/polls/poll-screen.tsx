@@ -23,6 +23,7 @@ export function PollScreen({
   siteUrl,
   fit = "viewport",
   preview = false,
+  unavailable = false,
 }: {
   poll: PublicPoll | null;
   results: PollResults | null;
@@ -30,6 +31,8 @@ export function PollScreen({
   /** "viewport": the live screen; "container": inside an admin page. */
   fit?: "viewport" | "container";
   preview?: boolean;
+  /** Database unreachable: the header alone until a later refresh succeeds. */
+  unavailable?: boolean;
 }) {
   const frame = (
     <div
@@ -40,7 +43,9 @@ export function PollScreen({
       )}
     >
       <TopBar />
-      {!poll ? (
+      {unavailable ? (
+        <div className="grow" />
+      ) : !poll ? (
         <Center>
           <p className="font-display text-[3cqw] font-semibold text-muted">{POLL_TEXT.noPoll}</p>
         </Center>

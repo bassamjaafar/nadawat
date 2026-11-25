@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { hasSupabaseAdmin } from "@/lib/env";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { PollResults, PollStatus, PublicPoll } from "@/lib/polls/types";
@@ -53,22 +54,57 @@ const demoVoters: Set<string> = ((globalThis as Record<string, unknown>).__nadaw
 
 // ---------------------------------------------------------------------------
 
+const READ_TIMEOUT_MS = 3000;
+const RETRY_DELAYS_MS = [250, 750];
+
+/**
+ * A read of public poll data, tried up to three times: a dropped connection
+ * or a brief database outage must not look like "there is no poll". The
+ * database client doesn't retry function calls itself. Reads only — votes
+ * are never resent from here.
+ */
+async function readWithRetry<T>(
+  label: string,
+  read: (signal: AbortSignal) => PromiseLike<{ data: unknown; error: { message: string } | null }>,
+): Promise<{ ok: true; data: T | null } | { ok: false }> {
+  for (let attempt = 0; ; attempt++) {
+    let reason: string;
+    try {
+      const { data, error } = await read(AbortSignal.timeout(READ_TIMEOUT_MS));
+      if (!error) return { ok: true, data: (data as T | null) ?? null };
+      reason = error.message;
+    } catch (e) {
+      reason = e instanceof Error ? e.message : String(e);
+    }
+    console.error(`${label} failed (attempt ${attempt + 1}):`, reason);
+    if (attempt >= RETRY_DELAYS_MS.length) return { ok: false };
+    await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt]));
+  }
+}
+
+/** `unavailable`: the database couldn't be reached — not the same as no poll. */
+export type PollLookup =
+  | { status: "ok"; poll: PublicPoll | null }
+  | { status: "unavailable"; poll: null };
+
 /**
  * The poll /vote shows: open, else scheduled, else the latest closed or
  * published one. With a slug (/vote?poll=…, used by the event page's
- * permanent results link), that poll instead — never a draft.
+ * permanent results link), that poll instead — never a draft. Shared by the
+ * page and its metadata within one request.
  */
-export async function getCurrentPoll(slug?: string): Promise<PublicPoll | null> {
-  if (!hasSupabaseAdmin) return DEMO_POLL;
-  const { data, error } = await getSupabaseAdminClient().rpc(
-    "public_poll_state",
-    slug ? { p_slug: slug } : {},
+export const lookupCurrentPoll = cache(async (slug?: string): Promise<PollLookup> => {
+  if (!hasSupabaseAdmin) return { status: "ok", poll: DEMO_POLL };
+  const admin = getSupabaseAdminClient();
+  const res = await readWithRetry<PublicPoll>("public_poll_state", (signal) =>
+    admin.rpc("public_poll_state", slug ? { p_slug: slug } : {}).abortSignal(signal),
   );
-  if (error) {
-    console.error("public_poll_state failed:", error.message);
-    return null;
-  }
-  return (data as PublicPoll | null) ?? null;
+  return res.ok ? { status: "ok", poll: res.data } : { status: "unavailable", poll: null };
+});
+
+/** For surfaces that only promote the poll: nothing to show either way. */
+export async function getCurrentPoll(slug?: string): Promise<PublicPoll | null> {
+  return (await lookupCurrentPoll(slug)).poll;
 }
 
 /**
@@ -82,25 +118,19 @@ export async function getPollForDebate(debate: { id: string; slug: string }): Pr
     return debate.slug === demoEvent ? DEMO_POLL : null;
   }
   const admin = getSupabaseAdminClient();
-  const { data, error } = await admin
-    .from("polls")
-    .select("slug")
-    .eq("debate_id", debate.id)
-    .neq("status", "draft")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) {
-    console.error("poll for event failed:", error.message);
-    return null;
-  }
-  if (!data) return null;
-  const state = await admin.rpc("public_poll_state", { p_slug: data.slug });
-  if (state.error) {
-    console.error("public_poll_state failed:", state.error.message);
-    return null;
-  }
-  return (state.data as PublicPoll | null) ?? null;
+  const found = await readWithRetry<{ slug: string }>("poll for event", (signal) =>
+    admin
+      .from("polls")
+      .select("slug")
+      .eq("debate_id", debate.id)
+      .neq("status", "draft")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .abortSignal(signal)
+      .maybeSingle(),
+  );
+  if (!found.ok || !found.data) return null;
+  return getCurrentPoll(found.data.slug);
 }
 
 export async function getPollProtection(
@@ -138,12 +168,11 @@ export async function getPublishedResults(pollId: string): Promise<PollResults |
         }
       : null;
   }
-  const { data, error } = await getSupabaseAdminClient().rpc("poll_results", { p_poll: pollId });
-  if (error) {
-    console.error("poll_results failed:", error.message);
-    return null;
-  }
-  return (data as PollResults | null) ?? null;
+  const admin = getSupabaseAdminClient();
+  const res = await readWithRetry<PollResults>("poll_results", (signal) =>
+    admin.rpc("poll_results", { p_poll: pollId }).abortSignal(signal),
+  );
+  return res.ok ? res.data : null;
 }
 
 /** Per-browser rate limit (10 submissions / 10 minutes). Never per network. */

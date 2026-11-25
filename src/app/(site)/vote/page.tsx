@@ -5,8 +5,9 @@ import { connection } from "next/server";
 import { ArrowLink } from "@/components/ui/arrow-link";
 import { PollLockup } from "@/components/polls/poll-mark";
 import { PollResultsView } from "@/components/polls/poll-results";
+import { PollUnavailable } from "@/components/polls/poll-unavailable";
 import { VoteForm, VoteNotice } from "@/components/polls/vote-form";
-import { getCurrentPoll, getPublishedResults, hasVoted } from "@/lib/data/polls";
+import { getPublishedResults, hasVoted, lookupCurrentPoll } from "@/lib/data/polls";
 import { env } from "@/lib/env";
 import { formatDate, formatDateShort, formatTime } from "@/lib/format";
 import { readVoter, voterKey } from "@/lib/polls/keys";
@@ -25,7 +26,7 @@ async function requestedSlug(searchParams: Props["searchParams"]): Promise<strin
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   await connection();
-  const poll = await getCurrentPoll(await requestedSlug(searchParams));
+  const { poll } = await lookupCurrentPoll(await requestedSlug(searchParams));
   const title = poll ? `${POLL_TEXT.name}: ${poll.question_ar}` : POLL_TEXT.name;
   return {
     title: POLL_TEXT.name,
@@ -38,7 +39,18 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function VotePage({ searchParams }: Props) {
   await connection();
-  const poll = await getCurrentPoll(await requestedSlug(searchParams));
+  const { status, poll } = await lookupCurrentPoll(await requestedSlug(searchParams));
+
+  if (status === "unavailable") {
+    return (
+      <Shell>
+        <PollLockup />
+        <div className="mt-8">
+          <PollUnavailable />
+        </div>
+      </Shell>
+    );
+  }
 
   if (!poll) {
     return (
@@ -53,7 +65,13 @@ export default async function VotePage({ searchParams }: Props) {
   }
 
   const me = poll.status === "open" ? await readVoter() : null;
-  const alreadyVoted = me ? await hasVoted(poll.id, voterKey(me.secret, poll.id, me.voter)) : false;
+  // If this one check fails, show the form: recordVote() repeats it anyway.
+  const alreadyVoted = me
+    ? await hasVoted(poll.id, voterKey(me.secret, poll.id, me.voter)).catch((e) => {
+        console.error("has_voted failed:", e instanceof Error ? e.message : e);
+        return false;
+      })
+    : false;
   const results = poll.status === "published" ? await getPublishedResults(poll.id) : null;
   const debate = poll.debate;
   const eventHref = debate?.is_published ? `/events/${debate.slug}` : null;
@@ -113,6 +131,8 @@ export default async function VotePage({ searchParams }: Props) {
           </div>
         ) : poll.status === "published" && results ? (
           <PollResultsView results={results} />
+        ) : poll.status === "published" ? (
+          <PollUnavailable />
         ) : (
           <VoteNotice state="closed" />
         )}

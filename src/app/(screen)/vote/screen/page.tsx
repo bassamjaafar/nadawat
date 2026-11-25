@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { PollScreen } from "@/components/polls/poll-screen";
 import { AutoRefresh } from "@/components/polls/auto-refresh";
-import { getCurrentPoll, getPublishedResults } from "@/lib/data/polls";
+import { getPublishedResults, lookupCurrentPoll } from "@/lib/data/polls";
 import { env } from "@/lib/env";
 import { POLL_TEXT } from "@/lib/polls/text";
 
@@ -19,12 +19,17 @@ export const metadata: Metadata = {
  */
 export default async function VoteScreenPage() {
   await connection();
-  const poll = await getCurrentPoll();
+  const { status, poll } = await lookupCurrentPoll();
   const results = poll?.status === "published" ? await getPublishedResults(poll.id) : null;
   return (
     <>
       <AutoRefresh seconds={5} always />
-      <PollScreen poll={poll} results={results} siteUrl={env.NEXT_PUBLIC_SITE_URL} />
+      <PollScreen
+        poll={poll}
+        results={results}
+        siteUrl={env.NEXT_PUBLIC_SITE_URL}
+        unavailable={status === "unavailable"}
+      />
     </>
   );
 }

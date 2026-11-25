@@ -1,7 +1,8 @@
 /**
- * Public «سؤال ندوات» wording, as approved on 16 Nov 2026. Change only with
- * approval; keep the site's gender-inclusive forms (المشاركين/ات، السوريات
- * والسوريين) and its tanween spelling (شكرًا، عمومًا).
+ * Public «سؤال ندوات» wording, as approved on 16 Nov 2026 (verification-step
+ * and loading messages: 25 Nov 2026). Change only with approval; keep the
+ * site's gender-inclusive forms (المشاركين/ات، السوريات والسوريين) and its
+ * tanween spelling (شكرًا، عمومًا).
  */
 export const POLL_TEXT = {
   name: "سؤال ندوات",
@@ -19,10 +20,14 @@ export const POLL_TEXT = {
   closed: "انتهى التصويت على هذا السؤال.",
   resultsPending: "لم تُنشر نتائج الاستطلاع بعد.",
   noPoll: "لا يوجد سؤال مفتوح للتصويت حاليًا.",
+  loadFailed: "تعذّر تحميل السؤال. يُرجى إعادة تحميل الصفحة.",
+  reload: "إعادة تحميل الصفحة",
   browseEvents: "تصفّح الفعاليات",
   eventLink: "صفحة الندوة وروابط البثّ المباشر",
 
   errorNoChoice: "يُرجى اختيار إجابة قبل التصويت.",
+  errorCheckIncomplete: "يُرجى إكمال خطوة التحقّق أعلاه قبل التصويت.",
+  errorCheckLoad: "تعذّر تحميل خطوة التحقّق. يُرجى إعادة تحميل الصفحة أو فتحها في متصفّح آخر.",
   errorVerification: "تعذّر التحقّق من الطلب. يُرجى المحاولة مجدّدًا.",
   errorConnection: "تعذّر إرسال صوتك. يُرجى التحقّق من الاتصال والمحاولة مجدّدًا.",
   errorTooManyAttempts: "يُرجى المحاولة بعد قليل.",

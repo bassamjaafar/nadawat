@@ -69,7 +69,11 @@ export async function recordVote(formData: FormData): Promise<VoteOutcome> {
       // The reason is counted (no visitor data) for the admin monitoring page.
       if (status === "failed") {
         await notePollRefusal(pollId, refusal ?? "other");
-        return { outcome: "error", message: POLL_TEXT.errorVerification };
+        return {
+          outcome: "error",
+          message:
+            refusal === "no_token" ? POLL_TEXT.errorCheckIncomplete : POLL_TEXT.errorVerification,
+        };
       }
       checkStatus = status;
     }

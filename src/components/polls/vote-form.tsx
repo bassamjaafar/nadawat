@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import { voteAction } from "@/app/(site)/vote/actions";
 import { Button } from "@/components/ui/button";
 import { Honeypot } from "@/components/ui/field";
@@ -22,6 +22,10 @@ type Done = "voted" | "already_voted" | "closed";
  * passed in, never derived from env here — see the hydration note in
  * subscribe-form.tsx.
  *
+ * A ballot isn't sent until the verification step is complete: the visitor
+ * is told what's missing instead of being refused by the server (which
+ * still refuses any ballot without it).
+ *
  * `send` changes only how the ballot travels (event pages post it to
  * /vote/ballot); both ways end in the same server-side recordVote().
  */
@@ -41,6 +45,23 @@ export function VoteForm({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
   const [resetSignal, setResetSignal] = useState(0);
+  const [token, setToken] = useState("");
+  const [checkFailed, setCheckFailed] = useState(false);
+
+  // Once the verification step is complete, a message about it is out of date.
+  const onToken = useCallback((t: string) => {
+    setToken(t);
+    if (t) {
+      setError((e) =>
+        e === POLL_TEXT.errorCheckIncomplete || e === POLL_TEXT.errorCheckLoad ? null : e,
+      );
+    }
+  }, []);
+
+  const onLoadFailed = useCallback((failed: boolean) => {
+    setCheckFailed(failed);
+    if (!failed) setError((e) => (e === POLL_TEXT.errorCheckLoad ? null : e));
+  }, []);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,10 +70,21 @@ export function VoteForm({
       setError(POLL_TEXT.errorNoChoice);
       return;
     }
+    const ballot = new FormData(e.currentTarget);
+    if (turnstileSiteKey) {
+      if (!token) {
+        setError(checkFailed ? POLL_TEXT.errorCheckLoad : POLL_TEXT.errorCheckIncomplete);
+        // A stuck check is started again; one in progress is left alone.
+        if (checkFailed) setResetSignal((n) => n + 1);
+        return;
+      }
+      // Cloudflare's widget adds its own field of the same name; send one.
+      ballot.set("cf-turnstile-response", token);
+    }
     setPending(true);
     setError(null);
     try {
-      const res = await send(new FormData(e.currentTarget));
+      const res = await send(ballot);
       if (res.outcome === "error") {
         setError(res.message);
         setResetSignal((n) => n + 1);
@@ -71,11 +103,13 @@ export function VoteForm({
     return <VoteNotice state={done} />;
   }
 
+  const message = error ?? (checkFailed && !token ? POLL_TEXT.errorCheckLoad : null);
+
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-5">
       <input type="hidden" name="poll_id" value={pollId} />
 
-      <fieldset className="flex flex-col gap-2.5" aria-describedby={error ? "vote-error" : undefined}>
+      <fieldset className="flex flex-col gap-2.5" aria-describedby={message ? "vote-error" : undefined}>
         <legend className="mb-1.5 text-[0.92rem] text-muted">{POLL_TEXT.choosePrompt}</legend>
         {options.map((o) => {
           const selected = choice === o.id;
@@ -119,16 +153,21 @@ export function VoteForm({
       <Honeypot />
 
       {turnstileSiteKey ? (
-        <TurnstileWidget siteKey={turnstileSiteKey} resetSignal={resetSignal} />
+        <TurnstileWidget
+          siteKey={turnstileSiteKey}
+          resetSignal={resetSignal}
+          onToken={onToken}
+          onLoadFailed={onLoadFailed}
+        />
       ) : null}
 
-      {error ? (
+      {message ? (
         <p
           id="vote-error"
           role="alert"
           className="rounded-[var(--radius)] border border-[#d8b9ad] bg-[#f3e4de] px-4 py-3 text-[0.9rem] text-[#8f3520]"
         >
-          {error}
+          {message}
         </p>
       ) : null}
 
