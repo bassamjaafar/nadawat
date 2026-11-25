@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { YouTubeEmbed } from "@/components/debates/youtube-embed";
 import { ParticipantProfiles } from "@/components/debates/speakers";
 import { DebateCard } from "@/components/debates/debate-card";
@@ -25,6 +26,9 @@ import { env } from "@/lib/env";
 // Short, so the page turns live (and back) within about a minute.
 export const revalidate = 60;
 
+// The page's share image and video cover are the same file: looked up once.
+const eventImage = cache(youtubeShareImage);
+
 type Params = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
@@ -43,7 +47,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   // back to hqdefault), else the cover image. None → opengraph-image.tsx.
   const image = debate.youtube_video_id
     ? {
-        ...(await youtubeShareImage(debate.youtube_video_id, debate.updated_at)),
+        ...(await eventImage(debate.youtube_video_id, debate.updated_at)),
         alt: debate.title_ar,
       }
     : debate.cover_image_url
@@ -107,6 +111,14 @@ export default async function DebatePage({ params }: Params) {
   const phase = eventPhase(debate);
   const live = phase === "live";
   const upcoming = phase !== "past"; // upcoming or live
+  // The recording — or the livestream itself while the event is live.
+  const video =
+    phase !== "upcoming" && debate.youtube_video_id
+      ? {
+          id: debate.youtube_video_id,
+          cover: (await eventImage(debate.youtube_video_id, debate.updated_at)).url,
+        }
+      : null;
   const when = debate.starts_at
     ? `${formatDate(debate.starts_at, debate.timezone)} · ${formatTime(debate.starts_at, debate.timezone)} بتوقيت دمشق`
     : null;
@@ -134,13 +146,8 @@ export default async function DebatePage({ params }: Params) {
       </div>
 
       <div className="container-page mt-10">
-        {phase !== "upcoming" && debate.youtube_video_id ? (
-          // The recording — or the livestream itself while the event is live.
-          <YouTubeEmbed
-            videoId={debate.youtube_video_id}
-            title={debate.title_ar}
-            updatedAt={debate.updated_at}
-          />
+        {video ? (
+          <YouTubeEmbed videoId={video.id} title={debate.title_ar} cover={video.cover} />
         ) : debate.cover_image_url ? (
           <div className="relative aspect-[16/8] overflow-hidden rounded-[var(--radius-lg)] bg-cream-deep">
             <Image

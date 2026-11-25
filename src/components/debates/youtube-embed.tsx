@@ -2,21 +2,21 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { youtubeThumbnailUrl } from "@/lib/youtube";
 
 /**
  * Privacy-conscious YouTube embed: shows the thumbnail until the visitor
  * chooses to play, then loads the player from youtube-nocookie.com. Never
- * autoplays on page load.
+ * autoplays on page load. `cover` is that thumbnail, at the largest size
+ * the video has (see youtubeShareImage).
  */
 export function YouTubeEmbed({
   videoId,
   title,
-  updatedAt,
+  cover,
 }: {
   videoId: string;
   title: string;
-  updatedAt?: string;
+  cover: string;
 }) {
   const [active, setActive] = useState(false);
 
@@ -38,10 +38,10 @@ export function YouTubeEmbed({
           aria-label={`تشغيل الفيديو: ${title}`}
         >
           <Image
-            src={youtubeThumbnailUrl(videoId, updatedAt)}
+            src={cover}
             alt=""
             fill
-            sizes="(max-width: 768px) 100vw, 720px"
+            sizes="(max-width: 1184px) 100vw, 1088px"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           />
           <span className="absolute inset-0 bg-olive/25 transition-colors group-hover:bg-olive/15" />
