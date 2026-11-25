@@ -16,13 +16,14 @@ import {
 import { formatDate, formatTime } from "@/lib/format";
 import { absoluteUrl } from "@/lib/url";
 import { youtubeShareImage } from "@/lib/youtube";
-import { isUpcoming } from "@/lib/types";
+import { eventPhase } from "@/lib/types";
 import { SITE_NAME } from "@/lib/site";
 import { PollEventPanel, promoState } from "@/components/polls/poll-promo";
 import { getPollForDebate, getPublishedResults } from "@/lib/data/polls";
 import { env } from "@/lib/env";
 
-export const revalidate = 300;
+// Short, so the page turns live (and back) within about a minute.
+export const revalidate = 60;
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -103,7 +104,9 @@ export default async function DebatePage({ params }: Params) {
         className="max-w-[44rem]"
       />
     ) : null;
-  const upcoming = isUpcoming(debate);
+  const phase = eventPhase(debate);
+  const live = phase === "live";
+  const upcoming = phase !== "past"; // upcoming or live
   const when = debate.starts_at
     ? `${formatDate(debate.starts_at, debate.timezone)} · ${formatTime(debate.starts_at, debate.timezone)} بتوقيت دمشق`
     : null;
@@ -119,19 +122,20 @@ export default async function DebatePage({ params }: Params) {
         </Link>
 
         <p className="mt-6 text-kicker font-medium uppercase text-clay">
-          {upcoming ? "ندوة قادمة" : "من الأرشيف"}
+          {live ? "مباشر الآن" : upcoming ? "ندوة قادمة" : "من الأرشيف"}
         </p>
         <h1 className="mt-3 max-w-[46rem] text-h1 text-ink">{debate.title_ar}</h1>
         {when ? <p className="mt-4 text-meta text-muted">{when}</p> : null}
         {debate.location_ar ? (
           <p className="mt-1 text-meta text-muted">{debate.location_ar}</p>
         ) : null}
-        {/* Upcoming event: the question comes straight after the title and date. */}
+        {/* Upcoming or live event: the question comes straight after the title and date. */}
         {upcoming && pollPanel ? <div className="mt-8">{pollPanel}</div> : null}
       </div>
 
       <div className="container-page mt-10">
-        {!upcoming && debate.youtube_video_id ? (
+        {phase !== "upcoming" && debate.youtube_video_id ? (
+          // The recording — or the livestream itself while the event is live.
           <YouTubeEmbed
             videoId={debate.youtube_video_id}
             title={debate.title_ar}
@@ -151,7 +155,7 @@ export default async function DebatePage({ params }: Params) {
         ) : null}
       </div>
 
-      {upcoming ? (
+      {phase === "upcoming" || (live && hasWatchLinks(debate)) ? (
         <section
           aria-label="المشاهدة والمشاركة"
           className="container-page mt-10"
@@ -169,9 +173,11 @@ export default async function DebatePage({ params }: Params) {
               </p>
               <p className="mt-2 text-h3 text-ink">لا يحتاج إلى تسجيل</p>
               <p className="mt-2 text-[0.95rem] leading-7 text-muted">
-                {hasWatchLinks(debate)
-                  ? "البثّ المباشر متاح على يوتيوب وفيسبوك في موعد الندوة."
-                  : "ستُضاف روابط البثّ المباشر على يوتيوب وفيسبوك هنا قبل موعد الندوة."}
+                {live
+                  ? "البثّ المباشر متاح الآن على يوتيوب وفيسبوك."
+                  : hasWatchLinks(debate)
+                    ? "البثّ المباشر متاح على يوتيوب وفيسبوك في موعد الندوة."
+                    : "ستُضاف روابط البثّ المباشر على يوتيوب وفيسبوك هنا قبل موعد الندوة."}
               </p>
               {hasWatchLinks(debate) ? (
                 <div className="mt-5 flex flex-wrap gap-3">

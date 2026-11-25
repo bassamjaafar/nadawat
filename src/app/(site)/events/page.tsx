@@ -9,7 +9,7 @@ import {
   getUpcomingDebate,
 } from "@/lib/data/debates";
 import { formatDateShort, formatYear } from "@/lib/format";
-import { pastEventCtaLabel, type DebateSummary } from "@/lib/types";
+import { eventPhase, pastEventCtaLabel, type DebateSummary } from "@/lib/types";
 
 export const revalidate = 300;
 
@@ -48,7 +48,7 @@ export default async function DebatesPage() {
       {upcoming ? (
         <section className="container-page section-y-sm border-b border-line">
           <p className="text-kicker font-medium uppercase text-clay">
-            الندوة القادمة
+            {eventPhase(upcoming) === "live" ? "مباشر الآن" : "الندوة القادمة"}
           </p>
           <div className="mt-4 grid gap-6 sm:grid-cols-[0.9fr_1.1fr] sm:items-center">
             <Link

@@ -2,7 +2,9 @@ import "server-only";
 import { hasSupabase } from "@/lib/env";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import {
-  isUpcoming,
+  ENDED_STATUSES,
+  isCurrent,
+  LIVE_HOURS,
   type DebateDetail,
   type DebateParticipant,
   type DebateSummary,
@@ -95,15 +97,27 @@ const fixturesByDate = [...FIXTURE_DEBATES].sort(
 
 // --- Public API ----------------------------------------------------------
 //
-// "Upcoming" vs "archived" is derived purely from starts_at vs now() below —
-// never from the (legacy) status column — so an event lives in exactly one
-// row and never needs to be manually flipped or duplicated once it happens.
-// `status` is only still checked for "draft", which stays an explicit,
-// independent editorial gate (not ready to publish at all).
+// Current (upcoming or live) vs archived is derived from starts_at vs now(),
+// so an event lives in exactly one row and never needs to be manually flipped
+// or duplicated once it happens. The (legacy) status column only ends the
+// live period early, and "draft" stays an explicit, independent editorial
+// gate (not ready to publish at all). The two filters below are exact
+// complements, and the same rule as eventPhase() in lib/types.ts.
 
+function phaseFilters(now = Date.now()) {
+  const nowIso = new Date(now).toISOString();
+  const liveFrom = new Date(now - LIVE_HOURS * 3_600_000).toISOString();
+  const ended = `(${ENDED_STATUSES.join(",")})`;
+  return {
+    current: `starts_at.gt.${nowIso},and(starts_at.gt.${liveFrom},status.not.in.${ended})`,
+    past: `starts_at.is.null,starts_at.lte.${liveFrom},and(starts_at.lte.${nowIso},status.in.${ended})`,
+  };
+}
+
+/** The soonest event that isn't over: the live one, else the next one. */
 export async function getUpcomingDebate(): Promise<DebateDetail | null> {
   if (!hasSupabase) {
-    return FIXTURE_DEBATES.find((d) => isUpcoming(d)) ?? null;
+    return FIXTURE_DEBATES.find((d) => isCurrent(d)) ?? null;
   }
   const supabase = getSupabasePublicClient();
   const { data, error } = await supabase
@@ -111,7 +125,7 @@ export async function getUpcomingDebate(): Promise<DebateDetail | null> {
     .select(DEBATE_SELECT)
     .eq("is_published", true)
     .neq("status", "draft")
-    .gt("starts_at", new Date().toISOString())
+    .or(phaseFilters().current)
     .order("starts_at", { ascending: true })
     .order("id", { ascending: true })
     .limit(1)
@@ -126,18 +140,17 @@ export async function getUpcomingDebate(): Promise<DebateDetail | null> {
 export async function getRecentDebates(limit = 3): Promise<DebateSummary[]> {
   if (!hasSupabase) {
     return fixturesByDate
-      .filter((d) => !isUpcoming(d))
+      .filter((d) => !isCurrent(d))
       .slice(0, limit)
       .map(toSummary);
   }
   const supabase = getSupabasePublicClient();
-  const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("debates")
     .select(DEBATE_SELECT)
     .eq("is_published", true)
     .neq("status", "draft")
-    .or(`starts_at.lte.${nowIso},starts_at.is.null`)
+    .or(phaseFilters().past)
     .order("starts_at", { ascending: false, nullsFirst: false })
     .order("id", { ascending: true })
     .limit(limit);
@@ -150,16 +163,15 @@ export async function getRecentDebates(limit = 3): Promise<DebateSummary[]> {
 
 export async function getArchiveDebates(): Promise<DebateSummary[]> {
   if (!hasSupabase) {
-    return fixturesByDate.filter((d) => !isUpcoming(d)).map(toSummary);
+    return fixturesByDate.filter((d) => !isCurrent(d)).map(toSummary);
   }
   const supabase = getSupabasePublicClient();
-  const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("debates")
     .select(DEBATE_SELECT)
     .eq("is_published", true)
     .neq("status", "draft")
-    .or(`starts_at.lte.${nowIso},starts_at.is.null`)
+    .or(phaseFilters().past)
     .order("starts_at", { ascending: false, nullsFirst: false })
     .order("id", { ascending: true });
   if (error) {

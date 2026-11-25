@@ -14,7 +14,7 @@ import {
   type ParticipateInput,
 } from "@/lib/validation";
 import { getDebateBySlug } from "@/lib/data/debates";
-import { isUpcoming } from "@/lib/types";
+import { isCurrent } from "@/lib/types";
 
 type Fingerprint = { ipHash: string | null; userAgent: string | null };
 
@@ -36,7 +36,7 @@ export async function submitParticipation(
   const live = input.participationType === "live";
   const debate = await getDebateBySlug(input.debateSlug);
 
-  if (!debate || !isUpcoming(debate) || !debate.registration_open) {
+  if (!debate || !isCurrent(debate) || !debate.registration_open) {
     return {
       status: "error",
       message: "المشاركة غير متاحة لهذه الندوة حاليًا.",

@@ -3,7 +3,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { SpeakerLineup } from "@/components/debates/speakers";
 import { WatchButtons, hasWatchLinks } from "@/components/debates/watch-buttons";
 import { formatDate, formatTime } from "@/lib/format";
-import { isUpcoming, pastEventCtaLabel, type DebateDetail } from "@/lib/types";
+import { eventPhase, pastEventCtaLabel, type DebateDetail } from "@/lib/types";
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
@@ -15,8 +15,8 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 }
 
 /**
- * The homepage's single, always-present prominent event slot: the soonest
- * upcoming event if one is scheduled, otherwise the most recently completed
+ * The homepage's single, always-present prominent event slot: the live or
+ * soonest upcoming event if there is one, otherwise the most recently completed
  * one. Same hero-level treatment either way — the only differences are the
  * kicker label, the meta row (date/time/location vs. just a publish date),
  * and the actions (watch live / take part vs. watch the recording).
@@ -26,13 +26,14 @@ function MetaRow({ label, value }: { label: string; value: string }) {
  */
 export function EventHero({ debate, poll }: { debate: DebateDetail; poll?: ReactNode }) {
   const href = `/events/${debate.slug}`;
-  const upcoming = isUpcoming(debate);
+  const phase = eventPhase(debate);
+  const upcoming = phase !== "past";
   const watching = hasWatchLinks(debate);
 
   return (
     <section aria-labelledby="event-hero-title" className="container-page pt-7 pb-4 sm:pt-10">
       <p className="text-[0.975rem] leading-[1.6] font-medium uppercase tracking-wide text-clay">
-        {upcoming ? "الندوة القادمة" : "آخر ندوة"}
+        {phase === "live" ? "مباشر الآن" : upcoming ? "الندوة القادمة" : "آخر ندوة"}
       </p>
 
       <div className="mt-6 grid gap-x-12 gap-y-10 xl:grid-cols-[0.9fr_1.1fr]">

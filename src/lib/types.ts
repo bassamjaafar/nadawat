@@ -50,14 +50,35 @@ export type DebateDetail = DebateSummary & {
   participants: DebateParticipant[];
 };
 
+/** How long an event counts as live after its start time. */
+export const LIVE_HOURS = 3;
+
+/** Statuses that end the live period early, once the event has started. */
+export const ENDED_STATUSES: DebateStatus[] = ["completed", "archived"];
+
+export type EventPhase = "upcoming" | "live" | "past";
+
 /**
- * Whether an event is still ahead of us — derived purely from its date, not
- * the (legacy) `status` field. An event is never manually moved from
- * "upcoming" to "archived": the moment its start time passes, it's archived
- * automatically, and there's exactly one row for it the whole time.
+ * Where an event stands — derived from its date, so it never needs to be
+ * moved by hand: upcoming until its start time, live for LIVE_HOURS, then
+ * archived, in exactly one row the whole time. The (legacy) `status` field
+ * does one thing here: «منتهية» or «مؤرشفة» ends the live period early.
+ * Before the start time it changes nothing.
  */
-export function isUpcoming(d: Pick<DebateSummary, "starts_at">): boolean {
-  return !!d.starts_at && new Date(d.starts_at).getTime() > Date.now();
+export function eventPhase(
+  d: Pick<DebateSummary, "starts_at" | "status">,
+  now: number = Date.now(),
+): EventPhase {
+  if (!d.starts_at) return "past";
+  const start = new Date(d.starts_at).getTime();
+  if (start > now) return "upcoming";
+  if (start > now - LIVE_HOURS * 3_600_000 && !ENDED_STATUSES.includes(d.status)) return "live";
+  return "past";
+}
+
+/** Upcoming or live: not in the archive yet. */
+export function isCurrent(d: Pick<DebateSummary, "starts_at" | "status">): boolean {
+  return eventPhase(d) !== "past";
 }
 
 /** "مشاهدة الندوة" only makes sense once a recording actually exists. */

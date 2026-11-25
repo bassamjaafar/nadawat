@@ -13,7 +13,7 @@ import {
   getUpcomingDebate,
 } from "@/lib/data/debates";
 import type { ReactNode } from "react";
-import { isUpcoming } from "@/lib/types";
+import { isCurrent } from "@/lib/types";
 import type { DebateDetail, DebateSummary } from "@/lib/types";
 
 // Homepage reflects live scheduling — revalidate frequently.
@@ -43,10 +43,10 @@ export default async function HomePage({
   const pollState = promoState(poll, "home");
   const pollCard = poll && pollState ? <PollHomeCard poll={poll} state={pollState} /> : null;
 
-  const upcoming = featured && isUpcoming(featured) ? featured : autoUpcoming;
+  const upcoming = featured && isCurrent(featured) ? featured : autoUpcoming;
 
   // The homepage always keeps exactly one event in the prominent hero slot:
-  // the soonest upcoming one if any is scheduled, otherwise the most
+  // the live or soonest upcoming one if there is any, otherwise the most
   // recently completed one — never a generic "no event" hero as long as
   // *something* has been published. That "otherwise" branch needs the full
   // DebateDetail (for the speaker lineup), not just the lighter summary
