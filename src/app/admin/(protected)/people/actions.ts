@@ -123,8 +123,7 @@ export async function uploadPhotoAction(
     revalidatePublicPages();
     return { url };
   } catch (err) {
-    return {
-      error: err instanceof Error ? err.message : "تعذّر رفع الصورة.",
-    };
+    console.error("photo upload failed", err);
+    return { error: "تعذّر رفع الصورة. يُرجى المحاولة مرة أخرى." };
   }
 }

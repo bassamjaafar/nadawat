@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { uploadPhotoAction } from "@/app/admin/(protected)/people/actions";
+import { shrinkImage } from "@/lib/admin/shrink-image";
+
+const UPLOAD_FAILED = "تعذّر رفع الصورة. يُرجى المحاولة مرة أخرى.";
 
 export function PhotoUpload({
   personId,
@@ -27,13 +30,24 @@ export function PhotoUpload({
     setError(null);
     if (!file) return;
 
-    setPreview(URL.createObjectURL(file));
+    const previewUrl = URL.createObjectURL(file);
+    setPreview(previewUrl);
     setPending(true);
-    const formData = new FormData();
-    formData.set("photo", file);
-    const result = await uploadPhotoAction(personId, formData);
-    setPending(false);
-    e.target.value = "";
+
+    // A rejected or dropped request throws instead of returning an error,
+    // which used to leave «جارٍ الرفع…» on screen forever.
+    let result: Awaited<ReturnType<typeof uploadPhotoAction>>;
+    try {
+      const formData = new FormData();
+      formData.set("photo", await shrinkImage(file));
+      result = await uploadPhotoAction(personId, formData);
+    } catch {
+      result = { error: UPLOAD_FAILED };
+    } finally {
+      setPending(false);
+      e.target.value = "";
+      URL.revokeObjectURL(previewUrl);
+    }
 
     if ("error" in result) {
       setError(result.error);
@@ -74,7 +88,7 @@ export function PhotoUpload({
         {pending ? (
           <p className="text-[0.8rem] text-olive">جارٍ الرفع…</p>
         ) : (
-          <p className="text-[0.8rem] text-muted">JPG أو PNG أو WEBP، حتى 5 ميغابايت.</p>
+          <p className="text-[0.8rem] text-muted">JPG أو PNG أو WEBP.</p>
         )}
       </div>
     </div>
