@@ -8,6 +8,7 @@ const FULL_NAV = [
   { href: "/admin", label: "لوحة التحكم" },
   { href: "/admin/events", label: "الفعاليات" },
   { href: "/admin/people", label: "الأشخاص" },
+  { href: "/admin/about", label: "صفحة عن ندوات" },
   { href: "/admin/registrations", label: "طلبات المشاركة" },
   { href: "/admin/subscribers", label: "المشتركون/ات" },
   { href: "/admin/polls", label: "سؤال ندوات" },

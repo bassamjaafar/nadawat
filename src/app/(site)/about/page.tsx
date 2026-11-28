@@ -1,62 +1,24 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/ui/page-header";
-import { BrandStatement } from "@/components/home/brand-statement";
-import { SITE_TAGLINE } from "@/lib/site";
+import { AboutHeader, AboutPageBody } from "@/components/about/about-page-body";
+import { getAboutSections, getPublicTeam } from "@/lib/data/about";
 
 export const metadata: Metadata = {
   title: "عن ندوات",
   description:
-    "ندوات منصة سورية مستقلة وغير ربحية للحوار العام. ما نسعى إليه، ومبدأنا: نختلف باحترام.",
+    "ندوات منصة سورية مستقلة وغير ربحية للحوار العام: من نحن، وكيف نعمل، وسياستنا التحريرية، والفريق، والتمويل. مبدأنا: نختلف باحترام.",
   alternates: { canonical: "/about" },
 };
 
-export default function AboutPage() {
+// Admin saves refresh this page straight away; this is only the fallback.
+export const revalidate = 300;
+
+export default async function AboutPage() {
+  const [sections, groups] = await Promise.all([getAboutSections(), getPublicTeam()]);
+
   return (
-    <div className="pb-4">
-      <PageHeader
-        kicker="عن ندوات"
-        title="مساحةٌ للاختلاف المنظَّم"
-        lede="ندوات مبادرةٌ مستقلّة تنظّم ندوات عامة حول قضايا سوريا، وتحفظها أرشيفًا مفتوحًا للجميع."
-      />
-
-      <div className="container-page section-y">
-        <div className="prose-ar">
-          <h2>ما هي ندوات</h2>
-          <p>ندوات منصة سورية مستقلة وغير ربحية للحوار العام.</p>
-          <p>
-            ننظم لقاءات افتراضية تستضيف ضيوفًا وضيفات بآراء وخبرات وتجارب مختلفة
-            لمناقشة القضايا السياسية والاقتصادية والاجتماعية التي تهمّ السوريات والسوريين.
-          </p>
-          <p>
-            نؤمن أن الاختلاف جزء طبيعي من أي مجتمع، وأن قيمة الحوار لا تكمن
-            بالضرورة في الوصول إلى رأي واحد، بل في إتاحة المجال لعرض المواقف
-            بوضوح، وطرح الأسئلة، وفهم وجهات النظر المختلفة.
-          </p>
-          <p>
-            لا تتبنى ندوات موقفاً مسبقاً من القضايا التي تطرحها، وتسعى إلى
-            توفير مساحة جادة ومنظمة يُدار فيها الحوار باحترام، ويُمنح الضيوف/ات مجالًا عادلًا لعرض الأفكار ومناقشتها.
-          </p>
-          <p>
-            تعتمد ندوات بدرجة كبيرة على المساهمات التطوعية، وقد تقدّم في بعض
-            الحالات مكافآت محدودة لبعض الأدوار المهنية أو التحضيرية. ولا ترتبط أي مكافأة بالموقف أو الرأي المُعبَّر عنه.
-          </p>
-
-          <h2>ما الذي نسعى إليه؟</h2>
-          <p>
-            المساهمة في بناء ثقافة سورية ترى في الاختلاف فرصة للفهم والتفكير،
-            لا سبباً للخصومة؛ وتشجع على النقاش الجاد، والتفكير النقدي،
-            والانفتاح على الآراء المختلفة.
-          </p>
-
-          <h2>«{SITE_TAGLINE}»</h2>
-          <p>
-            {SITE_TAGLINE} ليست شعارًا، بل قاعدة العمل. تعني أن نختلف في الرأي دون
-            أن ننتقص من قدر المخالف/ة، وأن نستمع بنيّة الفهم لا بنيّة الردّ، وأن نقبل أنّ من نختلف معهم/ن في النقاش شركاء وشريكات في الوطن.
-          </p>
-        </div>
-      </div>
-
-      <BrandStatement />
-    </div>
+    <>
+      <AboutHeader />
+      <AboutPageBody sections={sections} groups={groups} />
+    </>
   );
 }

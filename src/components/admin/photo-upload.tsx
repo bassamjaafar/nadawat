@@ -7,12 +7,22 @@ import { shrinkImage } from "@/lib/admin/shrink-image";
 
 const UPLOAD_FAILED = "تعذّر رفع الصورة. يُرجى المحاولة مرة أخرى.";
 
+type UploadResult = { url: string } | { error: string };
+
+/**
+ * Guest photos by default; pass `uploadAction` (a bound server action) to
+ * upload somewhere else, e.g. a team member's photo.
+ */
 export function PhotoUpload({
   personId,
   initialUrl,
+  uploadAction,
+  hint,
 }: {
   personId: string;
   initialUrl: string | null;
+  uploadAction?: (formData: FormData) => Promise<UploadResult>;
+  hint?: string;
 }) {
   const [url, setUrl] = useState(initialUrl);
   const [preview, setPreview] = useState<string | null>(null);
@@ -36,11 +46,13 @@ export function PhotoUpload({
 
     // A rejected or dropped request throws instead of returning an error,
     // which used to leave «جارٍ الرفع…» on screen forever.
-    let result: Awaited<ReturnType<typeof uploadPhotoAction>>;
+    let result: UploadResult;
     try {
       const formData = new FormData();
       formData.set("photo", await shrinkImage(file));
-      result = await uploadPhotoAction(personId, formData);
+      result = uploadAction
+        ? await uploadAction(formData)
+        : await uploadPhotoAction(personId, formData);
     } catch {
       result = { error: UPLOAD_FAILED };
     } finally {
@@ -88,7 +100,7 @@ export function PhotoUpload({
         {pending ? (
           <p className="text-[0.8rem] text-olive">جارٍ الرفع…</p>
         ) : (
-          <p className="text-[0.8rem] text-muted">JPG أو PNG أو WEBP.</p>
+          <p className="text-[0.8rem] text-muted">{hint ?? "JPG أو PNG أو WEBP."}</p>
         )}
       </div>
     </div>
